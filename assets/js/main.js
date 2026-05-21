@@ -172,22 +172,64 @@ function launchHero({ instant = false, skipNameAnim = false } = {}) {
 
   let cx = -100, cy = -100; // dot (immediate)
   let rx = -100, ry = -100; // ring (lagged)
+  let lastX = 0, lastY = 0;
+  let lastTime = performance.now();
+  let mouseSpeed = 0;
+  let scaleVal = 1;
   let rafId;
 
-  // Dot follows mouse exactly
+  // Dot follows mouse exactly + track speed
   window.addEventListener('mousemove', e => {
     cx = e.clientX;
     cy = e.clientY;
     dot.style.left = cx + 'px';
     dot.style.top  = cy + 'px';
+
+    const now = performance.now();
+    if (lastX === 0 && lastY === 0) {
+      lastX = cx;
+      lastY = cy;
+      lastTime = now;
+      return;
+    }
+
+    const dt = now - lastTime;
+    if (dt > 0) {
+      const dx = cx - lastX;
+      const dy = cy - lastY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const instantSpeed = dist / dt; // pixels per ms
+      // Low-pass filter for smooth speed changes
+      mouseSpeed += (instantSpeed - mouseSpeed) * 0.2;
+    }
+    lastX = cx;
+    lastY = cy;
+    lastTime = now;
   }, { passive: true });
 
-  // Ring follows with lerp — runs in RAF loop
+  // Ring follows with lerp + dynamic scaling based on speed
   function ringFollow() {
     rx += (cx - rx) * 0.13;
     ry += (cy - ry) * 0.13;
     ring.style.left = rx + 'px';
     ring.style.top  = ry + 'px';
+
+    // Decelerate speed when movement stops
+    mouseSpeed *= 0.94;
+    if (mouseSpeed < 0.01) mouseSpeed = 0;
+
+    // Calculate scale factor: expand up to 2.8x (scale = 2.8)
+    const threshold = 0.3; // speed threshold before scaling starts
+    const maxScaleIncrease = 1.8;
+    const speedFactor = Math.min(Math.max(0, mouseSpeed - threshold) * 0.45, maxScaleIncrease);
+    const targetScale = 1 + speedFactor;
+
+    // Smoothly interpolate the scale to prevent stepping
+    scaleVal += (targetScale - scaleVal) * 0.12;
+
+    // Apply translation + scale transform
+    ring.style.transform = `translate(-50%, -50%) scale(${scaleVal.toFixed(3)})`;
+
     rafId = requestAnimationFrame(ringFollow);
   }
   rafId = requestAnimationFrame(ringFollow);
@@ -211,6 +253,8 @@ function launchHero({ instant = false, skipNameAnim = false } = {}) {
   document.addEventListener('mouseenter', () => {
     dot.style.opacity  = '1';
     ring.style.opacity = '1';
+    lastX = 0;
+    lastY = 0;
   });
 })();
 

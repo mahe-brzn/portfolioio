@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ── SEO ──────────────────────────────────────────────── -->
+  <title>Mahé Brizion — Portfolio</title>
+  <meta name="description"
+        content="Mahé Brizion — Sysadmin, iOS Developer & Drone Pilot certifié DGAC. Étudiant Bac Pro CIEL au Lycée Paul Héroult, Savoie." />
+  <meta name="author" content="Mahé Brizion" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mahebrizion.fr" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://mahebrizion.fr" />
+  <meta property="og:title"       content="Mahé Brizion — Portfolio" />
+  <meta property="og:description" content="Sysadmin, iOS Developer & Drone Pilot. Étudiant Bac Pro CIEL, Savoie." />
+  <meta name="theme-color"        content="#060608" />
+
+  <!-- ── Fonts ────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body class="loading">
+
+  <!-- ══════════════════════════════════════════════════
+       GRAIN — Animated noise texture overlay
+  ══════════════════════════════════════════════════ -->
+  <div id="grain" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════════════════
+       CUSTOM CURSOR (hidden on touch via CSS + JS)
+  ══════════════════════════════════════════════════ -->
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════════════════
+       PRELOADER — Scale Reveal
+  ══════════════════════════════════════════════════ -->
+  <div id="preloader" role="status" aria-label="Chargement du portfolio" aria-live="polite">
+    <div class="pre-bar-wrap" aria-hidden="true">
+      <div class="pre-bar"></div>
+    </div>
+    <span class="pre-counter" aria-hidden="true">0%</span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       NAV
+  ══════════════════════════════════════════════════ -->
+  <header role="banner">
+    <nav id="nav" aria-label="Navigation principale">
+      <div class="wrap nav-row">
+
+        <a href="#hero" class="nav-logo" aria-label="Mahé Brizion — retour en haut">MB</a>
+
+        <!-- Desktop links -->
+        <ul class="nav-links" role="list">
+          <li role="listitem">
+            <a href="#about"    id="nl-about">À propos</a>
+          </li>
+          <li role="listitem">
+            <a href="#skills"   id="nl-skills">Compétences</a>
+          </li>
+          <li role="listitem">
+            <a href="#projects" id="nl-work">Projets</a>
+          </li>
+          <li role="listitem">
+            <a href="#cta"      id="nl-contact">Contact</a>
+          </li>
+        </ul>
+
+        <div class="nav-right">
+          <!-- Availability indicator -->
+          <div class="nav-status" aria-label="Statut : disponible">
+            <span class="nav-dot" aria-hidden="true"></span>
+            <span>Disponible</span>
+          </div>
+
+          <!-- Burger button (mobile) -->
+          <button
+            class="nav-burger"
+            aria-label="Ouvrir le menu de navigation"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+          >
+            <span class="burger-bar" aria-hidden="true"></span>
+            <span class="burger-bar" aria-hidden="true"></span>
+            <span class="burger-bar" aria-hidden="true"></span>
+          </button>
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════
+       MOBILE OFF-CANVAS MENU
+       role=dialog + aria-modal pour le focus trap
+  ══════════════════════════════════════════════════ -->
+  <div
+    id="mobile-menu"
+    class="mob-menu"
+    role="dialog"
+    aria-label="Menu de navigation"
+    aria-modal="true"
+    hidden
+  >
+    <!-- Close button (first focusable element) -->
+    <button class="mob-close" aria-label="Fermer le menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M4 4l12 12M16 4L4 16"
+              stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <!-- Mobile nav links -->
+    <nav aria-label="Navigation mobile">
+      <ul class="mob-nav-links" role="list">
+        <li role="listitem">
+          <a href="#about" class="mob-link">
+            <span class="link-num">01</span>À propos
+          </a>
+        </li>
+        <li role="listitem">
+          <a href="#skills" class="mob-link">
+            <span class="link-num">02</span>Compétences
+          </a>
+        </li>
+        <li role="listitem">
+          <a href="#projects" class="mob-link">
+            <span class="link-num">03</span>Projets
+          </a>
+        </li>
+        <li role="listitem">
+          <a href="#cta" class="mob-link">
+            <span class="link-num">04</span>Contact
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Footer info inside mobile menu -->
+    <div class="mob-footer" aria-label="Contact rapide">
+      <a href="mailto:contact@mahebrizion.fr" class="mob-footer-email">
+        contact@mahebrizion.fr
+      </a>
+      <p class="mob-footer-meta">mahebrizion.fr · Savoie, France 🏔️</p>
+    </div>
+  </div>
+
+  <main id="main-content">
+
+    <!-- ══════════════════════════════════════════════════
+         HERO
+    ══════════════════════════════════════════════════ -->
+    <section id="hero" aria-labelledby="hero-name">
+
+      <!-- ── Drone Video Background Slot ──────────────
+           Pour injecter votre vidéo DJI Mini 3 Pro :
+           1. Décommentez le bloc <video> ci-dessous
+           2. Remplacez le src par votre fichier
+           3. Ajustez opacity dans .hero-video-bg video
+           Blend mode recommandé : luminosity (élégant)
+           Alternatives : screen (plus lumineux), overlay
+      ─────────────────────────────────────────────── -->
+      <div class="hero-video-bg" aria-hidden="true">
+        <!--
+        <video autoplay muted loop playsinline
+               poster="assets/img/drone-poster.jpg"
+               aria-hidden="true">
+          <source src="assets/video/drone.mp4" type="video/mp4">
+        </video>
+        -->
+      </div>
+
+      <!-- Ambient orbs (mouse parallax targets) -->
+      <div class="hero-ambient" aria-hidden="true">
+        <div class="amb-orb amb-1"></div>
+        <div class="amb-orb amb-2"></div>
+      </div>
+      <div class="hero-grid" aria-hidden="true"></div>
+
+      <!-- Massive name — visually decorative, sr-only label on section -->
+      <div class="hero-name-wrap" aria-hidden="true">
+        <span class="hero-name-line">
+          <span class="hero-name-inner solid">Mahé</span>
+        </span>
+        <span class="hero-name-line">
+          <span class="hero-name-inner outline">Brizion</span>
+        </span>
+      </div>
+
+      <!-- Screen-reader accessible h1 (visually hidden equivalent done via aria-labelledby) -->
+      <h1 id="hero-name" class="sr-only">Mahé Brizion — Portfolio</h1>
+
+      <!-- Animated divider line -->
+      <div class="hero-line-wrap" aria-hidden="true">
+        <div class="hero-line">
+          <div class="hero-line-orb"></div>
+        </div>
+      </div>
+
+      <!-- Bottom content: desc + stats + CTA -->
+      <div class="hero-bottom">
+
+        <div class="hero-meta">
+          <div class="hero-eyebrow" aria-hidden="true">
+            <span class="eyebrow-line"></span>
+            <span class="eyebrow-text">Étudiant Bac Pro CIEL · Savoie, France</span>
+          </div>
+          <p class="hero-desc">
+            Sysadmin, développeur <strong>iOS</strong>,
+            architecte <strong>IoT</strong> et pilote de <strong>drone</strong> certifié DGAC.
+            À 16 ans, je construis l'infrastructure de mes idées — du home lab au ciel.
+          </p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:36px;">
+          <dl class="hero-stats">
+            <div class="hero-stat">
+              <dt class="stat-label">Domaines</dt>
+              <dd class="stat-num" data-count="5" data-suffix="+">
+                <span class="n">0</span><span class="accent-num">+</span>
+              </dd>
+            </div>
+            <div class="hero-stat">
+              <dt class="stat-label">Projets</dt>
+              <dd class="stat-num" data-count="6" data-suffix="">
+                <span class="n">0</span>
+              </dd>
+            </div>
+            <div class="hero-stat">
+              <dt class="stat-label">Ans</dt>
+              <dd class="stat-num" data-count="16" data-suffix="">
+                <span class="n">0</span>
+              </dd>
+            </div>
+          </dl>
+
+          <div class="hero-cta-wrap">
+            <a href="#projects" class="btn-magnetic" id="hero-cta">
+              Voir mes projets
+              <span class="btn-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8h10M9 4l4 4-4 4"
+                        stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="hero-scroll" aria-hidden="true">
+        <span class="scroll-label">Scroll</span>
+        <div class="scroll-bar">
+          <div class="scroll-progress"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         ABOUT
+    ══════════════════════════════════════════════════ -->
+    <section id="about" aria-labelledby="about-title">
+      <div class="divider"></div>
+      <div class="wrap"
+           style="padding-top:clamp(80px,12vw,160px);
+                  padding-bottom:clamp(80px,12vw,160px);">
+
+        <p class="s-label reveal" data-num="01" aria-hidden="true">À propos</p>
+
+        <div class="about-grid">
+
+          <!-- Left: title + facts -->
+          <div class="reveal">
+            <h2 class="about-title" id="about-title">
+              Construire,<br>
+              <span class="accent">apprendre</span>,<br>
+              recommencer.
+            </h2>
+
+            <dl class="about-facts">
+              <div class="fact-row">
+                <dt class="fact-label">Formation</dt>
+                <dd class="fact-value">Bac Pro CIEL — 1ère</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Lycée</dt>
+                <dd class="fact-value">Paul Héroult</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Localisation</dt>
+                <dd class="fact-value">Savoie, Alpes 🏔️</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Setup</dt>
+                <dd class="fact-value">MacBook Pro M4 · iPhone 17 Pro</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Certification</dt>
+                <dd class="fact-value">DGAC A1/A3 ✓</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Stage</dt>
+                <dd class="fact-value">EPITECH — Juin 2025</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Right: bio -->
+          <div class="reveal reveal-d1">
+            <p class="about-bio-text">
+              Depuis mes premières lignes de configuration sur <strong>Proxmox</strong>,
+              j'ai compris que la technologie est un terrain de jeu infini. Je pilote
+              un home lab complet, je code des apps <strong>iOS en SwiftUI</strong>,
+              j'automatise mon domicile avec <strong>Home Assistant</strong>
+              et je filme le monde depuis le ciel avec mon <strong>DJI Mini 3 Pro</strong>.
+            </p>
+            <p class="about-bio-text">
+              Mon stage à <strong>EPITECH</strong> en juin 2025 a confirmé ce que
+              je savais déjà : je veux construire des choses qui comptent,
+              avec des gens passionnés, dans des environnements exigeants.
+            </p>
+            <blockquote class="about-quote">
+              <p>
+                "Chaque projet est une expérience,<br>
+                chaque bug une leçon,<br>
+                chaque déploiement une victoire."
+              </p>
+            </blockquote>
+          </div>
+
+        </div>
+      </div>
+      <div class="divider"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         SKILLS
+    ══════════════════════════════════════════════════ -->
+    <section id="skills" aria-labelledby="skills-title">
+      <div class="wrap" style="padding-top:clamp(80px,12vw,160px);">
+        <p class="s-label reveal" data-num="02" aria-hidden="true">Compétences</p>
+        <h2 id="skills-title" class="sr-only">Mes compétences techniques</h2>
+      </div>
+
+      <!-- Scrolling marquee (decorative) -->
+      <div class="marquee-wrap" aria-hidden="true">
+        <div class="marquee-track" role="presentation">
+          <div class="marquee-copy">
+            <span class="m-word">Proxmox</span><span class="m-sep">·</span>
+            <span class="m-word">SwiftUI</span><span class="m-sep">·</span>
+            <span class="m-word">Home&nbsp;Assistant</span><span class="m-sep">·</span>
+            <span class="m-word">Drone&nbsp;DGAC</span><span class="m-sep">·</span>
+            <span class="m-word">Active&nbsp;Directory</span><span class="m-sep">·</span>
+            <span class="m-word">Live&nbsp;Activities</span><span class="m-sep">·</span>
+            <span class="m-word">Zigbee</span><span class="m-sep">·</span>
+            <span class="m-word">LuckPerms</span><span class="m-sep">·</span>
+          </div>
+          <div class="marquee-copy" aria-hidden="true">
+            <span class="m-word">Proxmox</span><span class="m-sep">·</span>
+            <span class="m-word">SwiftUI</span><span class="m-sep">·</span>
+            <span class="m-word">Home&nbsp;Assistant</span><span class="m-sep">·</span>
+            <span class="m-word">Drone&nbsp;DGAC</span><span class="m-sep">·</span>
+            <span class="m-word">Active&nbsp;Directory</span><span class="m-sep">·</span>
+            <span class="m-word">Live&nbsp;Activities</span><span class="m-sep">·</span>
+            <span class="m-word">Zigbee</span><span class="m-sep">·</span>
+            <span class="m-word">LuckPerms</span><span class="m-sep">·</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Domain grid -->
+      <div class="wrap" style="padding-bottom:clamp(80px,12vw,160px);">
+        <ul class="domains" aria-label="Domaines d'expertise">
+
+          <li class="domain">
+            <p class="d-num" aria-hidden="true">01</p>
+            <h3 class="d-name">Système<br>&amp; Réseau</h3>
+            <ul class="d-tags" aria-label="Technologies">
+              <li class="d-tag">Proxmox VE</li>
+              <li class="d-tag">Windows Server</li>
+              <li class="d-tag">Active Directory</li>
+              <li class="d-tag">DNS · Virtualisation</li>
+            </ul>
+          </li>
+
+          <li class="domain">
+            <p class="d-num" aria-hidden="true">02</p>
+            <h3 class="d-name">Développement<br>iOS</h3>
+            <ul class="d-tags" aria-label="Technologies">
+              <li class="d-tag">Swift · SwiftUI</li>
+              <li class="d-tag">Live Activities</li>
+              <li class="d-tag">Navitia API</li>
+              <li class="d-tag">Dynamic Island</li>
+            </ul>
+          </li>
+
+          <li class="domain">
+            <p class="d-num" aria-hidden="true">03</p>
+            <h3 class="d-name">Domotique<br>&amp; IoT</h3>
+            <ul class="d-tags" aria-label="Technologies">
+              <li class="d-tag">Home Assistant</li>
+              <li class="d-tag">HomeKit · Matter</li>
+              <li class="d-tag">Zigbee</li>
+              <li class="d-tag">YAML Dashboards</li>
+            </ul>
+          </li>
+
+          <li class="domain">
+            <p class="d-num" aria-hidden="true">04</p>
+            <h3 class="d-name">Admin<br>Gaming</h3>
+            <ul class="d-tags" aria-label="Technologies">
+              <li class="d-tag">Paper / Spigot</li>
+              <li class="d-tag">LuckPerms</li>
+              <li class="d-tag">WorldGuard</li>
+              <li class="d-tag">AuthMe</li>
+            </ul>
+          </li>
+
+          <li class="domain">
+            <p class="d-num" aria-hidden="true">05</p>
+            <h3 class="d-name">Audiovisuel<br>&amp; Drone</h3>
+            <ul class="d-tags" aria-label="Technologies">
+              <li class="d-tag">DJI Mini 3 Pro</li>
+              <li class="d-tag">DGAC A1/A3</li>
+              <li class="d-tag">Production vidéo</li>
+              <li class="d-tag">Podcast</li>
+            </ul>
+          </li>
+
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         PROJECTS
+    ══════════════════════════════════════════════════ -->
+    <section id="projects" aria-labelledby="projects-title">
+      <div class="wrap">
+        <p class="s-label reveal" data-num="03" aria-hidden="true">Projets</p>
+        <h2 id="projects-title" class="sr-only">Mes projets</h2>
+
+        <div class="projects-list">
+
+          <article class="project-row" aria-label="Projet : App iOS Train Spotting">
+            <span class="p-num" aria-hidden="true">01</span>
+            <div>
+              <p class="p-status">
+                <span class="p-dot wip" aria-hidden="true"></span>
+                <span>En développement</span>
+              </p>
+              <h3 class="p-name">App iOS — Train Spotting</h3>
+              <p class="p-desc">Application SwiftUI de suivi de trains en temps réel via l'API Navitia. Live Activities &amp; Dynamic Island pour les prochains passages sur l'écran de verrouillage.</p>
+            </div>
+            <div class="p-meta" aria-label="Technologies utilisées">
+              <p class="p-tech">SwiftUI · Swift<br>Navitia API<br>Live Activities<br>iOS 18</p>
+              <span class="p-arrow" aria-hidden="true">↗</span>
+            </div>
+          </article>
+
+          <article class="project-row" aria-label="Projet : Home Lab Proxmox">
+            <span class="p-num" aria-hidden="true">02</span>
+            <div>
+              <p class="p-status">
+                <span class="p-dot active" aria-hidden="true"></span>
+                <span>Actif</span>
+              </p>
+              <h3 class="p-name">Home Lab Proxmox</h3>
+              <p class="p-desc">Infrastructure de virtualisation personnelle — VMs Windows Server, Active Directory, DNS. Terrain d'entraînement permanent pour les compétences sysadmin.</p>
+            </div>
+            <div class="p-meta" aria-label="Technologies utilisées">
+              <p class="p-tech">Proxmox VE<br>Windows Server<br>Active Directory</p>
+              <span class="p-arrow" aria-hidden="true">↗</span>
+            </div>
+          </article>
+
+          <article class="project-row" aria-label="Projet : Smart Home Home Assistant">
+            <span class="p-num" aria-hidden="true">03</span>
+            <div>
+              <p class="p-status">
+                <span class="p-dot active" aria-hidden="true"></span>
+                <span>Actif &amp; en évolution</span>
+              </p>
+              <h3 class="p-name">Smart Home — Home Assistant</h3>
+              <p class="p-desc">Écosystème domotique unifié avec dashboards YAML avancés, automatisations complexes et intégration Zigbee / Matter / HomeKit.</p>
+            </div>
+            <div class="p-meta" aria-label="Technologies utilisées">
+              <p class="p-tech">Home Assistant<br>HomeKit<br>Zigbee · Matter</p>
+              <span class="p-arrow" aria-hidden="true">↗</span>
+            </div>
+          </article>
+
+          <article class="project-row" aria-label="Projet : Podcast Éducatif">
+            <span class="p-num" aria-hidden="true">04</span>
+            <div>
+              <p class="p-status">
+                <span class="p-dot wip" aria-hidden="true"></span>
+                <span>En cours</span>
+              </p>
+              <h3 class="p-name">Podcast Éducatif</h3>
+              <p class="p-desc">Co-création d'un podcast donnant la parole au personnel éducatif. Production audio complète et offre de service pour clients externes.</p>
+            </div>
+            <div class="p-meta" aria-label="Technologies utilisées">
+              <p class="p-tech">Production audio<br>Montage<br>Podcast</p>
+              <span class="p-arrow" aria-hidden="true">↗</span>
+            </div>
+          </article>
+
+          <article class="project-row" aria-label="Projet : Stage EPITECH">
+            <span class="p-num" aria-hidden="true">05</span>
+            <div>
+              <p class="p-status">
+                <span class="p-dot done" aria-hidden="true"></span>
+                <span>Réalisé — Juin 2025</span>
+              </p>
+              <h3 class="p-name">Stage — EPITECH</h3>
+              <p class="p-desc">Immersion professionnelle au sein d'EPITECH. Découverte des pratiques et de la culture tech en environnement réel.</p>
+            </div>
+            <div class="p-meta" aria-label="Technologies utilisées">
+              <p class="p-tech">EPITECH<br>Informatique<br>2025</p>
+              <span class="p-arrow" aria-hidden="true">↗</span>
+            </div>
+          </article>
+
+          <article class="project-row" aria-label="Projet : Drone Aerial DJI">
+            <span class="p-num" aria-hidden="true">06</span>
+            <div>
+              <p class="p-status">
+                <span class="p-dot done" aria-hidden="true"></span>
+                <span>Certifié DGAC</span>
+              </p>
+              <h3 class="p-name">Drone Aerial — DJI Mini 3 Pro</h3>
+              <p class="p-desc">Pilotage certifié DGAC A1/A3. Captation aérienne de paysages alpins et production de contenus cinématographiques en Savoie.</p>
+            </div>
+            <div class="p-meta" aria-label="Technologies utilisées">
+              <p class="p-tech">DJI Mini 3 Pro<br>DGAC A1/A3<br>Montage vidéo</p>
+              <span class="p-arrow" aria-hidden="true">↗</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         CTA — Contact
+    ══════════════════════════════════════════════════ -->
+    <section id="cta" aria-labelledby="cta-title">
+      <div class="divider"></div>
+      <div class="wrap"
+           style="padding-top:clamp(80px,14vw,180px);
+                  padding-bottom:clamp(80px,14vw,180px);
+                  text-align:center;">
+
+        <p class="cta-over reveal" aria-hidden="true">
+          Disponible pour stages &amp; collaborations
+        </p>
+
+        <h2 class="cta-title" id="cta-title">Travaillons ensemble</h2>
+
+        <a href="mailto:contact@mahebrizion.fr"
+           class="cta-email reveal"
+           id="cta-email"
+           aria-label="Envoyer un email à contact@mahebrizion.fr">
+          contact@mahebrizion.fr
+        </a>
+
+        <nav class="cta-socials reveal reveal-d1" aria-label="Liens externes">
+          <a href="https://github.com/mahe-brizion"
+             class="social-link"
+             target="_blank"
+             rel="noopener noreferrer"
+             id="social-github"
+             aria-label="Mon profil GitHub (nouvelle fenêtre)">
+            GitHub
+          </a>
+          <a href="https://mahebrizion.fr"
+             class="social-link"
+             target="_blank"
+             rel="noopener noreferrer"
+             id="social-site"
+             aria-label="Mon site web mahebrizion.fr (nouvelle fenêtre)">
+            mahebrizion.fr
+          </a>
+          <a href="#about"
+             class="social-link"
+             id="social-about">
+            À propos
+          </a>
+        </nav>
+
+      </div>
+      <div class="divider"></div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════ -->
+  <footer role="contentinfo">
+    <div class="wrap footer-row">
+      <p class="footer-copy">
+        &copy; 2025 <span>Mahé Brizion</span>
+      </p>
+      <p class="footer-loc">mahebrizion.fr &middot; Savoie, France 🏔️</p>
+    </div>
+  </footer>
+
+  <!-- Skip to content — keyboard a11y -->
+  <a href="#main-content"
+     class="skip-link"
+     tabindex="0">
+    Aller au contenu principal
+  </a>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

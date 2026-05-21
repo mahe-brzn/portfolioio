@@ -235,7 +235,7 @@ function launchHero({ instant = false, skipNameAnim = false } = {}) {
   rafId = requestAnimationFrame(ringFollow);
 
   // Hover state on interactive elements
-  const interactives = $$('a, button, .project-row, .domain, .btn-magnetic');
+  const interactives = $$('a, button, .project-row, .experience-row, .domain, .btn-magnetic');
   interactives.forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));

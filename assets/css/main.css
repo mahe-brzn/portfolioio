@@ -1136,6 +1136,80 @@ body.loading .hero-name-inner {
 
 .domain:hover .d-tag { color: var(--grey-4); }
 
+/* ── 13.5. Experiences (Parcours) ────────────────────────── */
+.experiences-list {
+  border-top: 1px solid rgba(255,255,255,.06);
+  margin-top: 40px;
+}
+
+.experience-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 40px 0;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.experience-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--grey-1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .6s var(--ease-out);
+  z-index: 0;
+}
+
+.experience-row:hover::before {
+  transform: scaleX(1);
+}
+
+.experience-row > * {
+  position: relative;
+  z-index: 1;
+}
+
+.exp-date {
+  font-family: var(--font-d);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--grey-3);
+  transition: color .3s;
+  padding-top: 4px;
+}
+
+.experience-row:hover .exp-date {
+  color: var(--accent);
+}
+
+.exp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exp-title {
+  font-family: var(--font-d);
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+.exp-desc {
+  font-size: .92rem;
+  color: var(--grey-4);
+  max-width: 720px;
+  line-height: 1.8;
+}
+
 /* ── 14. Projects ────────────────────────────────────────── */
 #projects { padding: clamp(80px, 12vw, 160px) 0; }
 
@@ -1351,6 +1425,7 @@ footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.06); }
   .about-grid { grid-template-columns: 1fr; gap: 56px; }
   .project-row { grid-template-columns: 48px 1fr; }
   .p-meta { display: none; }
+  .experience-row { grid-template-columns: 140px 1fr; gap: 20px; padding: 30px 0; }
   .hero-stats { gap: 20px; }
   /* Show burger, hide desktop links & status label */
   .nav-links  { display: none; }
@@ -1363,6 +1438,7 @@ footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.06); }
   .domains { grid-template-columns: 1fr 1fr; }
   .project-row { grid-template-columns: 1fr; gap: 10px; }
   .p-num { display: none; }
+  .experience-row { grid-template-columns: 1fr; gap: 10px; padding: 24px 0; }
   .footer-row { flex-direction: column; text-align: center; }
 }
 
@@ -1439,6 +1515,8 @@ footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.06); }
 
   /* Project rows & domain cells */
   .project-row { transition: opacity .4s ease !important; transform: none !important; }
+  .experience-row { transition: opacity .4s ease !important; transform: none !important; }
+  .experience-row::before { transition: transform .2s ease !important; }
   .domain      { transition: opacity .4s ease, background .2s !important; transform: none !important; }
 
   /* Kill all other animations */
@@ -1454,4 +1532,5 @@ footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.06); }
   .nav-links a::after { transition: transform .2s ease !important; }
   .domain::after { transition: transform .2s ease !important; }
   .project-row::before { transition: transform .2s ease !important; }
+  .experience-row::before { transition: transform .2s ease !important; }
 }

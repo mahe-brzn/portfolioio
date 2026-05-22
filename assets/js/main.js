@@ -62,6 +62,12 @@ const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
 
     // 4. Get final layout position/dimensions
     const lastRect = heroName.getBoundingClientRect();
+    
+    // 4a. Lock hero height to prevent layout shift when taking name out of flow
+    const heroSection = document.getElementById('hero');
+    if (heroSection) {
+      heroSection.style.minHeight = heroSection.offsetHeight + 'px';
+    }
 
     // 4b. Lift element above preloader with fixed positioning for the transition duration
     heroName.classList.add('transitioning');
@@ -105,6 +111,7 @@ const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
         heroName.style.width = '';
         heroName.style.height = '';
         preEl.remove();
+        if (heroSection) heroSection.style.minHeight = '';
       }, 2150);
     }
 

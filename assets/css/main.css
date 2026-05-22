@@ -62,27 +62,6 @@ a { text-decoration: none; color: inherit; }
   border: 0;
 }
 
-/* ── Skip to content link (keyboard a11y) ────────────────── */
-.skip-link {
-  position: fixed;
-  top: 16px; left: 16px;
-  z-index: 99999;
-  background: var(--accent);
-  color: var(--black);
-  font-family: var(--font-d);
-  font-size: .85rem;
-  font-weight: 700;
-  padding: 12px 24px;
-  border-radius: 4px;
-  transform: translateY(-120%);
-  transition: transform .3s var(--ease-out);
-}
-
-.skip-link:focus-visible {
-  transform: translateY(0);
-  outline: 2px solid var(--black);
-  outline-offset: 3px;
-}
 
 /* ── 2. Global Focus Visible (A11y) ─────────────────────── */
 :focus { outline: none; }
@@ -644,7 +623,7 @@ body.loading .hero-name-inner {
   z-index: 2;
   padding: 0 clamp(24px, 5vw, 80px);
   max-width: 1360px;
-  margin: 0 auto;
+  margin: clamp(80px, 12vw, 160px) auto 0;
   width: 100%;
   text-align: center;
 }
@@ -653,6 +632,7 @@ body.loading .hero-name-inner {
   position: fixed !important;
   z-index: 9005 !important;
   pointer-events: none;
+  margin: 0 !important;
 }
 
 .hero-name-line {
@@ -775,12 +755,16 @@ body.loading .hero-name-inner {
   justify-content: space-between;
   align-items: flex-end;
   gap: 40px;
-  flex-wrap: wrap;
   opacity: 0;
 }
 
 .hero-bottom.animate {
   animation: fadeUp .95s var(--ease-out) .7s forwards;
+}
+
+.hero-meta {
+  max-width: 600px;
+  flex: 1 1 300px;
 }
 
 .hero-eyebrow {
@@ -818,10 +802,11 @@ body.loading .hero-name-inner {
   display: flex;
   gap: clamp(20px, 4vw, 56px);
   align-items: flex-end;
+  justify-content: flex-end;
   flex-wrap: wrap;
 }
 
-.hero-stat { display: flex; flex-direction: column; gap: 4px; text-align: center; }
+.hero-stat { display: flex; flex-direction: column-reverse; gap: 4px; text-align: center; }
 
 .stat-num {
   font-family: var(--font-d);

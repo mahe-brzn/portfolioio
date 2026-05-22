@@ -141,8 +141,14 @@
   <!-- ── Fonts ────────────────────────────────────────────── -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
   <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap"
+        media="print" onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+  </noscript>
 
   <link rel="stylesheet" href="assets/css/main.css" />
 </head>
@@ -177,7 +183,7 @@
     <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
 
-        <a href="#hero" class="nav-logo" aria-label="Mahé Brizion — retour en haut">MB</a>
+        <a href="#hero" class="nav-logo" aria-label="MB — Mahé Brizion, retour en haut">MB</a>
 
         <!-- Desktop links -->
         <ul class="nav-links" role="list">
@@ -200,7 +206,7 @@
 
         <div class="nav-right">
           <!-- Availability indicator -->
-          <div class="nav-status" aria-label="Statut : disponible">
+          <div class="nav-status" role="status" aria-label="Statut : disponible">
             <span class="nav-dot" aria-hidden="true"></span>
             <span>Disponible</span>
           </div>

@@ -136,6 +136,32 @@ async function uploadImage(fileInputId, bucket, folder) {
 // ════════════════════════════════════════════════════════
 // ── ÉQUIPE ───────────────────────────────────────────────
 // ════════════════════════════════════════════════════════
+
+async function loadRecruitmentSettings() {
+  const { data, error } = await supabaseClient.from('settings').select('*').eq('id', 'recrutement').single();
+  if (!error && data) {
+    const val = data.value || {};
+    document.getElementById('recruit-active-toggle').checked = val.active === true;
+    document.getElementById('recruit-url-input').value = val.url || '';
+  }
+}
+
+async function updateRecruitmentSettings() {
+  const active = document.getElementById('recruit-active-toggle').checked;
+  const url = document.getElementById('recruit-url-input').value;
+  
+  const { error } = await supabaseClient.from('settings').upsert({
+    id: 'recrutement',
+    value: { active, url }
+  });
+  
+  if (error) {
+    showToast('Erreur lors de la sauvegarde : ' + error.message, true);
+  } else {
+    showToast('Paramètres de recrutement enregistrés.');
+  }
+}
+
 async function loadEquipe() {
   const grid = document.getElementById('equipe-grid');
   grid.innerHTML = '<div class="skeleton" style="height:320px;width:280px;"></div>'.repeat(4);

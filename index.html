@@ -769,7 +769,16 @@
           contact@mahebrizion.fr
         </a>
 
-        <nav class="cta-socials reveal reveal-d1" aria-label="Liens externes">
+        <!-- Formulaire de contact discret -->
+        <form id="contact-form" class="cta-form reveal reveal-d1" action="https://formsubmit.co/secret@mahebrizion.fr" method="POST">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="name" id="cf-name" placeholder="Votre nom" required />
+          <input type="email" name="email" id="cf-email" placeholder="Votre email" required />
+          <textarea name="message" id="cf-message" placeholder="Votre message" rows="4" required></textarea>
+          <button type="submit" class="cta-submit-btn">Envoyer <span class="arrow">↗</span></button>
+        </form>
+
+        <nav class="cta-socials reveal reveal-d2" aria-label="Liens externes">
           <a href="https://github.com/mahe-brzn"
              class="social-link"
              target="_blank"
@@ -812,6 +821,16 @@
   </footer>
 
 
+  <!-- ══════════════════════════════════════════════════
+       EASTER EGG (Salomé)
+  ══════════════════════════════════════════════════ -->
+  <div id="salome-easter-egg" aria-hidden="true" style="cursor: pointer;" aria-label="Fermer (Cliquer n'importe où)">
+    <div class="salome-content">
+      <img id="salome-img" alt="Salomé Easter Egg" />
+    </div>
+  </div>
+
+  <script src="assets/js/salome.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>

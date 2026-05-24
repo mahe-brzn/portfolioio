@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Mentions Légales | Mahé Brizion</title>
+  <meta name="description" content="Mentions légales du portfolio de Mahé Brizion." />
+  <meta name="theme-color" content="#060608" />
+
+  <!-- ── Fonts ────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <style>
+    /* Spécifique à la page Mentions Légales */
+    body {
+      overflow-x: hidden;
+      padding-top: 100px;
+    }
+    .legal-wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+      position: relative;
+      z-index: 10;
+    }
+    .legal-title {
+      font-family: var(--font-d);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 60px;
+      animation: fadeUp 1s var(--ease-out) forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .legal-content {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--grey-3);
+      animation: fadeUp 1s var(--ease-out) 0.1s forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .legal-content h2 {
+      font-family: var(--font-d);
+      font-size: 1.8rem;
+      color: var(--white);
+      margin-top: 50px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .legal-content p, .legal-content ul {
+      margin-bottom: 24px;
+    }
+    .legal-content ul {
+      padding-left: 20px;
+      list-style-type: disc;
+    }
+    .legal-content li {
+      margin-bottom: 10px;
+    }
+    .legal-content strong {
+      color: var(--white);
+      font-weight: 500;
+    }
+    .legal-content a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      transition: color 0.3s;
+    }
+    .legal-content a:hover {
+      color: var(--white);
+    }
+    .back-nav {
+      margin-bottom: 40px;
+      animation: fadeUp 1s var(--ease-out) forwards;
+    }
+    .back-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-4);
+      transition: color 0.3s, transform 0.3s;
+    }
+    .back-nav a:hover {
+      color: var(--white);
+      transform: translateX(-5px);
+    }
+  </style>
+</head>
+
+<body class="loading-done">
+
+  <!-- Grain & Cursor -->
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Header minimal (juste le logo) -->
+  <header role="banner" style="position: fixed; top: 0; left: 0; right: 0; padding: 28px clamp(24px, 5vw, 80px); z-index: 100;">
+    <a href="/" class="nav-logo" style="text-decoration: none; color: var(--white); font-family: var(--font-d); font-weight: 700; letter-spacing: 0.16em;">MB</a>
+  </header>
+
+  <main id="main-content">
+    <div class="legal-wrap">
+      
+      <div class="back-nav">
+        <a href="/">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M9 13L3 7l6-6M3 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Retour au Portfolio
+        </a>
+      </div>
+
+      <h1 class="legal-title">Mentions Légales</h1>
+
+      <div class="legal-content">
+        <h2>1. Éditeur du site</h2>
+        <p>
+          Le présent site, accessible à l'URL <strong>mahebrizion.fr</strong> (le « Site »), est édité par :<br>
+          <strong>Mahé Brizion</strong><br>
+          Résidant en Savoie, France.<br>
+          Adresse e-mail : <a href="mailto:contact@mahebrizion.fr">contact@mahebrizion.fr</a>
+        </p>
+
+        <h2>2. Hébergement</h2>
+        <p>
+          Le Site est hébergé par la société <strong>GitHub, Inc.</strong> via le service GitHub Pages.<br>
+          Adresse : 88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis.<br>
+          Site web : <a href="https://github.com" target="_blank" rel="noopener noreferrer">github.com</a>
+        </p>
+
+        <h2>3. Propriété intellectuelle</h2>
+        <p>
+          L'ensemble de ce Site relève de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés, y compris pour les documents téléchargeables et les représentations iconographiques et photographiques.
+        </p>
+        <p>
+          La reproduction de tout ou partie de ce Site sur un support électronique quel qu'il soit est formellement interdite sauf autorisation expresse de l'éditeur.
+        </p>
+
+        <h2>4. Données personnelles & Cookies</h2>
+        <p>
+          Le Site ne collecte aucune donnée personnelle à l'insu des utilisateurs. Le formulaire de contact utilise le service tiers FormSubmit pour l'envoi d'e-mails, sans stocker les données sur les serveurs du Site.
+        </p>
+        <p>
+          Le Site n'utilise <strong>aucun cookie de ciblage publicitaire ni cookie de traçage intrusif</strong> nécessitant le recueil de votre consentement.
+        </p>
+
+        <h2>5. Responsabilité</h2>
+        <p>
+          Mahé Brizion s'efforce d'assurer au mieux l'exactitude et la mise à jour des informations diffusées sur ce Site. Toutefois, l'éditeur décline toute responsabilité quant aux éventuelles imprécisions ou omissions portant sur des informations disponibles sur le Site, ainsi que pour les dommages résultant d'une intrusion frauduleuse d'un tiers.
+        </p>
+        <p>
+          Les liens hypertextes mis en place dans le cadre du présent Site en direction d'autres ressources présentes sur le réseau Internet ne sauraient engager la responsabilité de Mahé Brizion (comme par exemple, un certain site de vente de pantalons en lin pour dandy italien).
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/assets/js/main.js" defer></script>
+</body>
+</html>

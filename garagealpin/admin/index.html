@@ -132,7 +132,10 @@
     <div class="login-box">
 
       <div class="login-logo">Garage<span>.</span>Alpin</div>
-      <div class="login-subtitle">Espace Administrateur</div>
+      <div class="login-subtitle" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+        <span>Espace Administrateur</span>
+        <span id="app-status" style="font-size:0.65rem;color:var(--text-muted);border:1px solid var(--border);border-radius:4px;padding:2px 6px;letter-spacing:normal;">v1.1 (Supabase...)</span>
+      </div>
 
       <!-- Étape 1 : Email + Mot de passe -->
       <div id="step-credentials">
@@ -198,9 +201,27 @@
       const SUPABASE_URL  = 'https://snbldqyjfabjbogqclid.supabase.co';
       const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYmxkcXlqZmFiamJvZ3FjbGlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NDQzNDAsImV4cCI6MjA5NTIyMDM0MH0.idbnztDL3h_jD1yNaCUmV_CGiAYvKu4Yiwx2ubiN9JM';
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      
+      // Mettre à jour l'indicateur visuel sur la page
+      document.addEventListener('DOMContentLoaded', () => {
+        const indicator = document.getElementById('app-status');
+        if (indicator) {
+          indicator.textContent = 'v1.1 (Supabase OK)';
+          indicator.style.color = '#22c55e';
+          indicator.style.borderColor = 'rgba(34,197,94,0.3)';
+        }
+      });
     } catch (e) {
       console.error(e);
-      setStatus(e.message, 'error');
+      document.addEventListener('DOMContentLoaded', () => {
+        setStatus(e.message, 'error');
+        const indicator = document.getElementById('app-status');
+        if (indicator) {
+          indicator.textContent = 'v1.1 (Supabase Bloqué)';
+          indicator.style.color = 'var(--red)';
+          indicator.style.borderColor = 'var(--red)';
+        }
+      });
     }
     // ────────────────────────────────────────────────────────────────
 
@@ -231,44 +252,53 @@
       btn.innerHTML = '<span class="loader"></span>';
       setStatus('Connexion en cours…');
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error) {
-        setStatus('Email ou mot de passe incorrect.', 'error');
-        btn.disabled  = false;
-        btn.innerHTML = 'Se connecter';
-        return;
-      }
-
-      // Connexion réussie — vérifier si 2FA est requis
-      const factors = await supabase.auth.mfa.listFactors();
-      const verifiedFactors = factors.data?.totp?.filter(f => f.status === 'verified') || [];
-      const hasTOTP = verifiedFactors.length > 0;
-
-      if (hasTOTP) {
-        // 2FA déjà configurée → demander le code
-        document.getElementById('step-credentials').style.display = 'none';
-        document.getElementById('step-2fa').style.display = 'block';
-        setStatus('');
-        initOtpInputs();
-      } else {
-        // Nettoyer d'éventuels facteurs non vérifiés (ex: enrôlement abandonné)
-        const unverifiedFactors = factors.data?.totp?.filter(f => f.status === 'unverified') || [];
-        for (const f of unverifiedFactors) {
-          await supabase.auth.mfa.unenroll({ factorId: f.id });
+        if (error) {
+          setStatus('Email ou mot de passe incorrect.', 'error');
+          btn.disabled  = false;
+          btn.innerHTML = 'Se connecter';
+          return;
         }
 
-        // 2FA pas encore configurée ou réinitialisée → Setup obligatoire
-        document.getElementById('step-credentials').style.display = 'none';
-        document.getElementById('step-2fa').style.display          = 'block';
-        document.getElementById('totp-setup-box').style.display    = 'block';
-        setStatus('Configurez la 2FA pour continuer.', 'success');
-        await setupTOTP();
-        initOtpInputs();
-      }
+        // Connexion réussie — vérifier si 2FA est requis
+        const factors = await supabase.auth.mfa.listFactors();
+        const verifiedFactors = factors.data?.totp?.filter(f => f.status === 'verified') || [];
+        const hasTOTP = verifiedFactors.length > 0;
 
-      btn.disabled  = false;
-      btn.innerHTML = 'Se connecter';
+        if (hasTOTP) {
+          // 2FA déjà configurée → demander le code
+          document.getElementById('step-credentials').style.display = 'none';
+          document.getElementById('step-2fa').style.display = 'block';
+          setStatus('');
+          initOtpInputs();
+        } else {
+          // Nettoyer d'éventuels facteurs non vérifiés (ex: enrôlement abandonné)
+          const unverifiedFactors = factors.data?.totp?.filter(f => f.status === 'unverified') || [];
+          for (const f of unverifiedFactors) {
+            try {
+              await supabase.auth.mfa.unenroll({ factorId: f.id });
+            } catch (e) {
+              console.warn("Unenroll failed:", e);
+            }
+          }
+
+          // 2FA pas encore configurée ou réinitialisée → Setup obligatoire
+          document.getElementById('step-credentials').style.display = 'none';
+          document.getElementById('step-2fa').style.display          = 'block';
+          document.getElementById('totp-setup-box').style.display    = 'block';
+          setStatus('Configurez la 2FA pour continuer.', 'success');
+          await setupTOTP();
+          initOtpInputs();
+        }
+      } catch (err) {
+        console.error("Login exception:", err);
+        setStatus("Erreur lors de la connexion : " + err.message, 'error');
+      } finally {
+        btn.disabled  = false;
+        btn.innerHTML = 'Se connecter';
+      }
     }
 
     // ── Configurer TOTP (premier usage) ────────────────────────────

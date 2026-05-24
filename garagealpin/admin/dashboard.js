@@ -16,8 +16,11 @@ const BUCKET_VEHICLES  = 'vehicles';
   // Afficher l'email utilisateur
   const email = session.user.email;
   document.getElementById('user-email').textContent = email;
-  document.getElementById('user-name').textContent  = email.split('@')[0];
-  document.getElementById('user-avatar').textContent = email[0].toUpperCase();
+  let dispName = email.split('@')[0];
+  if (email.toLowerCase() === 'mahe@mahebrizion.fr') dispName = 'Mahé Brizion';
+  else dispName = dispName.charAt(0).toUpperCase() + dispName.slice(1);
+  document.getElementById('user-name').textContent = dispName;
+  document.getElementById('user-avatar').textContent = dispName[0].toUpperCase();
 
   // Charger toutes les données
   loadEquipe();

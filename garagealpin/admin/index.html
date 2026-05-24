@@ -271,7 +271,7 @@
           initOtpInputs();
         } else {
           // Nettoyer d'éventuels facteurs non vérifiés (ex: enrôlement abandonné)
-          const unverifiedFactors = factors.data?.totp?.filter(f => f.status === 'unverified') || [];
+          const unverifiedFactors = factors.data?.all?.filter(f => f.status === 'unverified') || [];
           for (const f of unverifiedFactors) {
             try {
               await supabaseClient.auth.mfa.unenroll({ factorId: f.id });
@@ -302,7 +302,7 @@
       const { data, error } = await supabaseClient.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Garage Alpin Admin' });
       if (error || !data) { setStatus('Erreur lors de la configuration 2FA.', 'error'); return; }
 
-      const qrUri = data.totp.qr_code;
+      const qrUri = data.totp.uri;
       await QRCode.toCanvas(document.getElementById('qr-canvas'), qrUri, { width: 180, margin: 1 });
 
       // Stocker l'ID du facteur pour la vérification

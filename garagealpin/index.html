@@ -2,6 +2,17 @@
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    if (sessionStorage.getItem('garage_auth') !== 'romain') {
+      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
+      if (pwd === 'romain') {
+        sessionStorage.setItem('garage_auth', 'romain');
+      } else {
+        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
+        throw new Error('Unauthorized');
+      }
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
@@ -452,7 +463,7 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a></span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
         <div style="display:flex;gap:24px;">
           <a href="#">Mentions légales</a>
           <a href="#">Confidentialité</a>

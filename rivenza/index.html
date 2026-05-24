@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Rivenza : Quand mon pote se prend pour un dandy italien | Mahé Brizion</title>
+  <meta name="description" content="Une analyse totalement décalée et (pas) objective de Rivenza, la marque de dropshipping 'luxe discret' d'un ami." />
+  <meta name="theme-color" content="#060608" />
+
+  <!-- ── Fonts ────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <style>
+    /* Spécifique à la page blog Rivenza */
+    body {
+      overflow-x: hidden;
+      padding-top: 100px;
+    }
+    .blog-wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+      position: relative;
+      z-index: 10;
+    }
+    .blog-header {
+      margin-bottom: 60px;
+      text-align: center;
+    }
+    .blog-tag {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: inline-block;
+      animation: fadeUp 1s var(--ease-out) forwards;
+    }
+    .blog-title {
+      font-family: var(--font-d);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      animation: fadeUp 1s var(--ease-out) 0.1s forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .blog-meta {
+      font-size: 0.85rem;
+      color: var(--grey-4);
+      animation: fadeUp 1s var(--ease-out) 0.2s forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .blog-content {
+      font-size: 1.15rem;
+      line-height: 1.9;
+      color: var(--grey-3);
+      animation: fadeUp 1s var(--ease-out) 0.3s forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .blog-content p {
+      margin-bottom: 24px;
+    }
+    .blog-content strong {
+      color: var(--white);
+      font-weight: 500;
+    }
+    .blog-content a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      transition: color 0.3s;
+    }
+    .blog-content a:hover {
+      color: var(--white);
+    }
+    .blog-content blockquote {
+      border-left: 2px solid var(--accent);
+      padding-left: 20px;
+      margin: 40px 0;
+      font-style: italic;
+      color: var(--grey-4);
+      font-size: 1.25rem;
+    }
+    .back-nav {
+      margin-bottom: 40px;
+      animation: fadeUp 1s var(--ease-out) forwards;
+    }
+    .back-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-4);
+      transition: color 0.3s, transform 0.3s;
+    }
+    .back-nav a:hover {
+      color: var(--white);
+      transform: translateX(-5px);
+    }
+  </style>
+</head>
+
+<body class="loading-done">
+
+  <!-- Grain & Cursor -->
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Header minimal (juste le logo) -->
+  <header role="banner" style="position: fixed; top: 0; left: 0; right: 0; padding: 28px clamp(24px, 5vw, 80px); z-index: 100;">
+    <a href="/" class="nav-logo" style="text-decoration: none; color: var(--white); font-family: var(--font-d); font-weight: 700; letter-spacing: 0.16em;">MB</a>
+  </header>
+
+  <main id="main-content">
+    <div class="blog-wrap">
+      
+      <div class="back-nav">
+        <a href="/">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M9 13L3 7l6-6M3 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Retour au Portfolio
+        </a>
+      </div>
+
+      <header class="blog-header">
+        <span class="blog-tag">Analyse de pote (Pas objective)</span>
+        <h1 class="blog-title">Rivenza : Quand mon pote se prend pour un dandy italien 🤌</h1>
+        <p class="blog-meta">Publié entre deux redémarrages de Proxmox — Par Mahé Brizion</p>
+      </header>
+
+      <div class="blog-content">
+        <p>On a tous un pote qui, du jour au lendemain, décide que les t-shirts troués c'est terminé, et qu'il est temps d'embrasser la <em>dolce vita</em>. Pour mon ami, c'est allé beaucoup plus loin : il a carrément fondé <strong>Rivenza</strong>.</p>
+        
+        <p>C'est censé être du « luxe discret » inspiré de l'élégance italienne. Vous voyez très bien le genre : des matières nobles, du lin premium, des mecs qui regardent l'horizon sur un yacht à Portofino... Bref, à peu près tout ce que je ne fais pas quand je suis en train de configurer des VLANs ou de souder des composants en pleine nuit.</p>
+        
+        <blockquote>
+          "Le luxe discret, c'est l'art de ne pas crier qu'on a du style." <br>
+          <span style="font-size: 0.9rem; color: var(--grey-3);">- Probablement lui, en train de regarder ses stats de ventes sur Shopify.</span>
+        </blockquote>
+
+        <p>Leur produit phare ? Le pantalon <strong>Le Portofino</strong>. Apparemment, quand on le met, on a instantanément envie de boire un Espresso ristretto en terrasse et de lâcher des « Prego » à des inconnus dans la rue.</p>
+        
+        <p>Honnêtement, je rigole, mais son site web est super propre. Les photos claquent, le branding est impeccable... Mais on sait très bien que derrière cette image de magnat de la mode méditerranéenne, il y a juste un mec qui boit du Redbull en hurlant devant ses courbes de conversion publicitaires. 📈</p>
+        
+        <p>Allez, donnez de la force à ce futur Giorgio Armani d'Internet (et aidez-le à payer ses factures d'hébergement web). Si vous cherchez un pantalon en lin pour flex cet été, c'est par là :</p>
+        
+        <p style="text-align: center; margin-top: 50px;">
+          <a href="https://rivenza.fr" target="_blank" rel="noopener noreferrer" class="btn-magnetic" style="text-decoration: none; display: inline-flex; padding: 20px 40px; background: var(--accent); color: var(--black); font-weight: 700; border-radius: 2px;">
+            Découvrir Rivenza.fr
+          </a>
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Custom cursor logic (lightweight version without GSAP)
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    
+    if (!isTouch) {
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let dotX = mouseX;
+      let dotY = mouseY;
+      let ringX = mouseX;
+      let ringY = mouseY;
+      
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+      
+      const animate = () => {
+        dotX += (mouseX - dotX) * 0.2;
+        dotY += (mouseY - dotY) * 0.2;
+        ringX += (mouseX - ringX) * 0.1;
+        ringY += (mouseY - ringY) * 0.1;
+        
+        dot.style.transform = `translate(${dotX}px, ${dotY}px) translate(-50%, -50%)`;
+        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+        
+        requestAnimationFrame(animate);
+      };
+      animate();
+      
+      const interactives = document.querySelectorAll('a, button');
+      interactives.forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      });
+      document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+      document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
+    }
+  </script>
+</body>
+</html>

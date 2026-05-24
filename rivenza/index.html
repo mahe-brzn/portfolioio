@@ -145,18 +145,18 @@
       <div class="blog-content">
         <p>On a tous un pote qui, du jour au lendemain, décide que les t-shirts troués c'est terminé, et qu'il est temps d'embrasser la <em>dolce vita</em>. Pour mon ami, c'est allé beaucoup plus loin : il a carrément fondé <strong>Rivenza</strong>.</p>
         
-        <p>C'est censé être du « luxe discret » inspiré de l'élégance italienne. Vous voyez très bien le genre : des matières nobles, du lin premium, des mecs qui regardent l'horizon sur un yacht à Portofino... Bref, à peu près tout ce que je ne fais pas quand je suis en train de configurer des VLANs ou de souder des composants en pleine nuit.</p>
+        <p>C'est censé être du « luxe discret » inspiré de l'élégance italienne. Vous voyez très bien le genre : des matières nobles, du lin premium, des mecs qui regardent l'horizon sur un yacht à Portofino... Bref, le mode de vie exact qu'il s'imagine devoir adopter pour enfin impressionner Salomé. Spoiler : elle l'a déjà recalé 20 fois cette année (oui, j'ai compté), et je doute fortement qu'un pantalon en lin change la donne, même s'il est "premium".</p>
         
         <blockquote>
           "Le luxe discret, c'est l'art de ne pas crier qu'on a du style." <br>
-          <span style="font-size: 0.9rem; color: var(--grey-3);">- Probablement lui, en train de regarder ses stats de ventes sur Shopify.</span>
+          <span style="font-size: 0.9rem; color: var(--grey-3);">- Probablement lui, en train d'essayer de justifier son 21ème message laissé en "Vu" par Salomé.</span>
         </blockquote>
 
-        <p>Leur produit phare ? Le pantalon <strong>Le Portofino</strong>. Apparemment, quand on le met, on a instantanément envie de boire un Espresso ristretto en terrasse et de lâcher des « Prego » à des inconnus dans la rue.</p>
+        <p>Leur produit phare ? Le pantalon <strong>Le Portofino</strong>. Apparemment, quand on le met, on a instantanément envie de boire un Espresso ristretto en terrasse et de lâcher des « Prego » à des inconnus dans la rue. Dommage que Salomé ne boive pas de café.</p>
         
-        <p>Honnêtement, je rigole, mais son site web est super propre. Les photos claquent, le branding est impeccable... Mais on sait très bien que derrière cette image de magnat de la mode méditerranéenne, il y a juste un mec qui boit du Redbull en hurlant devant ses courbes de conversion publicitaires. 📈</p>
+        <p>Honnêtement, je rigole (à peine), mais son site web est super propre. Les photos claquent, le branding est impeccable... Mais on sait très bien que derrière cette fausse image de magnat de la mode méditerranéenne, il y a juste un mec en caleçon qui boit du Redbull à 3h du mat en pleurant devant ses courbes de conversion publicitaires. 📉</p>
         
-        <p>Allez, donnez de la force à ce futur Giorgio Armani d'Internet (et aidez-le à payer ses factures d'hébergement web). Si vous cherchez un pantalon en lin pour flex cet été, c'est par là :</p>
+        <p>Allez, donnez de la force à ce futur Giorgio Armani d'Internet (et aidez-le à oublier Salomé). Si vous cherchez un pantalon en lin pour flex cet été, c'est par là :</p>
         
         <p style="text-align: center; margin-top: 50px;">
           <a href="https://rivenza.fr" target="_blank" rel="noopener noreferrer" class="btn-magnetic" style="text-decoration: none; display: inline-flex; padding: 20px 40px; background: var(--accent); color: var(--black); font-weight: 700; border-radius: 2px;">
@@ -168,46 +168,6 @@
     </div>
   </main>
 
-  <script>
-    // Custom cursor logic (lightweight version without GSAP)
-    const dot = document.getElementById('cursor-dot');
-    const ring = document.getElementById('cursor-ring');
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    
-    if (!isTouch) {
-      let mouseX = window.innerWidth / 2;
-      let mouseY = window.innerHeight / 2;
-      let dotX = mouseX;
-      let dotY = mouseY;
-      let ringX = mouseX;
-      let ringY = mouseY;
-      
-      document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-      });
-      
-      const animate = () => {
-        dotX += (mouseX - dotX) * 0.2;
-        dotY += (mouseY - dotY) * 0.2;
-        ringX += (mouseX - ringX) * 0.1;
-        ringY += (mouseY - ringY) * 0.1;
-        
-        dot.style.transform = `translate(${dotX}px, ${dotY}px) translate(-50%, -50%)`;
-        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-        
-        requestAnimationFrame(animate);
-      };
-      animate();
-      
-      const interactives = document.querySelectorAll('a, button');
-      interactives.forEach(el => {
-        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-      });
-      document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
-      document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
-    }
-  </script>
+  <script src="/assets/js/main.js" defer></script>
 </body>
 </html>

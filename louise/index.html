@@ -19,7 +19,7 @@
 
   <link rel="stylesheet" href="/assets/css/main.css" />
   <style>
-    /* Redéfinition subtile et romantique de la couleur d'accent pour cette page (Rose Gold doux) */
+    /* Redéfinition subtile et romantique de la couleur d'accent pour cette page (Rose Gold chaud) */
     :root {
       --accent: #dfb399; 
     }
@@ -78,6 +78,10 @@
       text-align: justify;
       hyphens: auto;
     }
+    .section-text strong {
+      color: var(--white);
+      font-weight: 500;
+    }
     
     /* Bouton final centré et élégant */
     .final-action {
@@ -118,7 +122,7 @@
       color: var(--white);
     }
     
-    /* Suppression du header pour une immersion totale */
+    /* Suppression du header et du footer pour une immersion totale */
     header {
       display: none !important;
     }
@@ -138,35 +142,35 @@
   <main id="main-content">
     <div class="letter-wrap">
 
-      <!-- Section 1 : L'évidence -->
+      <!-- Section 1 : L'évidence qui refuse de s'éteindre -->
       <section class="reveal-section">
-        <h2 class="section-title">L'évidence des <span class="highlight">premiers instants</span></h2>
+        <h2 class="section-title">L'évidence qui refuse de <span class="highlight">s'éteindre</span></h2>
         <p class="section-text">
-          Début 2026. Un écran, des confidences nocturnes, et soudain, le monde entier semblait tenir dans le creux de ces quelques mots échangés. Ce qui devait être une simple conversation est devenu une évidence fulgurante. Nos nuits blanches rythmées par les mêmes mélodies, cette complicité fusionnelle qui ne s'explique pas... On dit que certaines rencontres sont écrites. Avec toi, c'est comme si j'avais retrouvé une chanson que je connaissais déjà par cœur.
+          Il y a des rencontres qui vous percutent avec la puissance d'une certitude. Dès nos premiers échanges, l'évidence était là, fulgurante et entière. Il y a eu la passion immense des débuts, mais aussi les erreurs de notre jeunesse, les silences et les maladresses d'un amour qui se cherchait encore. J'ai pris le temps de regarder mes fautes en face, d'apprendre de ces distances vaines. Aujourd'hui, si une seule vérité a survécu au temps, c'est celle-ci : <strong>c'est toi que j'aime</strong>. Profondément. Avec la maturité et la détermination de celui qui sait enfin exactement ce qu'il veut.
         </p>
       </section>
 
-      <!-- Section 2 : Un lien inébranlable -->
+      <!-- Section 2 : L'ancrage dans la tempête -->
       <section class="reveal-section">
-        <h2 class="section-title">Un lien <span class="highlight">inébranlable</span></h2>
+        <h2 class="section-title">L'ancrage dans la <span class="highlight">tempête</span></h2>
         <p class="section-text">
-          Et puis, il y a eu l'orage. Cet instant suspendu où l'ombre s'est faite menaçante. Je n'ai pas eu besoin de réfléchir, je n'ai jamais douté. Devenir ton ancrage, être ce rempart quand tout semblait vaciller autour de toi, m'est apparu comme la plus absolue des nécessités. À travers la tempête, j'ai voulu être ta présence protectrice. Ce moment d'une intensité vertigineuse a scellé au fond de moi une promesse silencieuse : celle de toujours veiller sur ta lumière, de tenir ta main quand le sol se dérobe.
+          Et puis, il y a eu ce moment où le ciel s'est assombri. Cet instant suspendu où tout menaçait de basculer. Je n'ai pas eu besoin de réfléchir pour devenir ton bouclier face à l'orage. Être ce roc, ce refuge quand le monde semblait s'effondrer autour de toi, a scellé en moi bien plus qu'une simple présence. Cela a forgé un engagement absolu. Je serai toujours là pour t'épauler, pour repousser les ombres et veiller sur ta lumière, avec la force de celui qui ne t'abandonnera pas.
         </p>
       </section>
 
-      <!-- Section 3 : La pureté de ce qui reste -->
+      <!-- Section 3 : La vérité sans filtre -->
       <section class="reveal-section">
-        <h2 class="section-title">La pureté de ce qui <span class="highlight">reste</span></h2>
+        <h2 class="section-title">La vérité <span class="highlight">sans filtre</span></h2>
         <p class="section-text">
-          Aujourd'hui, l'essentiel demeure intouché. Le premier amour, celui qui brûle d'une flamme pure et sincère, ne s'efface pas. Il est là, intact, dénué de la moindre attente ou d'une quelconque pression étouffante. Une simple main tendue, un espace apaisé et profond. Une porte qui restera toujours ouverte, avec pour seule certitude la beauté lumineuse de ce que nous avons partagé. Juste la paix d'un sentiment qui n'attend rien, si ce n'est ton bonheur.
+          Je pourrais me cacher derrière le masque d'une amitié rassurante et de complaisance, mais ce serait te mentir, et je refuse les demi-mesures. Ce que je ressens mérite la plus grande des franchises : <strong>je te veux, toi</strong>. Je veux construire une relation véritable, solide et amoureuse. Je veux avoir la chance de t'accompagner, de te rendre heureuse et de bâtir avec toi. Je dépose cette vérité devant toi, sans exiger de réponse immédiate. Prends l'espace et le rythme dont tu as besoin après ce que tu as traversé. Sache simplement que ma porte t'est grande ouverte, et que je suis prêt.
         </p>
       </section>
 
       <!-- Conclusion & Action -->
       <section class="reveal-section final-action">
-        <p class="final-quote">Parce que tu resteras toujours l'une de mes plus belles évidences.</p>
+        <p class="final-quote">Parce que tu es, et resteras toujours, mon évidence.</p>
         <a href="mailto:louise@mahebrizion.fr" class="btn-letter">
-          Écrire une nouvelle note
+          Laisser parler ton cœur
         </a>
       </section>
 
@@ -176,7 +180,6 @@
   <script src="/assets/js/main.js" defer></script>
   
   <script>
-    // Simple script pour gérer l'apparition douce des sections au scroll
     document.addEventListener("DOMContentLoaded", () => {
       const reveals = document.querySelectorAll(".reveal-section");
       
@@ -193,7 +196,6 @@
       });
 
       reveals.forEach((el, index) => {
-        // Ajouter un léger délai pour la première section pour qu'elle apparaisse à l'ouverture de la page
         if(index === 0) {
           setTimeout(() => {
             el.classList.add("on");

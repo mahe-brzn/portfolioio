@@ -2,7 +2,7 @@
 // Remplacez ces valeurs par celles de votre projet Supabase
 const SUPABASE_URL  = 'https://snbldqyjfabjbogqclid.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYmxkcXlqZmFiamJvZ3FjbGlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NDQzNDAsImV4cCI6MjA5NTIyMDM0MH0.idbnztDL3h_jD1yNaCUmV_CGiAYvKu4Yiwx2ubiN9JM';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BUCKET_EMPLOYEES = 'employees';
@@ -10,7 +10,7 @@ const BUCKET_VEHICLES  = 'vehicles';
 
 // ── Auth Guard ────────────────────────────────────────────────────────────────
 (async () => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
   // Afficher l'email utilisateur
@@ -27,7 +27,7 @@ const BUCKET_VEHICLES  = 'vehicles';
 })();
 
 async function logout() {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
   window.location.href = 'index.html';
 }
 
@@ -122,10 +122,10 @@ async function uploadImage(fileInputId, bucket, folder) {
 
   const ext  = file.name.split('.').pop();
   const path = `${folder}/${Date.now()}.${ext}`;
-  const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+  const { error } = await supabaseClient.storage.from(bucket).upload(path, file, { upsert: true });
   if (error) { showToast('Erreur upload image : ' + error.message, 'error'); return null; }
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  const { data } = supabaseClient.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }
 
@@ -136,7 +136,7 @@ async function loadEquipe() {
   const grid = document.getElementById('equipe-grid');
   grid.innerHTML = '<div class="skeleton" style="height:320px;width:280px;"></div>'.repeat(4);
 
-  const { data, error } = await supabase.from('employees').select('*').order('sort_order');
+  const { data, error } = await supabaseClient.from('employees').select('*').order('sort_order');
   if (error) { showToast('Erreur chargement équipe', 'error'); return; }
 
   document.getElementById('equipe-count').textContent = `${data.length} membre${data.length > 1 ? 's' : ''}`;
@@ -185,9 +185,9 @@ async function saveEmployee() {
 
   let error;
   if (id) {
-    ({ error } = await supabase.from('employees').update(payload).eq('id', id));
+    ({ error } = await supabaseClient.from('employees').update(payload).eq('id', id));
   } else {
-    ({ error } = await supabase.from('employees').insert(payload));
+    ({ error } = await supabaseClient.from('employees').insert(payload));
   }
 
   btn.disabled = false; btn.textContent = 'Enregistrer';
@@ -200,7 +200,7 @@ async function saveEmployee() {
 
 async function deleteEmployee(id) {
   if (!confirm('Supprimer ce membre de l\'équipe ?')) return;
-  const { error } = await supabase.from('employees').delete().eq('id', id);
+  const { error } = await supabaseClient.from('employees').delete().eq('id', id);
   if (error) { showToast('Erreur suppression', 'error'); return; }
   showToast('Membre supprimé.');
   loadEquipe();
@@ -213,7 +213,7 @@ async function loadVehicules() {
   const grid = document.getElementById('vehicules-grid');
   grid.innerHTML = '<div class="skeleton" style="height:320px;width:280px;"></div>'.repeat(3);
 
-  const { data, error } = await supabase.from('vehicles').select('*').order('created_at');
+  const { data, error } = await supabaseClient.from('vehicles').select('*').order('created_at');
   if (error) { showToast('Erreur chargement véhicules', 'error'); return; }
 
   document.getElementById('vehicules-count').textContent = `${data.length} véhicule${data.length > 1 ? 's' : ''}`;
@@ -271,9 +271,9 @@ async function saveVehicle() {
 
   let error;
   if (id) {
-    ({ error } = await supabase.from('vehicles').update(payload).eq('id', id));
+    ({ error } = await supabaseClient.from('vehicles').update(payload).eq('id', id));
   } else {
-    ({ error } = await supabase.from('vehicles').insert(payload));
+    ({ error } = await supabaseClient.from('vehicles').insert(payload));
   }
 
   btn.disabled = false; btn.textContent = 'Enregistrer';
@@ -286,7 +286,7 @@ async function saveVehicle() {
 
 async function deleteVehicle(id) {
   if (!confirm('Supprimer ce véhicule ?')) return;
-  const { error } = await supabase.from('vehicles').delete().eq('id', id);
+  const { error } = await supabaseClient.from('vehicles').delete().eq('id', id);
   if (error) { showToast('Erreur suppression', 'error'); return; }
   showToast('Véhicule supprimé.');
   loadVehicules();
@@ -297,7 +297,7 @@ async function deleteVehicle(id) {
 // ════════════════════════════════════════════════════════
 async function loadServices() {
   const grid = document.getElementById('services-grid');
-  const { data, error } = await supabase.from('services').select('*').order('sort_order');
+  const { data, error } = await supabaseClient.from('services').select('*').order('sort_order');
   if (error) return;
   document.getElementById('services-count').textContent = `${data.length} service${data.length > 1 ? 's' : ''}`;
   grid.innerHTML = '';
@@ -325,8 +325,8 @@ async function saveService() {
     sort_order:  parseInt(document.getElementById('service-order').value) || 99,
   };
   let error;
-  if (id) ({ error } = await supabase.from('services').update(payload).eq('id', id));
-  else    ({ error } = await supabase.from('services').insert(payload));
+  if (id) ({ error } = await supabaseClient.from('services').update(payload).eq('id', id));
+  else    ({ error } = await supabaseClient.from('services').insert(payload));
   if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
   showToast(id ? 'Service mis à jour !' : 'Service ajouté !');
   closeModal('service');
@@ -335,7 +335,7 @@ async function saveService() {
 
 async function deleteService(id) {
   if (!confirm('Supprimer ce service ?')) return;
-  await supabase.from('services').delete().eq('id', id);
+  await supabaseClient.from('services').delete().eq('id', id);
   showToast('Service supprimé.');
   loadServices();
 }
@@ -347,7 +347,7 @@ const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
 
 async function loadHoraires() {
   const form = document.getElementById('horaires-form');
-  const { data, error } = await supabase.from('horaires').select('*').order('sort_order');
+  const { data, error } = await supabaseClient.from('horaires').select('*').order('sort_order');
 
   const horaires = data && data.length ? data : DAYS.map((d, i) => ({
     day: d, sort_order: i + 1,
@@ -398,7 +398,7 @@ async function saveHoraires() {
   }));
 
   // Upsert sur la colonne "day"
-  const { error } = await supabase.from('horaires').upsert(rows, { onConflict: 'day' });
+  const { error } = await supabaseClient.from('horaires').upsert(rows, { onConflict: 'day' });
   if (error) { showToast('Erreur sauvegarde horaires : ' + error.message, 'error'); return; }
   showToast('Horaires mis à jour !');
 }

@@ -193,14 +193,14 @@
     }
 
     // ─── CONFIGURATION SUPABASE ──────────────────────────────────────
-    let supabase;
+    let supabaseClient;
     try {
       if (!window.supabase) {
         throw new Error("Erreur de chargement : Le script Supabase n'a pas pu être chargé (bloqué par un AdBlocker ?)");
       }
       const SUPABASE_URL  = 'https://snbldqyjfabjbogqclid.supabase.co';
       const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYmxkcXlqZmFiamJvZ3FjbGlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NDQzNDAsImV4cCI6MjA5NTIyMDM0MH0.idbnztDL3h_jD1yNaCUmV_CGiAYvKu4Yiwx2ubiN9JM';
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
       
       // Mettre à jour l'indicateur visuel sur la page
       const indicator = document.getElementById('app-status');
@@ -223,9 +223,9 @@
 
     // Vérifier si déjà connecté
     (async () => {
-      if (!supabase) return;
+      if (!supabaseClient) return;
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) window.location.href = 'dashboard.html';
       } catch (e) {
         console.error("Session check error:", e);
@@ -234,7 +234,7 @@
 
     // ── Étape 1 : Connexion ─────────────────────────────────────────
     async function handleLogin() {
-      if (!supabase) {
+      if (!supabaseClient) {
         setStatus("Connexion impossible : Supabase n'est pas disponible.", 'error');
         return;
       }
@@ -249,7 +249,7 @@
       setStatus('Connexion en cours…');
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
         if (error) {
           setStatus('Email ou mot de passe incorrect.', 'error');
@@ -259,7 +259,7 @@
         }
 
         // Connexion réussie — vérifier si 2FA est requis
-        const factors = await supabase.auth.mfa.listFactors();
+        const factors = await supabaseClient.auth.mfa.listFactors();
         const verifiedFactors = factors.data?.totp?.filter(f => f.status === 'verified') || [];
         const hasTOTP = verifiedFactors.length > 0;
 
@@ -274,7 +274,7 @@
           const unverifiedFactors = factors.data?.totp?.filter(f => f.status === 'unverified') || [];
           for (const f of unverifiedFactors) {
             try {
-              await supabase.auth.mfa.unenroll({ factorId: f.id });
+              await supabaseClient.auth.mfa.unenroll({ factorId: f.id });
             } catch (e) {
               console.warn("Unenroll failed:", e);
             }
@@ -299,7 +299,7 @@
 
     // ── Configurer TOTP (premier usage) ────────────────────────────
     async function setupTOTP() {
-      const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Garage Alpin Admin' });
+      const { data, error } = await supabaseClient.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Garage Alpin Admin' });
       if (error || !data) { setStatus('Erreur lors de la configuration 2FA.', 'error'); return; }
 
       const qrUri = data.totp.qr_code;
@@ -323,18 +323,18 @@
 
       // Si setup en cours
       if (window._mfaFactorId) {
-        const challengeRes = await supabase.auth.mfa.challenge({ factorId: window._mfaFactorId });
+        const challengeRes = await supabaseClient.auth.mfa.challenge({ factorId: window._mfaFactorId });
         if (challengeRes.error) { setStatus('Erreur challenge 2FA.', 'error'); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
-        const verifyRes = await supabase.auth.mfa.verify({ factorId: window._mfaFactorId, challengeId: challengeRes.data.id, code });
+        const verifyRes = await supabaseClient.auth.mfa.verify({ factorId: window._mfaFactorId, challengeId: challengeRes.data.id, code });
         if (verifyRes.error) { setStatus('Code incorrect. Réessayez.', 'error'); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
       } else {
         // 2FA existante
-        const factors = await supabase.auth.mfa.listFactors();
+        const factors = await supabaseClient.auth.mfa.listFactors();
         const verifiedFactors = factors.data?.totp?.filter(f => f.status === 'verified') || [];
         const factor  = verifiedFactors[0];
         if (!factor) { setStatus('Aucun facteur 2FA vérifié trouvé. Veuillez vous reconnecter.', 'error'); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
-        const challengeRes = await supabase.auth.mfa.challenge({ factorId: factor.id });
-        const verifyRes = await supabase.auth.mfa.verify({ factorId: factor.id, challengeId: challengeRes.data.id, code });
+        const challengeRes = await supabaseClient.auth.mfa.challenge({ factorId: factor.id });
+        const verifyRes = await supabaseClient.auth.mfa.verify({ factorId: factor.id, challengeId: challengeRes.data.id, code });
         if (verifyRes.error) { setStatus('Code incorrect. Réessayez.', 'error'); inputs.forEach(i => i.value=''); inputs[0].focus(); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
       }
 
@@ -363,7 +363,7 @@
       document.getElementById('step-credentials').style.display  = 'block';
       document.querySelectorAll('.otp-input').forEach(i => i.value = '');
       setStatus('');
-      supabase.auth.signOut();
+      supabaseClient.auth.signOut();
     }
 
     // Enter key

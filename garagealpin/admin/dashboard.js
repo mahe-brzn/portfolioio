@@ -27,6 +27,7 @@ const BUCKET_VEHICLES  = 'vehicles';
   loadVehicules();
   loadServices();
   loadHoraires();
+  loadRecruitmentSettings();
 })();
 
 async function logout() {

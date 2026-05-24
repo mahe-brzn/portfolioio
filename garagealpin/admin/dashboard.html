@@ -244,6 +244,28 @@
           <h1>Notre Équipe</h1>
           <p>Gérez les membres de l'équipe du Garage Alpin</p>
         </div>
+        
+        <!-- Paramètres de Recrutement -->
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+          <h3 style="font-size: 1rem; margin-bottom: 16px; font-weight: 600;">Carte "Nous recrutons"</h3>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <div class="toggle-row" style="padding: 0; margin-bottom: 12px; justify-content: flex-start; gap: 16px;">
+              <label class="toggle">
+                <input type="checkbox" id="recruit-active-toggle" onchange="updateRecruitmentSettings()" />
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="font-size: 0.85rem; color: var(--text);">Activer la carte "Nous recrutons" à la fin de l'équipe</span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="recruit-url-input">Lien de recrutement (ex: Google Form, page web)</label>
+            <div style="display: flex; gap: 12px;">
+              <input type="url" id="recruit-url-input" placeholder="https://..." style="flex: 1;" />
+              <button class="btn btn-ghost" onclick="updateRecruitmentSettings()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+
         <div class="section-header">
           <h2 id="equipe-count">0 membres</h2>
           <button class="btn btn-primary" onclick="openModal('employee')">+ Ajouter un membre</button>
@@ -453,6 +475,6 @@
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="dashboard.js?v=7"></script>
+  <script src="dashboard.js?v=8"></script>
 </body>
 </html>

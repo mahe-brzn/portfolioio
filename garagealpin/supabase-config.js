@@ -3,8 +3,8 @@
 // Remplacez ces deux valeurs par celles de votre projet Supabase.
 // (Projet > Settings > API)
 
-const SUPABASE_URL  = 'VOTRE_SUPABASE_URL';
-const SUPABASE_ANON = 'VOTRE_SUPABASE_ANON_KEY';
+const SUPABASE_URL  = 'https://snbldqyjfabjbogqclid.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYmxkcXlqZmFiamJvZ3FjbGlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NDQzNDAsImV4cCI6MjA5NTIyMDM0MH0.idbnztDL3h_jD1yNaCUmV_CGiAYvKu4Yiwx2ubiN9JM';
 
 window._supabase = window.supabase
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)

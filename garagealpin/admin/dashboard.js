@@ -157,7 +157,7 @@ async function loadEquipe() {
         <div class="admin-card-sub">${emp.role}</div>
         <div class="admin-card-desc">${emp.description || '—'}</div>
         <div class="admin-card-actions">
-          <button class="btn btn-ghost" onclick="openModal('employee', JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(emp)).replace(/'/g, \'%27\')}')))">✏️ Modifier</button>
+          <button class="btn btn-ghost" onclick="openModal('employee', JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(emp)).replace(/'/g, '%27')}')))">✏️ Modifier</button>
           <button class="btn btn-danger" onclick="deleteEmployee('${emp.id}')">🗑 Supprimer</button>
         </div>
       </div>`;
@@ -237,7 +237,7 @@ async function loadVehicules() {
         <div class="admin-card-sub">${v.category} · ${v.year || '—'} · ${v.price_per_day ? v.price_per_day + '€/j' : '—'}</div>
         <div class="admin-card-desc">${features.slice(0,3).join(' · ') || '—'}</div>
         <div class="admin-card-actions">
-          <button class="btn btn-ghost" onclick="openModal('vehicle', JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(v)).replace(/'/g, \'%27\')}')))">✏️ Modifier</button>
+          <button class="btn btn-ghost" onclick="openModal('vehicle', JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(v)).replace(/'/g, '%27')}')))">✏️ Modifier</button>
           <button class="btn btn-danger" onclick="deleteVehicle('${v.id}')">🗑 Supprimer</button>
         </div>
       </div>`;
@@ -312,7 +312,7 @@ async function loadServices() {
         <div class="admin-card-title">${s.name}</div>
         <div class="admin-card-desc">${s.description || '—'}</div>
         <div class="admin-card-actions">
-          <button class="btn btn-ghost" onclick="openModal('service', JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(s)).replace(/'/g, \'%27\')}')))">✏️ Modifier</button>
+          <button class="btn btn-ghost" onclick="openModal('service', JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(s)).replace(/'/g, '%27')}')))">✏️ Modifier</button>
           <button class="btn btn-danger" onclick="deleteService('${s.id}')">🗑 Supprimer</button>
         </div>
       </div>`;

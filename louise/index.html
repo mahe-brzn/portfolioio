@@ -3,208 +3,699 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Pour Louise | Mahé Brizion</title>
   <meta name="description" content="À notre lumière, intacte et évidente." />
-  <meta name="theme-color" content="#060608" />
+  <meta name="theme-color" content="#0a0508" />
 
-  <!-- ── Fonts ────────────────────────────────────────────── -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'" />
-  <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
-  </noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500&display=swap" />
 
-  <link rel="stylesheet" href="/assets/css/main.css" />
   <style>
-    /* Redéfinition subtile et romantique de la couleur d'accent pour cette page (Rose Gold chaud) */
+    /* ── RESET ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    /* ── VARIABLES ──────────────────────────────────── */
     :root {
-      --accent: #dfb399; 
+      --bg:       #0a0508;
+      --bg2:      #100810;
+      --white:    #f5f0eb;
+      --cream:    #e8ddd4;
+      --rose:     #d4a08c;
+      --rose-dim: rgba(212, 160, 140, 0.15);
+      --rose-glow:rgba(212, 160, 140, 0.06);
+      --gold:     #c8a97e;
+      --text:     rgba(232, 221, 212, 0.72);
+      --serif:    'Cormorant Garamond', Georgia, serif;
+      --sans:     'Inter', sans-serif;
+      --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    /* Style spécifique à la lettre */
+    /* ── GLOBAL ─────────────────────────────────────── */
     body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--sans);
       overflow-x: hidden;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
     }
-    #main-content {
-      padding: clamp(60px, 10vw, 120px) 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    a { text-decoration: none; color: inherit; }
+    ::selection { background: rgba(212, 160, 140, 0.3); color: var(--white); }
+
+    /* ── SCROLLBAR ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--rose); }
+
+    /* ── CURSOR ─────────────────────────────────────── */
+    #cursor {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      mix-blend-mode: difference;
     }
-    .letter-wrap {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 0 24px;
+    #cursor-dot {
+      position: fixed;
+      width: 6px; height: 6px;
+      background: var(--rose);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      transition: width .2s, height .2s;
+    }
+    #cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(212, 160, 140, 0.5);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9998;
+      transition: width .3s var(--ease-expo), height .3s var(--ease-expo), border-color .3s;
+    }
+    body.hovered #cursor-dot { width: 10px; height: 10px; }
+    body.hovered #cursor-ring { width: 56px; height: 56px; border-color: var(--rose); }
+    @media (hover: none) { #cursor-dot, #cursor-ring { display: none !important; } }
+
+    /* ── BACKGROUND AURORA ──────────────────────────── */
+    #bg-aurora {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .aurora-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      animation: floatOrb 20s ease-in-out infinite;
+    }
+    .aurora-orb:nth-child(1) {
+      width: 60vw; height: 60vw;
+      top: -20%; left: -10%;
+      background: radial-gradient(circle, rgba(150, 60, 80, 0.15) 0%, transparent 70%);
+      animation-duration: 22s;
+    }
+    .aurora-orb:nth-child(2) {
+      width: 50vw; height: 50vw;
+      bottom: -15%; right: -10%;
+      background: radial-gradient(circle, rgba(120, 60, 100, 0.12) 0%, transparent 70%);
+      animation-duration: 18s;
+      animation-delay: -8s;
+    }
+    .aurora-orb:nth-child(3) {
+      width: 40vw; height: 40vw;
+      top: 40%; left: 30%;
+      background: radial-gradient(circle, rgba(180, 100, 80, 0.08) 0%, transparent 70%);
+      animation-duration: 25s;
+      animation-delay: -14s;
+    }
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(2vw, -3vh) scale(1.05); }
+      66%       { transform: translate(-2vw, 2vh) scale(0.96); }
+    }
+
+    /* ── GRAIN ──────────────────────────────────────── */
+    #grain {
+      position: fixed;
+      inset: -50%;
+      width: 200%; height: 200%;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(2) infinite;
+    }
+    @keyframes grain {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(2%, -3%); }
+      50%  { transform: translate(-3%, 2%); }
+      75%  { transform: translate(1%, 3%); }
+      100% { transform: translate(-2%, -1%); }
+    }
+
+    /* ── PARTICLES ──────────────────────────────────── */
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--rose);
+      opacity: 0;
+      animation: particleFloat linear infinite;
+    }
+    @keyframes particleFloat {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 0.4; }
+      90%  { opacity: 0.2; }
+      100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────── */
+    .page-wrapper {
       position: relative;
       z-index: 10;
+      min-height: 100vh;
     }
 
-    /* Animation de révélation des sections */
-    .reveal-section {
+    /* ── HERO ───────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--rose);
       opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
-      margin-bottom: clamp(60px, 10vw, 100px);
+      transform: translateY(20px);
+      animation: fadeUp 1s var(--ease-expo) 0.3s forwards;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .reveal-section.on {
-      opacity: 1;
-      transform: translateY(0);
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--rose));
+    }
+    .hero-eyebrow::after {
+      background: linear-gradient(270deg, transparent, var(--rose));
     }
 
-    /* Typographie délicate */
-    .section-title {
-      font-family: var(--font-d);
-      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: 30px;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-    }
-    .section-title .highlight {
-      color: var(--accent);
-      font-style: italic;
-      font-weight: 400;
-    }
-    .section-text {
-      font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(5rem, 18vw, 14rem);
       font-weight: 300;
-      line-height: 2;
-      color: var(--grey-4);
-      text-align: justify;
-      hyphens: auto;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: transparent;
+      background: linear-gradient(135deg, var(--white) 0%, var(--cream) 40%, var(--rose) 70%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      opacity: 0;
+      transform: translateY(40px);
+      animation: fadeUp 1.4s var(--ease-expo) 0.5s forwards;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    .hero-name::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--white) 0%, var(--rose) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: blur(30px);
+      opacity: 0.15;
+    }
+
+    .hero-sub {
+      font-family: var(--serif);
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text);
+      max-width: 500px;
+      line-height: 1.8;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 1s var(--ease-expo) 0.9s forwards;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      animation: fadeIn 1s ease 2s forwards;
+    }
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(212, 160, 140, 0.5);
+      writing-mode: vertical-rl;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--rose), transparent);
+      animation: scrollAnim 2s ease-in-out 2s infinite;
+    }
+    @keyframes scrollAnim {
+      0%, 100% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      50%       { transform: scaleY(0.3); opacity: 0.5; }
+    }
+
+    /* ── SECTIONS ───────────────────────────────────── */
+    .section-outer {
+      padding: clamp(80px, 14vw, 160px) clamp(24px, 8vw, 80px);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-inner {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 1.4s var(--ease-expo), transform 1.4s var(--ease-expo);
+    }
+    .section-inner.on { opacity: 1; transform: translateY(0); }
+
+    .section-num {
+      font-family: var(--sans);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-num::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(212, 160, 140, 0.3), transparent);
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 40px;
+    }
+    .section-title em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    .section-text {
+      font-family: var(--serif);
+      font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+      font-weight: 300;
+      line-height: 2.1;
+      color: var(--text);
     }
     .section-text strong {
       color: var(--white);
       font-weight: 500;
     }
-    
-    /* Bouton final centré et élégant */
-    .final-action {
+
+    /* ── DIVIDER ────────────────────────────────────── */
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px 0;
+      opacity: 0;
+      transform: scaleX(0.3);
+      transition: opacity 1.2s var(--ease-expo), transform 1.2s var(--ease-expo);
+    }
+    .ornament.on { opacity: 1; transform: scaleX(1); }
+    .ornament-line {
+      flex: 1;
+      max-width: 200px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212, 160, 140, 0.4));
+    }
+    .ornament-line:last-child {
+      background: linear-gradient(270deg, transparent, rgba(212, 160, 140, 0.4));
+    }
+    .ornament-diamond {
+      width: 6px;
+      height: 6px;
+      background: var(--rose);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    /* ── GRANDE CITATION CENTRALE ───────────────────── */
+    .pullquote-outer {
+      padding: clamp(60px, 10vw, 100px) clamp(24px, 8vw, 80px);
       text-align: center;
-      margin-top: clamp(80px, 15vw, 120px);
-      padding-bottom: 60px;
     }
-    .final-quote {
-      font-family: var(--font-d);
-      font-size: clamp(1.2rem, 2vw, 1.5rem);
-      font-weight: 500;
+    .pullquote {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 4vw, 3rem);
+      font-weight: 300;
       font-style: italic;
-      color: var(--white);
-      margin-bottom: 40px;
       line-height: 1.5;
+      color: transparent;
+      background: linear-gradient(135deg, var(--cream), var(--rose), var(--gold));
+      -webkit-background-clip: text;
+      background-clip: text;
+      max-width: 800px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1.4s var(--ease-expo) 0.2s, transform 1.4s var(--ease-expo) 0.2s;
     }
-    
-    .btn-letter {
+    .pullquote.on { opacity: 1; transform: translateY(0); }
+
+    /* ── CTA FINAL ──────────────────────────────────── */
+    #cta-final {
+      padding: clamp(80px, 14vw, 160px) 24px;
+      text-align: center;
+      position: relative;
+    }
+    #cta-final::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70vw;
+      height: 70vw;
+      max-width: 800px;
+      max-height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 160, 140, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-conclusion {
+      font-family: var(--serif);
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text);
+      max-width: 480px;
+      margin: 0 auto 60px;
+      line-height: 1.9;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s var(--ease-expo), transform 1s var(--ease-expo);
+    }
+    .cta-conclusion.on { opacity: 1; transform: translateY(0); }
+
+    .btn-louise {
       display: inline-flex;
       align-items: center;
-      gap: 14px;
-      color: var(--accent);
-      font-family: var(--font-d);
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+      gap: 16px;
+      padding: 22px 52px;
+      background: linear-gradient(135deg, rgba(212, 160, 140, 0.12), rgba(200, 169, 126, 0.08));
+      border: 1px solid rgba(212, 160, 140, 0.35);
+      border-radius: 60px;
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      padding: 16px 36px;
-      border: 1px solid rgba(223, 179, 153, 0.3);
-      border-radius: 40px;
-      transition: background 0.4s var(--ease-out), color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+      color: var(--rose);
+      backdrop-filter: blur(12px);
+      transition: all 0.5s var(--ease-expo);
       position: relative;
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px) scale(0.97);
+      transition: opacity 1s var(--ease-expo) 0.15s, transform 1s var(--ease-expo) 0.15s, background 0.4s, border-color 0.4s, color 0.4s, box-shadow 0.4s;
     }
-    .btn-letter:hover {
-      background: rgba(223, 179, 153, 0.1);
-      border-color: var(--accent);
+    .btn-louise.on { opacity: 1; transform: translateY(0) scale(1); }
+    .btn-louise::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(212, 160, 140, 0.2), rgba(200, 169, 126, 0.1));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .btn-louise:hover { 
+      border-color: rgba(212, 160, 140, 0.7);
       color: var(--white);
+      box-shadow: 0 0 60px rgba(212, 160, 140, 0.15), 0 0 120px rgba(212, 160, 140, 0.05);
     }
-    
-    /* Suppression du header et du footer pour une immersion totale */
-    header {
-      display: none !important;
+    .btn-louise:hover::before { opacity: 1; }
+    .btn-louise-icon {
+      width: 18px;
+      height: 1px;
+      background: currentColor;
+      position: relative;
+      transition: width 0.4s var(--ease-expo);
     }
-    footer {
-      display: none !important;
+    .btn-louise-icon::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid currentColor;
+      border-top: 1px solid currentColor;
+      transform: translateY(-50%) rotate(45deg);
+    }
+    .btn-louise:hover .btn-louise-icon { width: 28px; }
+
+    /* ── FOOTER MINIMAL ─────────────────────────────── */
+    .page-footer {
+      text-align: center;
+      padding: 40px 24px 60px;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(212, 160, 140, 0.3);
+    }
+
+    /* ── KEYFRAMES GLOBAUX ──────────────────────────── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 640px) {
+      .section-text { line-height: 1.9; }
+      .hero-name { letter-spacing: -0.03em; }
+    }
+
+    /* ── REDUCED MOTION ─────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .aurora-orb, #grain { animation: none; }
+      .section-inner, .pullquote, .cta-conclusion, .btn-louise, .ornament {
+        opacity: 1 !important;
+        transform: none !important;
+      }
     }
   </style>
 </head>
 
-<body class="loading-done">
+<body>
 
-  <!-- Grain & Cursor -->
+  <!-- Custom cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Backgrounds -->
+  <div id="bg-aurora" aria-hidden="true">
+    <div class="aurora-orb"></div>
+    <div class="aurora-orb"></div>
+    <div class="aurora-orb"></div>
+  </div>
   <div id="grain" aria-hidden="true"></div>
-  <div id="cursor-dot"  aria-hidden="true"></div>
-  <div id="cursor-ring" aria-hidden="true"></div>
+  <div id="particles" aria-hidden="true"></div>
 
-  <main id="main-content">
-    <div class="letter-wrap">
+  <!-- ════════════════ CONTENU ════════════════ -->
+  <div class="page-wrapper">
 
-      <!-- Section 1 : L'évidence qui refuse de s'éteindre -->
-      <section class="reveal-section">
-        <h2 class="section-title">L'évidence qui refuse de <span class="highlight">s'éteindre</span></h2>
-        <p class="section-text">
-          Il y a des rencontres qui vous percutent avec la puissance d'une certitude. Dès nos premiers échanges, l'évidence était là, fulgurante et entière. Il y a eu la passion immense des débuts, mais aussi les erreurs de notre jeunesse, les silences et les maladresses d'un amour qui se cherchait encore. J'ai pris le temps de regarder mes fautes en face, d'apprendre de ces distances vaines. Aujourd'hui, si une seule vérité a survécu au temps, c'est celle-ci : <strong>c'est toi que j'aime</strong>. Profondément. Avec la maturité et la détermination de celui qui sait enfin exactement ce qu'il veut.
-        </p>
-      </section>
+    <!-- HERO -->
+    <section id="hero" aria-label="Titre principal">
+      <div class="hero-eyebrow">Pour toi</div>
+      <h1 class="hero-name" data-text="Louise">Louise</h1>
+      <p class="hero-sub">Une évidence qui refuse de s'éteindre.</p>
+      <div class="scroll-hint" aria-hidden="true">
+        <div class="scroll-line"></div>
+        <span>Descends</span>
+      </div>
+    </section>
 
-      <!-- Section 2 : L'ancrage dans la tempête -->
-      <section class="reveal-section">
-        <h2 class="section-title">L'ancrage dans la <span class="highlight">tempête</span></h2>
-        <p class="section-text">
-          Et puis, il y a eu ce moment où le ciel s'est assombri. Cet instant suspendu où tout menaçait de basculer. Je n'ai pas eu besoin de réfléchir pour devenir ton bouclier face à l'orage. Être ce roc, ce refuge quand le monde semblait s'effondrer autour de toi, a scellé en moi bien plus qu'une simple présence. Cela a forgé un engagement absolu. Je serai toujours là pour t'épauler, pour repousser les ombres et veiller sur ta lumière, avec la force de celui qui ne t'abandonnera pas.
-        </p>
-      </section>
+    <!-- SECTION 1 -->
+    <section aria-labelledby="s1-title">
+      <div class="section-outer">
+        <div class="section-inner" data-reveal>
+          <div class="section-num">01 — L'évidence</div>
+          <h2 class="section-title" id="s1-title">L'évidence qui refuse<br>de <em>s'éteindre</em></h2>
+          <p class="section-text">
+            Il y a des rencontres qui vous percutent avec la puissance d'une certitude. La nôtre fut de celles-là. Dès nos premiers échanges, l'évidence était là, fulgurante et entière. Il y a eu la passion immense des débuts, mais aussi les erreurs de notre jeunesse — les distances vaines, les maladresses d'un amour qui se cherchait encore. J'ai pris le temps de regarder mes fautes en face, d'apprendre de ces silences. Aujourd'hui, si une seule vérité a survécu à tout cela, c'est celle-ci : <strong>c'est toi que j'aime</strong>. Profondément. Avec la maturité et la détermination de celui qui sait exactement ce qu'il veut.
+          </p>
+        </div>
+      </div>
+    </section>
 
-      <!-- Section 3 : La vérité sans filtre -->
-      <section class="reveal-section">
-        <h2 class="section-title">La vérité <span class="highlight">sans filtre</span></h2>
-        <p class="section-text">
-          Je pourrais me cacher derrière le masque d'une amitié rassurante et de complaisance, mais ce serait te mentir, et je refuse les demi-mesures. Ce que je ressens mérite la plus grande des franchises : <strong>je te veux, toi</strong>. Je veux construire une relation véritable, solide et amoureuse. Je veux avoir la chance de t'accompagner, de te rendre heureuse et de bâtir avec toi. Je dépose cette vérité devant toi, sans exiger de réponse immédiate. Prends l'espace et le rythme dont tu as besoin après ce que tu as traversé. Sache simplement que ma porte t'est grande ouverte, et que je suis prêt.
-        </p>
-      </section>
-
-      <!-- Conclusion & Action -->
-      <section class="reveal-section final-action">
-        <p class="final-quote">Parce que tu es, et resteras toujours, mon évidence.</p>
-        <a href="mailto:louise@mahebrizion.fr" class="btn-letter">
-          Laisser parler ton cœur
-        </a>
-      </section>
-
+    <div class="ornament" data-reveal>
+      <div class="ornament-line"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-diamond" style="opacity: 0.4; transform: rotate(45deg) scale(0.6);"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line"></div>
     </div>
-  </main>
 
-  <script src="/assets/js/main.js" defer></script>
-  
+    <!-- PULLQUOTE 1 -->
+    <div class="pullquote-outer">
+      <blockquote class="pullquote" data-reveal>
+        « Certaines personnes entrent dans ta vie et illuminent tout ce qui, avant elles, paraissait trop sombre. »
+      </blockquote>
+    </div>
+
+    <!-- SECTION 2 -->
+    <section aria-labelledby="s2-title">
+      <div class="section-outer">
+        <div class="section-inner" data-reveal>
+          <div class="section-num">02 — L'ancrage</div>
+          <h2 class="section-title" id="s2-title">L'ancrage dans<br>la <em>tempête</em></h2>
+          <p class="section-text">
+            Et puis, il y a eu ce moment où le ciel s'est assombri brusquement. Cet instant suspendu où tout menaçait de basculer. Je n'ai pas eu besoin de réfléchir pour devenir ton bouclier face à l'orage. Être ce roc, ce refuge quand le monde semblait s'effondrer autour de toi, a scellé en moi bien plus qu'une simple présence. Cela a forgé un <strong>engagement absolu</strong>. Je serai toujours là pour t'épauler, pour repousser les ombres et veiller sur ta lumière — avec la force de celui qui ne t'abandonnera jamais.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="ornament" data-reveal>
+      <div class="ornament-line"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-diamond" style="opacity: 0.4; transform: rotate(45deg) scale(0.6);"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line"></div>
+    </div>
+
+    <!-- PULLQUOTE 2 -->
+    <div class="pullquote-outer">
+      <blockquote class="pullquote" data-reveal>
+        « Aimer quelqu'un, c'est accepter d'être là, sans condition, au cœur de la nuit comme en pleine lumière. »
+      </blockquote>
+    </div>
+
+    <!-- SECTION 3 -->
+    <section aria-labelledby="s3-title">
+      <div class="section-outer">
+        <div class="section-inner" data-reveal>
+          <div class="section-num">03 — Le choix</div>
+          <h2 class="section-title" id="s3-title">La vérité<br><em>sans filtre</em></h2>
+          <p class="section-text">
+            Je pourrais me cacher derrière le masque d'une amitié rassurante. Mais ce serait te mentir, et je refuse les demi-mesures. Ce que je ressens mérite la plus grande des franchises : <strong>je te veux, toi</strong>. Je veux construire quelque chose de véritable, de solide et d'amoureux. Je veux avoir la chance de t'accompagner, de te rendre heureuse, de bâtir avec toi — jour après jour. Je dépose cette vérité devant toi sans exiger de réponse immédiate. Prends le temps et l'espace dont tu as besoin. Sache simplement que ma porte t'est grande ouverte, et que je suis là, prêt.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section id="cta-final" aria-label="Conclusion et contact">
+      <p class="cta-conclusion" data-reveal>
+        Parce que tu es, et resteras toujours,<br>mon évidence la plus pure.
+      </p>
+      <a href="mailto:louise@mahebrizion.fr" class="btn-louise" data-reveal data-reveal-delay="0.15">
+        <span>Laisser parler ton cœur</span>
+        <span class="btn-louise-icon" aria-hidden="true"></span>
+      </a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="page-footer">
+      <p>Mahé Brizion &nbsp;·&nbsp; mahebrizion.fr</p>
+    </footer>
+
+  </div><!-- /page-wrapper -->
+
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const reveals = document.querySelectorAll(".reveal-section");
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("on");
-            observer.unobserve(entry.target);
-          }
-        });
-      }, {
-        threshold: 0.15,
-        rootMargin: "0px 0px -50px 0px"
-      });
+    // ── Cursor ────────────────────────────────────────────
+    const cursorDot  = document.getElementById('cursor-dot');
+    const cursorRing = document.getElementById('cursor-ring');
+    let mx = -200, my = -200, rx = -200, ry = -200;
 
-      reveals.forEach((el, index) => {
-        if(index === 0) {
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+
+    (function moveCursor() {
+      cursorDot.style.left  = mx + 'px';
+      cursorDot.style.top   = my + 'px';
+      rx += (mx - rx) * 0.1;
+      ry += (my - ry) * 0.1;
+      cursorRing.style.left = rx + 'px';
+      cursorRing.style.top  = ry + 'px';
+      requestAnimationFrame(moveCursor);
+    })();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('hovered'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('hovered'));
+    });
+
+    // ── Particles ─────────────────────────────────────────
+    const container = document.getElementById('particles');
+    const PARTICLE_COUNT = 20;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 3 + 1;
+      p.style.cssText = `
+        width: ${size}px; height: ${size}px;
+        left: ${Math.random() * 100}%;
+        animation-duration: ${Math.random() * 15 + 20}s;
+        animation-delay: ${Math.random() * -30}s;
+        opacity: 0;
+      `;
+      container.appendChild(p);
+    }
+
+    // ── Scroll reveal ─────────────────────────────────────
+    const revealEls = document.querySelectorAll('[data-reveal]');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.revealDelay
+            ? parseFloat(entry.target.dataset.revealDelay) * 1000
+            : 0;
           setTimeout(() => {
-            el.classList.add("on");
-          }, 300);
-        } else {
-          observer.observe(el);
+            entry.target.classList.add('on');
+          }, delay);
+          io.unobserve(entry.target);
         }
       });
-    });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach(el => io.observe(el));
   </script>
 </body>
 </html>

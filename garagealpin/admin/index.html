@@ -223,7 +223,8 @@
 
       // Connexion réussie — vérifier si 2FA est requis
       const factors = await supabase.auth.mfa.listFactors();
-      const hasTOTP  = factors.data?.totp?.length > 0;
+      const verifiedFactors = factors.data?.totp?.filter(f => f.status === 'verified') || [];
+      const hasTOTP = verifiedFactors.length > 0;
 
       if (hasTOTP) {
         // 2FA déjà configurée → demander le code
@@ -232,7 +233,13 @@
         setStatus('');
         initOtpInputs();
       } else {
-        // 2FA pas encore configurée → Setup obligatoire
+        // Nettoyer d'éventuels facteurs non vérifiés (ex: enrôlement abandonné)
+        const unverifiedFactors = factors.data?.totp?.filter(f => f.status === 'unverified') || [];
+        for (const f of unverifiedFactors) {
+          await supabase.auth.mfa.unenroll({ factorId: f.id });
+        }
+
+        // 2FA pas encore configurée ou réinitialisée → Setup obligatoire
         document.getElementById('step-credentials').style.display = 'none';
         document.getElementById('step-2fa').style.display          = 'block';
         document.getElementById('totp-setup-box').style.display    = 'block';
@@ -278,7 +285,9 @@
       } else {
         // 2FA existante
         const factors = await supabase.auth.mfa.listFactors();
-        const factor  = factors.data.totp[0];
+        const verifiedFactors = factors.data?.totp?.filter(f => f.status === 'verified') || [];
+        const factor  = verifiedFactors[0];
+        if (!factor) { setStatus('Aucun facteur 2FA vérifié trouvé. Veuillez vous reconnecter.', 'error'); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
         const challengeRes = await supabase.auth.mfa.challenge({ factorId: factor.id });
         const verifyRes = await supabase.auth.mfa.verify({ factorId: factor.id, challengeId: challengeRes.data.id, code });
         if (verifyRes.error) { setStatus('Code incorrect. Réessayez.', 'error'); inputs.forEach(i => i.value=''); inputs[0].focus(); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }

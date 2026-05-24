@@ -791,28 +791,38 @@
     revealEls.forEach(el => io.observe(el));
 
     /* ════════════════════════════════════════════════════════
-       SOUND ENGINE — Web Audio API
-       Simulated spatial / immersive audio (no files needed)
+       SOUND ENGINE — Bekar-inspired
+       Piano harmonique + cordes + reverb longue
     ════════════════════════════════════════════════════════ */
-    let audioCtx = null;
-    let masterGain = null;
-    let droneNodes = [];
-    let shimmerNodes = [];
+    let audioCtx    = null;
+    let masterGain  = null;
+    let reverbNode  = null;
+    let reverbWet   = null;
+    let padNodes    = [];
     let soundActive = false;
-    let scrollNoteIndex = 0;
+    let phraseIndex = 0;
 
-    // D major pentatonic — warm and romantic
-    const SCALE = [293.66, 329.63, 369.99, 440.00, 493.88, 587.33, 659.25, 739.99];
+    // Gamme de La mineur naturel — mélancolique et intime comme Bekar
+    // Fondamentales en octave 4 (262 Hz = Do4)
+    const NOTES = {
+      C4:  261.63, D4:  293.66, E4:  329.63, F4:  349.23,
+      G4:  392.00, A4:  440.00, Bb4: 466.16, C5:  523.25,
+      D5:  587.33, E5:  659.25, F5:  698.46, G5:  783.99,
+      A5:  880.00, C3:  130.81, E3:  164.81, A3:  220.00,
+    };
 
-    // ── Build synthetic reverb (convolver) ──────────────
-    function buildReverb(ctx, duration = 4, decay = 2.5) {
+    // ── Reverb grande salle (longue queue, naturelle) ──────
+    function buildReverb(ctx) {
       const sr  = ctx.sampleRate;
-      const len = sr * duration;
+      const dur = 6; // 6s de queue = grande cathédrale
+      const len = sr * dur;
       const buf = ctx.createBuffer(2, len, sr);
       for (let ch = 0; ch < 2; ch++) {
         const d = buf.getChannelData(ch);
         for (let i = 0; i < len; i++) {
-          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+          // Pre-delay léger + décroissance douce exponentielle
+          const env = i < sr * 0.02 ? i / (sr * 0.02) : Math.pow(1 - (i - sr * 0.02) / len, 1.8);
+          d[i] = (Math.random() * 2 - 1) * env * 0.5;
         }
       }
       const conv = ctx.createConvolver();
@@ -820,186 +830,205 @@
       return conv;
     }
 
-    // ── Soft piano-like note (oscillator + ADSR) ─────────
-    function playNote(freq, pan = 0, vol = 0.08, delay = 0) {
-      if (!audioCtx || !soundActive) return;
-      const t = audioCtx.currentTime + delay;
-      const osc  = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const panner = audioCtx.createStereoPanner();
-      const filt = audioCtx.createBiquadFilter();
+    // ── Piano additive : fondamentale + harmoniques sinus ──
+    // Bekar a un piano très chaud, avec les hautes harmoniques coupées
+    function pianoCut(ctx, freq, pan, vol, t) {
+      const panner = ctx.createStereoPanner();
+      panner.pan.setValueAtTime(pan + (Math.random() - 0.5) * 0.04, t);
+      panner.connect(masterGain);
+      panner.connect(reverbWet);
 
-      filt.type = 'lowpass';
-      filt.frequency.setValueAtTime(1800, t);
-      filt.frequency.exponentialRampToValueAtTime(600, t + 0.8);
+      // Filtre passe-bas très chaud — coupe le métal/robot
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(900, t);
+      lp.frequency.linearRampToValueAtTime(350, t + 1.2);
+      lp.Q.value = 0.5;
+      lp.connect(panner);
 
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, t);
-      osc.detune.setValueAtTime((Math.random() - 0.5) * 6, t); // micro-humanisation
+      // Harmoniques empilées (simulation d'un piano acoustique)
+      const harmonics = [
+        { mult: 1,    amp: 1.00 },
+        { mult: 2,    amp: 0.28 },
+        { mult: 3,    amp: 0.10 },
+        { mult: 4,    amp: 0.04 },
+        { mult: 6,    amp: 0.015 },
+      ];
 
-      panner.pan.setValueAtTime(pan, t);
+      harmonics.forEach(({ mult, amp }) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq * mult, t);
+        // Micro-detuning humain entre harmoniques
+        osc.detune.setValueAtTime((Math.random() - 0.5) * 3, t);
 
-      // ADSR envelope
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(vol, t + 0.05);  // attack
-      gain.gain.exponentialRampToValueAtTime(vol * 0.5, t + 0.3); // decay
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 2.5); // release
+        // Enveloppe ADSR piano : attaque ultra rapide, décroissance longue
+        const peak = vol * amp;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(peak, t + 0.012);           // attack 12ms
+        gain.gain.exponentialRampToValueAtTime(peak * 0.35, t + 0.4); // decay
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 4.5);      // release long
 
-      osc.connect(filt);
-      filt.connect(gain);
-      gain.connect(panner);
-      panner.connect(reverb);
-      panner.connect(masterGain); // dry signal too
-
-      osc.start(t);
-      osc.stop(t + 2.8);
+        osc.connect(gain);
+        gain.connect(lp);
+        osc.start(t);
+        osc.stop(t + 5);
+      });
     }
 
-    // ── Harmonic chord for reveal moments ────────────────
+    // ── Cordes douces — pad avec attaque lente ─────────────
+    // Simule la section de cordes derrière les pianistes comme Bekar
+    function startStrings() {
+      // Accord de La mineur en position fondamentale
+      const chordFreqs = [NOTES.A3, NOTES.E3, NOTES.C4, NOTES.A3 * 0.5];
+      const t0 = audioCtx.currentTime;
+
+      chordFreqs.forEach((freq, i) => {
+        const osc    = audioCtx.createOscillator();
+        const gain   = audioCtx.createGain();
+        const pan    = audioCtx.createStereoPanner();
+        const filter = audioCtx.createBiquadFilter();
+
+        // Cordes = son de scie adouci avec filtre très sélectif
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, t0);
+        osc.detune.setValueAtTime((i % 2 === 0 ? 1 : -1) * (i * 4 + Math.random() * 3), t0);
+
+        // Filtre LP très bas pour enlever tout le côté électronique
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(280 + i * 30, t0);
+        filter.Q.value = 0.3;
+
+        // Attaque très lente comme des cordes (3 secondes)
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(0.018 - i * 0.002, t0 + 3.5);
+
+        // LFO vibrato très léger (style cordes naturelles)
+        const vibLfo  = audioCtx.createOscillator();
+        const vibGain = audioCtx.createGain();
+        vibLfo.frequency.value = 5.2 + Math.random() * 0.6;
+        vibGain.gain.value = 1.2;
+        vibLfo.connect(vibGain);
+        vibGain.connect(osc.detune);
+        vibLfo.start(t0 + 2); // commence après l'attaque
+
+        pan.pan.setValueAtTime([-0.5, 0.5, -0.2, 0.3][i], t0);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(pan);
+        pan.connect(reverbWet);
+        pan.connect(masterGain);
+        osc.start(t0);
+
+        padNodes.push({ osc, gain, lfo: vibLfo });
+      });
+    }
+
+    // ── Phrases piano inspirées de l'univers Bekar ─────────
+    // Douces, lentes, émotionnelles — comme "Sur les toits" de Bekar
+    const PHRASES = [
+      // Phrase 1 — montée mélancolique (A min)
+      [
+        { note: NOTES.A4, pan: -0.3, vol: 0.07, t: 0    },
+        { note: NOTES.C5, pan: -0.1, vol: 0.06, t: 0.85 },
+        { note: NOTES.E5, pan:  0.1, vol: 0.065,t: 1.7  },
+        { note: NOTES.A5, pan:  0.3, vol: 0.058,t: 2.7  },
+        { note: NOTES.G5, pan:  0.1, vol: 0.05, t: 4.0  },
+        { note: NOTES.E5, pan: -0.1, vol: 0.045,t: 5.0  },
+      ],
+      // Phrase 2 — descente douce (F maj / A min)
+      [
+        { note: NOTES.F5, pan:  0.2, vol: 0.06, t: 0    },
+        { note: NOTES.E5, pan:  0.0, vol: 0.055,t: 1.1  },
+        { note: NOTES.D5, pan: -0.2, vol: 0.05, t: 2.1  },
+        { note: NOTES.C5, pan: -0.3, vol: 0.06, t: 3.2  },
+        { note: NOTES.A4, pan: -0.4, vol: 0.07, t: 4.4  },
+      ],
+      // Phrase 3 — ostinato émotionnel
+      [
+        { note: NOTES.A4, pan: -0.4, vol: 0.065,t: 0    },
+        { note: NOTES.E5, pan:  0.0, vol: 0.055,t: 0.7  },
+        { note: NOTES.C5, pan: -0.2, vol: 0.05, t: 1.4  },
+        { note: NOTES.D5, pan:  0.1, vol: 0.06, t: 2.2  },
+        { note: NOTES.E5, pan:  0.2, vol: 0.065,t: 3.1  },
+        { note: NOTES.G5, pan:  0.4, vol: 0.055,t: 4.1  },
+        { note: NOTES.F5, pan:  0.2, vol: 0.04, t: 5.2  },
+      ],
+    ];
+
+    function playPhrase(phraseArr) {
+      if (!soundActive || !audioCtx) return;
+      phraseArr.forEach(({ note, pan, vol, t }) => {
+        pianoCut(audioCtx, note, pan, vol, audioCtx.currentTime + t);
+      });
+    }
+
     function playRevealNote() {
       if (!soundActive || !audioCtx) return;
-      const root = SCALE[scrollNoteIndex % SCALE.length];
-      const third = root * 1.2599; // minor third
-      const fifth = root * 1.4983; // perfect fifth
-      scrollNoteIndex++;
-      const pan = (Math.random() - 0.5) * 0.7;
-      playNote(root,  pan,         0.07, 0);
-      playNote(third, -pan * 0.5,  0.05, 0.08);
-      playNote(fifth, pan * 0.3,   0.04, 0.18);
-      // ghost octave
-      playNote(root * 2, -pan, 0.025, 0.4);
+      // Une seule note douce au reveal, discrète
+      const revealNotes = [NOTES.C5, NOTES.E5, NOTES.A4, NOTES.D5, NOTES.G4, NOTES.F5];
+      const note = revealNotes[phraseIndex % revealNotes.length];
+      const pan  = (phraseIndex % 2 === 0 ? -1 : 1) * (0.2 + Math.random() * 0.2);
+      phraseIndex++;
+      pianoCut(audioCtx, note, pan, 0.055, audioCtx.currentTime);
+      // Note de basse douce en écho
+      pianoCut(audioCtx, note * 0.5, -pan, 0.03, audioCtx.currentTime + 0.6);
     }
 
-    // ── Ambient drone pad (layered oscillators) ──────────
-    function startDrone() {
-      const droneFq = 73.42; // D2 — deep and warm
-      const detunes = [-6, 0, 6, 12, 19]; // rich chorusing
-      const vols    = [0.04, 0.055, 0.04, 0.02, 0.015];
-
-      droneNodes = detunes.map((det, i) => {
-        const osc  = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = i === 0 ? 'sine' : 'triangle';
-        osc.frequency.value = droneFq;
-        osc.detune.value = det;
-        gain.gain.setValueAtTime(0, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(vols[i], audioCtx.currentTime + 4);
-        osc.connect(gain);
-        gain.connect(reverb);
-        gain.connect(masterGain);
-        osc.start();
-        return { osc, gain };
-      });
-
-      // Subtle LFO tremolo on the drone
-      const lfo = audioCtx.createOscillator();
-      const lfoGain = audioCtx.createGain();
-      lfo.frequency.value = 0.08; // very slow breath
-      lfoGain.gain.value = 0.012;
-      lfo.connect(lfoGain);
-      droneNodes.forEach(({ gain }) => lfoGain.connect(gain.gain));
-      lfo.start();
-      droneNodes.push({ osc: lfo, gain: lfoGain });
-    }
-
-    // ── Shimmer layer (high-freq airy texture) ───────────
-    function startShimmer() {
-      const shimFreqs = [2349.32, 2637.02, 2793.83, 3135.96]; // D6-G6
-      shimmerNodes = shimFreqs.map((freq, i) => {
-        const osc  = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        osc.detune.value = (i % 2 === 0 ? 1 : -1) * (i * 3);
-        gain.gain.setValueAtTime(0, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.006, audioCtx.currentTime + 6);
-        // Very slow shimmer LFO
-        const sLfo = audioCtx.createOscillator();
-        const sLfoG = audioCtx.createGain();
-        sLfo.frequency.value = 0.12 + i * 0.04;
-        sLfoG.gain.value = 0.004;
-        sLfo.connect(sLfoG);
-        sLfoG.connect(gain.gain);
-        sLfo.start();
-        osc.connect(gain);
-        gain.connect(reverb);
-        osc.start();
-        return { osc, gain, lfo: sLfo };
-      });
-    }
-
-    // ── Opening phrase — played on first activation ───────
-    function playOpeningPhrase() {
-      const melody   = [0, 2, 4, 5, 7, 5, 4, 2]; // indices in SCALE
-      const pans     = [-0.6, -0.3, 0, 0.3, 0.5, 0.2, -0.2, -0.5];
-      const timing   = [0, 0.55, 1.0, 1.5, 2.1, 2.7, 3.3, 4.0];
-      const vols     = [0.07, 0.06, 0.075, 0.065, 0.08, 0.065, 0.06, 0.05];
-      melody.forEach((noteIdx, i) => {
-        playNote(SCALE[noteIdx], pans[i], vols[i], timing[i]);
-      });
-    }
-
-    // ── Scroll-reactive pitch shift on drone ──────────────
-    let scrollTicking = false;
-    window.addEventListener('scroll', () => {
-      if (!soundActive || !audioCtx || !droneNodes.length) return;
-      if (!scrollTicking) {
-        requestAnimationFrame(() => {
-          const progress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-          // Drone slowly rises as user scrolls deeper
-          droneNodes.forEach(({ osc }, i) => {
-            if (i < 5 && osc.detune) {
-              osc.detune.linearRampToValueAtTime(
-                osc.detune.value + progress * 8,
-                audioCtx.currentTime + 2
-              );
-            }
-          });
-          scrollTicking = false;
-        });
-        scrollTicking = true;
-      }
-    }, { passive: true });
-
-    // ── Toggle sound ──────────────────────────────────────
+    // ── Toggle son ─────────────────────────────────────────
     let reverb = null;
     const soundBtn = document.getElementById('sound-btn');
     const soundVu  = document.getElementById('sound-vu');
 
     soundBtn.addEventListener('click', () => {
       if (!audioCtx) {
-        // First activation — create context
-        audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+
         masterGain = audioCtx.createGain();
-        masterGain.gain.value = 0.85;
+        masterGain.gain.value = 0.78;
         masterGain.connect(audioCtx.destination);
 
-        reverb = buildReverb(audioCtx, 5, 2);
-        const reverbGain = audioCtx.createGain();
-        reverbGain.gain.value = 0.45;
-        reverb.connect(reverbGain);
-        reverbGain.connect(masterGain);
+        reverbNode = buildReverb(audioCtx);
+        reverbWet  = audioCtx.createGain();
+        reverbWet.gain.value = 0.55; // reverb bien présente mais pas noyée
+        reverbNode.connect(reverbWet);
+        reverbWet.connect(masterGain);
 
-        startDrone();
-        startShimmer();
-        playOpeningPhrase();
+        // Démarrer les cordes en fond
+        startStrings();
+
+        // Première phrase piano après un court silence (douceur)
+        setTimeout(() => {
+          if (soundActive) playPhrase(PHRASES[0]);
+        }, 800);
+
+        // Phrases qui se succèdent toutes les ~12 secondes
+        let phraseTimer;
+        const nextPhrase = () => {
+          if (!soundActive) return;
+          phraseIndex = (phraseIndex + 1) % PHRASES.length;
+          playPhrase(PHRASES[phraseIndex]);
+          phraseTimer = setTimeout(nextPhrase, 11000 + Math.random() * 4000);
+        };
+        phraseTimer = setTimeout(nextPhrase, 12000);
 
         soundActive = true;
         soundBtn.classList.add('active');
         soundVu.classList.add('active');
+
       } else if (soundActive) {
-        // Mute — fade out
-        masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
+        masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5);
         soundActive = false;
         soundBtn.classList.remove('active');
         soundVu.classList.remove('active');
       } else {
-        // Unmute — fade back in
-        masterGain.gain.linearRampToValueAtTime(0.85, audioCtx.currentTime + 1.2);
+        masterGain.gain.linearRampToValueAtTime(0.78, audioCtx.currentTime + 2);
         soundActive = true;
         soundBtn.classList.add('active');
         soundVu.classList.add('active');
-        playOpeningPhrase();
+        playPhrase(PHRASES[phraseIndex % PHRASES.length]);
       }
     });
   </script>

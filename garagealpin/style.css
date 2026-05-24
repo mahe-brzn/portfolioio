@@ -113,7 +113,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   pointer-events: none;
   z-index: 9998;
   transform: translate(-50%, -50%);
-  transition: opacity 0.3s, transform 0.1s;
+  transition: opacity 0.3s;
   will-change: transform;
 }
 #cursor-ring {

@@ -43,19 +43,23 @@
     let mx = -100, my = -100;
     let rx = -100, ry = -100;
     let rafCursor;
+    
+    // Pour éviter les reflows, on utilise transform plutôt que left/top
+    dot.style.left = '0px';
+    dot.style.top = '0px';
+    ring.style.left = '0px';
+    ring.style.top = '0px';
 
     document.addEventListener('mousemove', e => {
       mx = e.clientX;
       my = e.clientY;
-      dot.style.left = mx + 'px';
-      dot.style.top  = my + 'px';
+      dot.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
     });
 
     function lerpCursor() {
-      rx += (mx - rx) * 0.08; // Plus élastique et organique (au lieu de 0.12)
-      ry += (my - ry) * 0.08;
-      ring.style.left = rx + 'px';
-      ring.style.top  = ry + 'px';
+      rx += (mx - rx) * 0.15; // Réactivité augmentée pour être plus fluide
+      ry += (my - ry) * 0.15;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
       rafCursor = requestAnimationFrame(lerpCursor);
     }
     lerpCursor();

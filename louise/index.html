@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Pour Louise | Mahé Brizion</title>
+  <meta name="description" content="À notre lumière, intacte et évidente." />
+  <meta name="theme-color" content="#060608" />
+
+  <!-- ── Fonts ────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" media="print" onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+  </noscript>
+
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <style>
+    /* Redéfinition subtile et romantique de la couleur d'accent pour cette page (Rose Gold doux) */
+    :root {
+      --accent: #dfb399; 
+    }
+
+    /* Style spécifique à la lettre */
+    body {
+      overflow-x: hidden;
+    }
+    #main-content {
+      padding: clamp(60px, 10vw, 120px) 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .letter-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Animation de révélation des sections */
+    .reveal-section {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
+      margin-bottom: clamp(60px, 10vw, 100px);
+    }
+    .reveal-section.on {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Typographie délicate */
+    .section-title {
+      font-family: var(--font-d);
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 30px;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .section-title .highlight {
+      color: var(--accent);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .section-text {
+      font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+      font-weight: 300;
+      line-height: 2;
+      color: var(--grey-4);
+      text-align: justify;
+      hyphens: auto;
+    }
+    
+    /* Bouton final centré et élégant */
+    .final-action {
+      text-align: center;
+      margin-top: clamp(80px, 15vw, 120px);
+      padding-bottom: 60px;
+    }
+    .final-quote {
+      font-family: var(--font-d);
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      font-weight: 500;
+      font-style: italic;
+      color: var(--white);
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
+    
+    .btn-letter {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--accent);
+      font-family: var(--font-d);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 16px 36px;
+      border: 1px solid rgba(223, 179, 153, 0.3);
+      border-radius: 40px;
+      transition: background 0.4s var(--ease-out), color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-letter:hover {
+      background: rgba(223, 179, 153, 0.1);
+      border-color: var(--accent);
+      color: var(--white);
+    }
+    
+    /* Suppression du header pour une immersion totale */
+    header {
+      display: none !important;
+    }
+    footer {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="loading-done">
+
+  <!-- Grain & Cursor -->
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <main id="main-content">
+    <div class="letter-wrap">
+
+      <!-- Section 1 : L'évidence -->
+      <section class="reveal-section">
+        <h2 class="section-title">L'évidence des <span class="highlight">premiers instants</span></h2>
+        <p class="section-text">
+          Début 2026. Un écran, des confidences nocturnes, et soudain, le monde entier semblait tenir dans le creux de ces quelques mots échangés. Ce qui devait être une simple conversation est devenu une évidence fulgurante. Nos nuits blanches rythmées par les mêmes mélodies, cette complicité fusionnelle qui ne s'explique pas... On dit que certaines rencontres sont écrites. Avec toi, c'est comme si j'avais retrouvé une chanson que je connaissais déjà par cœur.
+        </p>
+      </section>
+
+      <!-- Section 2 : Un lien inébranlable -->
+      <section class="reveal-section">
+        <h2 class="section-title">Un lien <span class="highlight">inébranlable</span></h2>
+        <p class="section-text">
+          Et puis, il y a eu l'orage. Cet instant suspendu où l'ombre s'est faite menaçante. Je n'ai pas eu besoin de réfléchir, je n'ai jamais douté. Devenir ton ancrage, être ce rempart quand tout semblait vaciller autour de toi, m'est apparu comme la plus absolue des nécessités. À travers la tempête, j'ai voulu être ta présence protectrice. Ce moment d'une intensité vertigineuse a scellé au fond de moi une promesse silencieuse : celle de toujours veiller sur ta lumière, de tenir ta main quand le sol se dérobe.
+        </p>
+      </section>
+
+      <!-- Section 3 : La pureté de ce qui reste -->
+      <section class="reveal-section">
+        <h2 class="section-title">La pureté de ce qui <span class="highlight">reste</span></h2>
+        <p class="section-text">
+          Aujourd'hui, l'essentiel demeure intouché. Le premier amour, celui qui brûle d'une flamme pure et sincère, ne s'efface pas. Il est là, intact, dénué de la moindre attente ou d'une quelconque pression étouffante. Une simple main tendue, un espace apaisé et profond. Une porte qui restera toujours ouverte, avec pour seule certitude la beauté lumineuse de ce que nous avons partagé. Juste la paix d'un sentiment qui n'attend rien, si ce n'est ton bonheur.
+        </p>
+      </section>
+
+      <!-- Conclusion & Action -->
+      <section class="reveal-section final-action">
+        <p class="final-quote">Parce que tu resteras toujours l'une de mes plus belles évidences.</p>
+        <a href="mailto:louise@mahebrizion.fr" class="btn-letter">
+          Écrire une nouvelle note
+        </a>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/assets/js/main.js" defer></script>
+  
+  <script>
+    // Simple script pour gérer l'apparition douce des sections au scroll
+    document.addEventListener("DOMContentLoaded", () => {
+      const reveals = document.querySelectorAll(".reveal-section");
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("on");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
+      });
+
+      reveals.forEach((el, index) => {
+        // Ajouter un léger délai pour la première section pour qu'elle apparaisse à l'ouverture de la page
+        if(index === 0) {
+          setTimeout(() => {
+            el.classList.add("on");
+          }, 300);
+        } else {
+          observer.observe(el);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

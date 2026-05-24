@@ -181,27 +181,46 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
   <script>
-    // ─── CONFIGURATION SUPABASE ──────────────────────────────────────
-    // Remplacez ces valeurs après avoir créé votre projet Supabase
-    const SUPABASE_URL  = 'https://snbldqyjfabjbogqclid.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYmxkcXlqZmFiamJvZ3FjbGlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NDQzNDAsImV4cCI6MjA5NTIyMDM0MH0.idbnztDL3h_jD1yNaCUmV_CGiAYvKu4Yiwx2ubiN9JM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    // ────────────────────────────────────────────────────────────────
-
     const statusMsg = document.getElementById('status-msg');
     function setStatus(msg, type = '') {
-      statusMsg.textContent = msg;
-      statusMsg.className   = type;
+      if (statusMsg) {
+        statusMsg.textContent = msg;
+        statusMsg.className   = type;
+      }
     }
+
+    // ─── CONFIGURATION SUPABASE ──────────────────────────────────────
+    let supabase;
+    try {
+      if (!window.supabase) {
+        throw new Error("Erreur de chargement : Le script Supabase n'a pas pu être chargé (bloqué par un AdBlocker ?)");
+      }
+      const SUPABASE_URL  = 'https://snbldqyjfabjbogqclid.supabase.co';
+      const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYmxkcXlqZmFiamJvZ3FjbGlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NDQzNDAsImV4cCI6MjA5NTIyMDM0MH0.idbnztDL3h_jD1yNaCUmV_CGiAYvKu4Yiwx2ubiN9JM';
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    } catch (e) {
+      console.error(e);
+      setStatus(e.message, 'error');
+    }
+    // ────────────────────────────────────────────────────────────────
 
     // Vérifier si déjà connecté
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) window.location.href = 'dashboard.html';
+      if (!supabase) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) window.location.href = 'dashboard.html';
+      } catch (e) {
+        console.error("Session check error:", e);
+      }
     })();
 
     // ── Étape 1 : Connexion ─────────────────────────────────────────
     async function handleLogin() {
+      if (!supabase) {
+        setStatus("Connexion impossible : Supabase n'est pas disponible.", 'error');
+        return;
+      }
       const email    = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const btn      = document.getElementById('btn-login');

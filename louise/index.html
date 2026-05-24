@@ -792,20 +792,21 @@
 
     /* ════════════════════════════════════════════════════════
        HAPTIC ENGINE
-       iOS : impulsions audio basses fréquences → Taptic Engine
+       iOS  : impulsions audio basses fréquences → Taptic Engine
        Android : navigator.vibrate()
-       Le contexte audio haptic est séparé du moteur sonore
-       pour fonctionner même si le son est désactivé.
+       ⚠ Le script étant en bas de <body>, le DOM est déjà prêt.
+       ─ Pas de DOMContentLoaded nécessaire ici. ─
     ════════════════════════════════════════════════════════ */
     let hapticCtx = null;
 
-    // Initialiser un AudioContext minimal dédié aux haptics
-    // (doit être créé depuis un geste utilisateur)
     function initHapticCtx() {
-      if (hapticCtx) return;
+      if (hapticCtx && hapticCtx.state === 'running') return;
       try {
-        hapticCtx = new (window.AudioContext || window.webkitAudioContext)();
-        // iOS exige un "prime" : jouer un son silencieux au premier touch
+        if (!hapticCtx) {
+          hapticCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        // iOS nécessite un "prime" : buffer vide joué depuis un geste utilisateur
+        if (hapticCtx.state === 'suspended') hapticCtx.resume();
         const buf = hapticCtx.createBuffer(1, 1, 22050);
         const src = hapticCtx.createBufferSource();
         src.buffer = buf;
@@ -814,119 +815,89 @@
       } catch(e) { hapticCtx = null; }
     }
 
-    // Premier touch → init haptic context (requis par iOS)
-    document.addEventListener('touchstart', () => initHapticCtx(), { once: true, passive: true });
+    // Initialiser dès le premier touch n'importe où
+    document.addEventListener('touchstart', initHapticCtx, { once: true, passive: true });
 
-    /*
-     * haptic(style)
-     * Styles disponibles :
-     *   'light'  — leger efleurement (survol de lien)
-     *   'medium' — tap standard (section reveal)
-     *   'heavy'  — action importante (bouton CTA)
-     *   'double' — double tap (toggle son)
-     *   'success'— séquence de validation
-     *
-     * Technique iOS :
-     * Une impulsion sinusoïdale très courte à ~170-230 Hz
-     * excite le moteur Taptic Engine via la membrane du haut-parleur.
-     * Fonctionne sur iPhone 7+ avec iOS 13+ (haut-parleur interne).
-     * Les AirPods et casques filaires ne produisent PAS de retour haptique.
-     */
     function haptic(style = 'light') {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const isAndroid = /Android/.test(navigator.userAgent);
-
-      // ── Android : Vibration API ──────────────────────────
-      if (isAndroid && 'vibrate' in navigator) {
+      // ── Android : API native ─────────────────────────────
+      if ('vibrate' in navigator && !/iPhone|iPad|iPod/.test(navigator.userAgent)) {
         const patterns = {
           light:   [8],
           medium:  [18],
-          heavy:   [35],
-          double:  [12, 60, 12],
-          success: [10, 40, 10, 40, 20],
+          heavy:   [40],
+          double:  [15, 60, 15],
+          success: [10, 50, 10, 50, 25],
         };
-        navigator.vibrate(patterns[style] || [10]);
+        try { navigator.vibrate(patterns[style] || [12]); } catch(e) {}
         return;
       }
 
-      // ── iOS : impulsion audio → Taptic Engine ────────────
-      if (isIOS && hapticCtx) {
-        try {
-          // Paramètres par style
-          const configs = {
-            light:   { freq: 220, dur: 0.012, vol: 0.7  },
-            medium:  { freq: 180, dur: 0.020, vol: 0.85 },
-            heavy:   { freq: 140, dur: 0.032, vol: 0.95 },
-            double:  [
-              { freq: 200, dur: 0.015, vol: 0.8, delay: 0     },
-              { freq: 200, dur: 0.015, vol: 0.8, delay: 0.08  },
-            ],
-            success: [
-              { freq: 180, dur: 0.012, vol: 0.7, delay: 0     },
-              { freq: 240, dur: 0.012, vol: 0.75,delay: 0.1   },
-              { freq: 300, dur: 0.018, vol: 0.9, delay: 0.22  },
-            ],
-          };
-
-          const pulses = Array.isArray(configs[style])
-            ? configs[style]
-            : [{ ...configs[style], delay: 0 }];
-
-          pulses.forEach(({ freq, dur, vol, delay }) => {
-            const t   = hapticCtx.currentTime + (delay || 0);
-            const osc = hapticCtx.createOscillator();
-            const g   = hapticCtx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, t);
-
-            // Enveloppe impulsion : montée immédiate, coupure nette
-            g.gain.setValueAtTime(0, t);
-            g.gain.linearRampToValueAtTime(vol, t + 0.003);
-            g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-
-            // Direct → destination (pas de reverb ou d'effets)
-            osc.connect(g);
-            g.connect(hapticCtx.destination);
-
-            osc.start(t);
-            osc.stop(t + dur + 0.005);
-          });
-        } catch(e) { /* silently fail */ }
+      // ── iOS : impulsion sinusoïdale → Taptic Engine ───────
+      // Nécessite haut-parleur interne (pas casque/AirPods) + volume non nul
+      if (!hapticCtx) return;
+      if (hapticCtx.state === 'suspended') {
+        hapticCtx.resume().then(() => haptic(style));
+        return;
       }
+      try {
+        const configs = {
+          light:   [{ f: 230, d: 0.010, v: 0.75 }],
+          medium:  [{ f: 190, d: 0.018, v: 0.88 }],
+          heavy:   [{ f: 150, d: 0.028, v: 1.00 }],
+          double:  [{ f: 210, d: 0.012, v: 0.80, at: 0 }, { f: 210, d: 0.012, v: 0.80, at: 0.07 }],
+          success: [{ f: 190, d: 0.010, v: 0.75, at: 0 }, { f: 250, d: 0.010, v: 0.80, at: 0.09 }, { f: 310, d: 0.016, v: 0.95, at: 0.20 }],
+        };
+        (configs[style] || configs.light).forEach(({ f, d, v, at = 0 }) => {
+          const t   = hapticCtx.currentTime + at;
+          const osc = hapticCtx.createOscillator();
+          const g   = hapticCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, t);
+          g.gain.setValueAtTime(0, t);
+          g.gain.linearRampToValueAtTime(v, t + 0.002);   // montée brutale
+          g.gain.exponentialRampToValueAtTime(0.001, t + d); // coupure nette
+          osc.connect(g);
+          g.connect(hapticCtx.destination);
+          osc.start(t);
+          osc.stop(t + d + 0.004);
+        });
+      } catch(e) {}
     }
 
-    // ── Haptics sur les éléments interactifs ────────────────
-    document.addEventListener('DOMContentLoaded', () => {
-      // Bouton CTA principal
-      const btnLouise = document.querySelector('.btn-louise');
-      if (btnLouise) {
-        btnLouise.addEventListener('touchstart', () => haptic('heavy'),   { passive: true });
-        btnLouise.addEventListener('touchend',   () => haptic('success'), { passive: true });
-      }
+    // ── Attacher les listeners directement (DOM déjà prêt) ──
+    // Bouton CTA
+    const _btnLouise = document.querySelector('.btn-louise');
+    if (_btnLouise) {
+      _btnLouise.addEventListener('touchstart', () => haptic('heavy'),   { passive: true });
+      _btnLouise.addEventListener('touchend',   () => haptic('success'), { passive: true });
+    }
 
-      // Bouton son
-      const sBtn = document.getElementById('sound-btn');
-      if (sBtn) {
-        sBtn.addEventListener('touchstart', () => haptic('double'), { passive: true });
-      }
+    // Bouton son
+    const _sBtn = document.getElementById('sound-btn');
+    if (_sBtn) {
+      _sBtn.addEventListener('touchstart', () => haptic('double'), { passive: true });
+    }
 
-      // Pullquotes — légère vibration quand on les touche
-      document.querySelectorAll('.pullquote').forEach(el => {
-        el.addEventListener('touchstart', () => haptic('light'), { passive: true });
-      });
-
-      // Scroll milestone : tous les 25% de la page
-      let lastMilestone = -1;
-      window.addEventListener('scroll', () => {
-        const progress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-        const milestone = Math.floor(progress / 0.25);
-        if (milestone !== lastMilestone && milestone > 0) {
-          lastMilestone = milestone;
-          haptic(milestone === 3 ? 'heavy' : 'light');
-        }
-      }, { passive: true });
+    // Sections — tap sur le texte
+    document.querySelectorAll('.section-inner, .pullquote').forEach(el => {
+      el.addEventListener('touchstart', () => haptic('light'), { passive: true });
     });
+
+    // Ornements décoratifs
+    document.querySelectorAll('.ornament').forEach(el => {
+      el.addEventListener('touchstart', () => haptic('light'), { passive: true });
+    });
+
+    // Scroll milestones — tous les 25% de la page
+    let _lastMilestone = -1;
+    window.addEventListener('scroll', () => {
+      const progress   = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
+      const milestone  = Math.floor(progress / 0.25);
+      if (milestone !== _lastMilestone && milestone > 0) {
+        _lastMilestone = milestone;
+        haptic(milestone === 3 ? 'heavy' : 'medium');
+      }
+    }, { passive: true });
 
     /* ════════════════════════════════════════════════════════
        SOUND ENGINE — Univers Bekar / Lucci' / Wladimir Pariente

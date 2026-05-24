@@ -2,17 +2,6 @@
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <script>
-    if (sessionStorage.getItem('garage_auth') !== 'romain') {
-      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
-      if (pwd === 'romain') {
-        sessionStorage.setItem('garage_auth', 'romain');
-      } else {
-        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
-        throw new Error('Unauthorized');
-      }
-    }
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nous Trouver — Le Garage Alpin | Séez, Tarentaise</title>
   <meta name="description" content="Retrouvez le Garage Alpin à Séez (73700), zone artisanale de Tarentaise. Horaires, itinéraire et contact." />
@@ -252,7 +241,7 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--text); text-decoration:underline; font-weight:600;">Mahe BRIZION</a></span>
         <div style="display:flex;gap:24px;">
           <a href="#">Mentions légales</a>
           <a href="#">Confidentialité</a>

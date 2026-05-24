@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>404 - Page Introuvable | Mahé Brizion</title>
+  <meta name="description" content="La page que vous cherchez n'existe pas." />
+  <meta name="theme-color" content="#060608" />
+
+  <!-- ── Fonts ────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" />
+
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <style>
+    /* Styling specifically for 404 page to center content perfectly */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .error-code {
+      font-family: var(--font-d);
+      font-size: clamp(6rem, 20vw, 15rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: transparent;
+      -webkit-text-stroke: 2px rgba(240, 238, 233, 0.5);
+      margin-bottom: 20px;
+      animation: fadeUp 1s var(--ease-out) forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .error-title {
+      font-family: var(--font-d);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 16px;
+      animation: fadeUp 1s var(--ease-out) 0.2s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .error-desc {
+      color: var(--grey-4);
+      font-size: 1.1rem;
+      margin-bottom: 60px;
+      max-width: 500px;
+      animation: fadeUp 1s var(--ease-out) 0.3s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .btn-wrap {
+      animation: fadeUp 1s var(--ease-out) 0.4s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+  </style>
+</head>
+
+<body class="loading-done">
+
+  <!-- Grain & Cursor -->
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <main id="main-content">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Signal Perdu</h2>
+    <p class="error-desc">La transmission a été interrompue. La page que vous cherchez a dérivé dans le vide numérique ou n'a jamais existé.</p>
+    
+    <div class="btn-wrap">
+      <a href="/" class="btn-magnetic">
+        Retour à la base
+        <span class="btn-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M7 13L1 7l6-6M1 7h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Custom cursor logic for the 404 page so we don't need to load the huge GSAP bundle
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    
+    // Check if it's a touch device
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    
+    if (!isTouch) {
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let dotX = mouseX;
+      let dotY = mouseY;
+      let ringX = mouseX;
+      let ringY = mouseY;
+      
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+      
+      const animate = () => {
+        dotX += (mouseX - dotX) * 0.2;
+        dotY += (mouseY - dotY) * 0.2;
+        ringX += (mouseX - ringX) * 0.1;
+        ringY += (mouseY - ringY) * 0.1;
+        
+        dot.style.transform = `translate(${dotX}px, ${dotY}px) translate(-50%, -50%)`;
+        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+        
+        requestAnimationFrame(animate);
+      };
+      
+      animate();
+      
+      // Hover effects for the button
+      const link = document.querySelector('.btn-magnetic');
+      link.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+      link.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      
+      // Click effects
+      document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+      document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
+    }
+  </script>
+</body>
+</html>

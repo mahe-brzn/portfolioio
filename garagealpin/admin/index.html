@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Le Garage Alpin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="../images/logo_preloader.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@300;400;500;600&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07070a; --bg-2: #0f0f14; --border: rgba(255,255,255,0.08);
+      --text: rgba(255,255,255,0.85); --text-muted: rgba(255,255,255,0.4);
+      --white: #fff; --red: #e3000f; --red-dark: #b0000b;
+      --ease: cubic-bezier(0.16,1,0.3,1);
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; }
+
+    /* Grain */
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.6;
+    }
+
+    .login-wrap {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 24px; position: relative; z-index: 1;
+    }
+
+    .login-box {
+      width: 100%; max-width: 420px;
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 48px 40px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-logo {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 1.4rem; letter-spacing: -0.02em; margin-bottom: 8px;
+    }
+    .login-logo span { color: var(--red); }
+    .login-subtitle {
+      font-size: 0.82rem; color: var(--text-muted);
+      margin-bottom: 40px; display: flex; align-items: center; gap: 8px;
+    }
+    .login-subtitle::before {
+      content: ''; display: inline-block; width: 24px; height: 1px; background: var(--border);
+    }
+
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+    input {
+      width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px; color: var(--white); font-size: 0.95rem;
+      font-family: 'Inter', sans-serif; transition: border-color 0.3s, box-shadow 0.3s; outline: none;
+    }
+    input:focus { border-color: rgba(227,0,15,0.5); box-shadow: 0 0 0 3px rgba(227,0,15,0.1); }
+    input::placeholder { color: var(--text-muted); }
+
+    .btn-submit {
+      width: 100%; padding: 15px; margin-top: 8px;
+      background: var(--red); color: var(--white);
+      border: none; border-radius: 10px; font-size: 0.95rem;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+      letter-spacing: 0.03em;
+    }
+    .btn-submit:hover { background: var(--red-dark); }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* 2FA section */
+    #step-2fa { display: none; }
+
+    .otp-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
+    .otp-input {
+      width: 48px; height: 56px; text-align: center; font-size: 1.4rem;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--white); outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .otp-input:focus { border-color: rgba(227,0,15,0.5); box-shadow: 0 0 0 3px rgba(227,0,15,0.1); }
+
+    #status-msg {
+      font-size: 0.82rem; text-align: center; margin-top: 16px;
+      min-height: 20px; transition: all 0.3s;
+    }
+    #status-msg.error { color: #ff5252; }
+    #status-msg.success { color: #22c55e; }
+
+    .back-link {
+      display: block; text-align: center; margin-top: 24px;
+      font-size: 0.8rem; color: var(--text-muted); cursor: pointer;
+      text-decoration: underline; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--white); }
+
+    .setup-totp-box {
+      display: none; text-align: center;
+      padding: 24px; background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px;
+    }
+    .setup-totp-box p { font-size: 0.82rem; color: var(--text-muted); margin-top: 12px; }
+    .setup-totp-box canvas { border-radius: 8px; background: white; padding: 8px; }
+
+    .step-title {
+      font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .step-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 28px; }
+
+    .loader {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+      border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-box">
+
+      <div class="login-logo">Garage<span>.</span>Alpin</div>
+      <div class="login-subtitle">Espace Administrateur</div>
+
+      <!-- Étape 1 : Email + Mot de passe -->
+      <div id="step-credentials">
+        <div class="form-group">
+          <label for="email">Adresse e-mail</label>
+          <input type="email" id="email" placeholder="admin@legaragealpin.fr" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" placeholder="••••••••••••" autocomplete="current-password" />
+        </div>
+        <button class="btn-submit" id="btn-login" onclick="handleLogin()">Se connecter</button>
+      </div>
+
+      <!-- Étape 2 : 2FA / OTP -->
+      <div id="step-2fa">
+        <p class="step-title">Double authentification</p>
+        <p class="step-desc">Entrez le code à 6 chiffres depuis votre application d'authentification (Google Authenticator, Authy…)</p>
+
+        <!-- QR Code (affiché seulement lors du premier setup) -->
+        <div class="setup-totp-box" id="totp-setup-box">
+          <p style="margin-bottom:12px;font-weight:600;color:var(--white);">Configurez votre authenticator</p>
+          <canvas id="qr-canvas"></canvas>
+          <p>Scannez ce QR code avec votre application, puis entrez le code ci-dessous.</p>
+        </div>
+
+        <div class="otp-inputs">
+          <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        </div>
+        <button class="btn-submit" id="btn-verify" onclick="handleVerify2FA()">Vérifier</button>
+        <span class="back-link" onclick="goBack()">← Retour à la connexion</span>
+      </div>
+
+      <p id="status-msg"></p>
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- QR Code lib pour le setup TOTP -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <script>
+    // ─── CONFIGURATION SUPABASE ──────────────────────────────────────
+    // Remplacez ces valeurs après avoir créé votre projet Supabase
+    const SUPABASE_URL  = 'VOTRE_SUPABASE_URL';
+    const SUPABASE_ANON = 'VOTRE_SUPABASE_ANON_KEY';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    // ────────────────────────────────────────────────────────────────
+
+    const statusMsg = document.getElementById('status-msg');
+    function setStatus(msg, type = '') {
+      statusMsg.textContent = msg;
+      statusMsg.className   = type;
+    }
+
+    // Vérifier si déjà connecté
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) window.location.href = 'dashboard.html';
+    })();
+
+    // ── Étape 1 : Connexion ─────────────────────────────────────────
+    async function handleLogin() {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('btn-login');
+
+      if (!email || !password) { setStatus('Remplissez tous les champs.', 'error'); return; }
+
+      btn.disabled  = true;
+      btn.innerHTML = '<span class="loader"></span>';
+      setStatus('Connexion en cours…');
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        setStatus('Email ou mot de passe incorrect.', 'error');
+        btn.disabled  = false;
+        btn.innerHTML = 'Se connecter';
+        return;
+      }
+
+      // Connexion réussie — vérifier si 2FA est requis
+      const factors = await supabase.auth.mfa.listFactors();
+      const hasTOTP  = factors.data?.totp?.length > 0;
+
+      if (hasTOTP) {
+        // 2FA déjà configurée → demander le code
+        document.getElementById('step-credentials').style.display = 'none';
+        document.getElementById('step-2fa').style.display = 'block';
+        setStatus('');
+        initOtpInputs();
+      } else {
+        // 2FA pas encore configurée → Setup obligatoire
+        document.getElementById('step-credentials').style.display = 'none';
+        document.getElementById('step-2fa').style.display          = 'block';
+        document.getElementById('totp-setup-box').style.display    = 'block';
+        setStatus('Configurez la 2FA pour continuer.', 'success');
+        await setupTOTP();
+        initOtpInputs();
+      }
+
+      btn.disabled  = false;
+      btn.innerHTML = 'Se connecter';
+    }
+
+    // ── Configurer TOTP (premier usage) ────────────────────────────
+    async function setupTOTP() {
+      const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Garage Alpin Admin' });
+      if (error || !data) { setStatus('Erreur lors de la configuration 2FA.', 'error'); return; }
+
+      const qrUri = data.totp.qr_code;
+      await QRCode.toCanvas(document.getElementById('qr-canvas'), qrUri, { width: 180, margin: 1 });
+
+      // Stocker l'ID du facteur pour la vérification
+      window._mfaFactorId = data.id;
+    }
+
+    // ── Étape 2 : Vérification du code TOTP ────────────────────────
+    async function handleVerify2FA() {
+      const inputs = document.querySelectorAll('.otp-input');
+      const code   = Array.from(inputs).map(i => i.value).join('');
+      const btn    = document.getElementById('btn-verify');
+
+      if (code.length < 6) { setStatus('Entrez les 6 chiffres.', 'error'); return; }
+
+      btn.disabled  = true;
+      btn.innerHTML = '<span class="loader"></span>';
+      setStatus('Vérification…');
+
+      // Si setup en cours
+      if (window._mfaFactorId) {
+        const challengeRes = await supabase.auth.mfa.challenge({ factorId: window._mfaFactorId });
+        if (challengeRes.error) { setStatus('Erreur challenge 2FA.', 'error'); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
+        const verifyRes = await supabase.auth.mfa.verify({ factorId: window._mfaFactorId, challengeId: challengeRes.data.id, code });
+        if (verifyRes.error) { setStatus('Code incorrect. Réessayez.', 'error'); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
+      } else {
+        // 2FA existante
+        const factors = await supabase.auth.mfa.listFactors();
+        const factor  = factors.data.totp[0];
+        const challengeRes = await supabase.auth.mfa.challenge({ factorId: factor.id });
+        const verifyRes = await supabase.auth.mfa.verify({ factorId: factor.id, challengeId: challengeRes.data.id, code });
+        if (verifyRes.error) { setStatus('Code incorrect. Réessayez.', 'error'); inputs.forEach(i => i.value=''); inputs[0].focus(); btn.disabled = false; btn.innerHTML = 'Vérifier'; return; }
+      }
+
+      setStatus('Authentification réussie !', 'success');
+      setTimeout(() => window.location.href = 'dashboard.html', 800);
+    }
+
+    // ── OTP inputs navigation auto ──────────────────────────────────
+    function initOtpInputs() {
+      const inputs = document.querySelectorAll('.otp-input');
+      inputs.forEach((input, idx) => {
+        input.addEventListener('input', () => {
+          if (input.value && idx < inputs.length - 1) inputs[idx + 1].focus();
+          if (Array.from(inputs).every(i => i.value)) handleVerify2FA();
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !input.value && idx > 0) inputs[idx - 1].focus();
+        });
+      });
+      inputs[0].focus();
+    }
+
+    function goBack() {
+      document.getElementById('step-2fa').style.display          = 'none';
+      document.getElementById('totp-setup-box').style.display    = 'none';
+      document.getElementById('step-credentials').style.display  = 'block';
+      document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+      setStatus('');
+      supabase.auth.signOut();
+    }
+
+    // Enter key
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      if (document.getElementById('step-credentials').style.display !== 'none') handleLogin();
+    });
+  </script>
+</body>
+</html>

@@ -792,22 +792,31 @@
 
     /* ════════════════════════════════════════════════════════
        HAPTIC ENGINE
-       iOS  : Hack Checkbox (input type="checkbox" switch)
+       iOS  : impulsions audio basses fréquences → Taptic Engine
        Android : navigator.vibrate()
+       ⚠ Le script étant en bas de <body>, le DOM est déjà prêt.
+       ─ Pas de DOMContentLoaded nécessaire ici. ─
     ════════════════════════════════════════════════════════ */
-    // Création des éléments invisibles pour le hack iOS (iOS 17.4+)
-    const hapticInput = document.createElement('input');
-    hapticInput.type = 'checkbox';
-    hapticInput.setAttribute('switch', ''); // Attribut magique Apple
-    hapticInput.id = 'ios-haptic-switch';
-    hapticInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;';
-    
-    const hapticLabel = document.createElement('label');
-    hapticLabel.htmlFor = 'ios-haptic-switch';
-    hapticLabel.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;';
+    let hapticCtx = null;
 
-    document.body.appendChild(hapticInput);
-    document.body.appendChild(hapticLabel);
+    function initHapticCtx() {
+      if (hapticCtx && hapticCtx.state === 'running') return;
+      try {
+        if (!hapticCtx) {
+          hapticCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        // iOS nécessite un "prime" : buffer vide joué depuis un geste utilisateur
+        if (hapticCtx.state === 'suspended') hapticCtx.resume();
+        const buf = hapticCtx.createBuffer(1, 1, 22050);
+        const src = hapticCtx.createBufferSource();
+        src.buffer = buf;
+        src.connect(hapticCtx.destination);
+        src.start(0);
+      } catch(e) { hapticCtx = null; }
+    }
+
+    // Initialiser dès le premier touch n'importe où
+    document.addEventListener('touchstart', initHapticCtx, { once: true, passive: true });
 
     function haptic(style = 'light') {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -826,20 +835,35 @@
         return;
       }
 
-      // ── iOS : Hack Checkbox "switch" ──────────────────────
-      if (isIOS) {
+      // ── iOS : impulsion sinusoïdale → Taptic Engine ───────
+      // Nécessite haut-parleur interne (pas casque/AirPods) + volume non nul
+      if (isIOS && hapticCtx) {
+        if (hapticCtx.state === 'suspended') {
+          hapticCtx.resume().then(() => haptic(style));
+          return;
+        }
         try {
-          // Le clic programmatique sur le label déclenche le switch et le Taptic Engine
-          if (style === 'double') {
-            hapticLabel.click();
-            setTimeout(() => hapticLabel.click(), 100);
-          } else if (style === 'success') {
-            hapticLabel.click();
-            setTimeout(() => hapticLabel.click(), 150);
-            setTimeout(() => hapticLabel.click(), 300);
-          } else {
-            hapticLabel.click();
-          }
+          const configs = {
+            light:   [{ f: 230, d: 0.010, v: 0.75 }],
+            medium:  [{ f: 190, d: 0.018, v: 0.88 }],
+            heavy:   [{ f: 150, d: 0.028, v: 1.00 }],
+            double:  [{ f: 210, d: 0.012, v: 0.80, at: 0 }, { f: 210, d: 0.012, v: 0.80, at: 0.07 }],
+            success: [{ f: 190, d: 0.010, v: 0.75, at: 0 }, { f: 250, d: 0.010, v: 0.80, at: 0.09 }, { f: 310, d: 0.016, v: 0.95, at: 0.20 }],
+          };
+          (configs[style] || configs.light).forEach(({ f, d, v, at = 0 }) => {
+            const t   = hapticCtx.currentTime + at;
+            const osc = hapticCtx.createOscillator();
+            const g   = hapticCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, t);
+            g.gain.setValueAtTime(0, t);
+            g.gain.linearRampToValueAtTime(v, t + 0.002);   // montée brutale
+            g.gain.exponentialRampToValueAtTime(0.001, t + d); // coupure nette
+            osc.connect(g);
+            g.connect(hapticCtx.destination);
+            osc.start(t);
+            osc.stop(t + d + 0.004);
+          });
         } catch(e) {}
       }
     }

@@ -507,6 +507,74 @@
       .hero-name { letter-spacing: -0.03em; }
     }
 
+    /* ── SOUND TOGGLE ────────────────────────────────── */
+    #sound-btn {
+      position: fixed;
+      top: 28px;
+      right: 28px;
+      z-index: 9990;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 160, 140, 0.25);
+      background: rgba(10, 5, 8, 0.6);
+      backdrop-filter: blur(12px);
+      color: rgba(212, 160, 140, 0.6);
+      cursor: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.3s, color 0.3s, transform 0.3s var(--ease-expo), box-shadow 0.3s;
+      opacity: 0;
+      animation: fadeIn 1s ease 2.5s forwards;
+    }
+    #sound-btn:hover {
+      border-color: rgba(212, 160, 140, 0.7);
+      color: var(--rose);
+      box-shadow: 0 0 20px rgba(212, 160, 140, 0.1);
+    }
+    #sound-btn.active {
+      border-color: rgba(212, 160, 140, 0.5);
+      color: var(--rose);
+    }
+    #sound-btn svg { width: 18px; height: 18px; }
+    .icon-sound-on  { display: none; }
+    .icon-sound-off { display: block; }
+    #sound-btn.active .icon-sound-on  { display: block; }
+    #sound-btn.active .icon-sound-off { display: none; }
+
+    /* Visualizer bars (vu-meter style) */
+    #sound-vu {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9990;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 20px;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+    #sound-vu.active { opacity: 1; }
+    .vu-bar {
+      width: 2px;
+      background: var(--rose);
+      border-radius: 1px;
+      opacity: 0.6;
+      animation: vuAnim 1.2s ease-in-out infinite;
+    }
+    .vu-bar:nth-child(1) { animation-delay: 0s;    --h: 30%; }
+    .vu-bar:nth-child(2) { animation-delay: 0.15s; --h: 70%; }
+    .vu-bar:nth-child(3) { animation-delay: 0.3s;  --h: 50%; }
+    .vu-bar:nth-child(4) { animation-delay: 0.45s; --h: 90%; }
+    .vu-bar:nth-child(5) { animation-delay: 0.2s;  --h: 40%; }
+    .vu-bar:nth-child(6) { animation-delay: 0.35s; --h: 65%; }
+    @keyframes vuAnim {
+      0%, 100% { height: 15%; }
+      50%       { height: var(--h); }
+    }
+
     /* ── REDUCED MOTION ─────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -524,6 +592,32 @@
 </head>
 
 <body>
+
+  <!-- Sound toggle -->
+  <button id="sound-btn" aria-label="Activer / Désactiver le son">
+    <!-- Icon: sound ON -->
+    <svg class="icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </svg>
+    <!-- Icon: sound OFF (muted) -->
+    <svg class="icon-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <line x1="23" y1="9" x2="17" y2="15"/>
+      <line x1="17" y1="9" x2="23" y2="15"/>
+    </svg>
+  </button>
+
+  <!-- VU Meter -->
+  <div id="sound-vu" aria-hidden="true">
+    <div class="vu-bar"></div>
+    <div class="vu-bar"></div>
+    <div class="vu-bar"></div>
+    <div class="vu-bar"></div>
+    <div class="vu-bar"></div>
+    <div class="vu-bar"></div>
+  </div>
 
   <!-- Custom cursor -->
   <div id="cursor-dot"></div>
@@ -640,13 +734,13 @@
   </div><!-- /page-wrapper -->
 
   <script>
-    // ── Cursor ────────────────────────────────────────────
+    /* ════════════════════════════════════════════════════════
+       CURSOR
+    ════════════════════════════════════════════════════════ */
     const cursorDot  = document.getElementById('cursor-dot');
     const cursorRing = document.getElementById('cursor-ring');
     let mx = -200, my = -200, rx = -200, ry = -200;
-
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
-
     (function moveCursor() {
       cursorDot.style.left  = mx + 'px';
       cursorDot.style.top   = my + 'px';
@@ -656,46 +750,258 @@
       cursorRing.style.top  = ry + 'px';
       requestAnimationFrame(moveCursor);
     })();
-
     document.querySelectorAll('a, button').forEach(el => {
       el.addEventListener('mouseenter', () => document.body.classList.add('hovered'));
       el.addEventListener('mouseleave', () => document.body.classList.remove('hovered'));
     });
 
-    // ── Particles ─────────────────────────────────────────
-    const container = document.getElementById('particles');
-    const PARTICLE_COUNT = 20;
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    /* ════════════════════════════════════════════════════════
+       PARTICLES
+    ════════════════════════════════════════════════════════ */
+    const pContainer = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
       const size = Math.random() * 3 + 1;
-      p.style.cssText = `
-        width: ${size}px; height: ${size}px;
-        left: ${Math.random() * 100}%;
-        animation-duration: ${Math.random() * 15 + 20}s;
-        animation-delay: ${Math.random() * -30}s;
-        opacity: 0;
-      `;
-      container.appendChild(p);
+      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;animation-duration:${Math.random()*15+20}s;animation-delay:${Math.random()*-30}s;opacity:0;`;
+      pContainer.appendChild(p);
     }
 
-    // ── Scroll reveal ─────────────────────────────────────
+    /* ════════════════════════════════════════════════════════
+       SCROLL REVEAL
+    ════════════════════════════════════════════════════════ */
     const revealEls = document.querySelectorAll('[data-reveal]');
+    const sectionRevealedFlags = new WeakMap();
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const delay = entry.target.dataset.revealDelay
-            ? parseFloat(entry.target.dataset.revealDelay) * 1000
-            : 0;
+          const delay = entry.target.dataset.revealDelay ? parseFloat(entry.target.dataset.revealDelay) * 1000 : 0;
           setTimeout(() => {
             entry.target.classList.add('on');
+            // Trigger section note when a text section reveals
+            if (entry.target.classList.contains('section-inner') && !sectionRevealedFlags.get(entry.target)) {
+              sectionRevealedFlags.set(entry.target, true);
+              playRevealNote();
+            }
           }, delay);
           io.unobserve(entry.target);
         }
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
-
     revealEls.forEach(el => io.observe(el));
+
+    /* ════════════════════════════════════════════════════════
+       SOUND ENGINE — Web Audio API
+       Simulated spatial / immersive audio (no files needed)
+    ════════════════════════════════════════════════════════ */
+    let audioCtx = null;
+    let masterGain = null;
+    let droneNodes = [];
+    let shimmerNodes = [];
+    let soundActive = false;
+    let scrollNoteIndex = 0;
+
+    // D major pentatonic — warm and romantic
+    const SCALE = [293.66, 329.63, 369.99, 440.00, 493.88, 587.33, 659.25, 739.99];
+
+    // ── Build synthetic reverb (convolver) ──────────────
+    function buildReverb(ctx, duration = 4, decay = 2.5) {
+      const sr  = ctx.sampleRate;
+      const len = sr * duration;
+      const buf = ctx.createBuffer(2, len, sr);
+      for (let ch = 0; ch < 2; ch++) {
+        const d = buf.getChannelData(ch);
+        for (let i = 0; i < len; i++) {
+          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+        }
+      }
+      const conv = ctx.createConvolver();
+      conv.buffer = buf;
+      return conv;
+    }
+
+    // ── Soft piano-like note (oscillator + ADSR) ─────────
+    function playNote(freq, pan = 0, vol = 0.08, delay = 0) {
+      if (!audioCtx || !soundActive) return;
+      const t = audioCtx.currentTime + delay;
+      const osc  = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const panner = audioCtx.createStereoPanner();
+      const filt = audioCtx.createBiquadFilter();
+
+      filt.type = 'lowpass';
+      filt.frequency.setValueAtTime(1800, t);
+      filt.frequency.exponentialRampToValueAtTime(600, t + 0.8);
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      osc.detune.setValueAtTime((Math.random() - 0.5) * 6, t); // micro-humanisation
+
+      panner.pan.setValueAtTime(pan, t);
+
+      // ADSR envelope
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(vol, t + 0.05);  // attack
+      gain.gain.exponentialRampToValueAtTime(vol * 0.5, t + 0.3); // decay
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 2.5); // release
+
+      osc.connect(filt);
+      filt.connect(gain);
+      gain.connect(panner);
+      panner.connect(reverb);
+      panner.connect(masterGain); // dry signal too
+
+      osc.start(t);
+      osc.stop(t + 2.8);
+    }
+
+    // ── Harmonic chord for reveal moments ────────────────
+    function playRevealNote() {
+      if (!soundActive || !audioCtx) return;
+      const root = SCALE[scrollNoteIndex % SCALE.length];
+      const third = root * 1.2599; // minor third
+      const fifth = root * 1.4983; // perfect fifth
+      scrollNoteIndex++;
+      const pan = (Math.random() - 0.5) * 0.7;
+      playNote(root,  pan,         0.07, 0);
+      playNote(third, -pan * 0.5,  0.05, 0.08);
+      playNote(fifth, pan * 0.3,   0.04, 0.18);
+      // ghost octave
+      playNote(root * 2, -pan, 0.025, 0.4);
+    }
+
+    // ── Ambient drone pad (layered oscillators) ──────────
+    function startDrone() {
+      const droneFq = 73.42; // D2 — deep and warm
+      const detunes = [-6, 0, 6, 12, 19]; // rich chorusing
+      const vols    = [0.04, 0.055, 0.04, 0.02, 0.015];
+
+      droneNodes = detunes.map((det, i) => {
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = i === 0 ? 'sine' : 'triangle';
+        osc.frequency.value = droneFq;
+        osc.detune.value = det;
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(vols[i], audioCtx.currentTime + 4);
+        osc.connect(gain);
+        gain.connect(reverb);
+        gain.connect(masterGain);
+        osc.start();
+        return { osc, gain };
+      });
+
+      // Subtle LFO tremolo on the drone
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.value = 0.08; // very slow breath
+      lfoGain.gain.value = 0.012;
+      lfo.connect(lfoGain);
+      droneNodes.forEach(({ gain }) => lfoGain.connect(gain.gain));
+      lfo.start();
+      droneNodes.push({ osc: lfo, gain: lfoGain });
+    }
+
+    // ── Shimmer layer (high-freq airy texture) ───────────
+    function startShimmer() {
+      const shimFreqs = [2349.32, 2637.02, 2793.83, 3135.96]; // D6-G6
+      shimmerNodes = shimFreqs.map((freq, i) => {
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        osc.detune.value = (i % 2 === 0 ? 1 : -1) * (i * 3);
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.006, audioCtx.currentTime + 6);
+        // Very slow shimmer LFO
+        const sLfo = audioCtx.createOscillator();
+        const sLfoG = audioCtx.createGain();
+        sLfo.frequency.value = 0.12 + i * 0.04;
+        sLfoG.gain.value = 0.004;
+        sLfo.connect(sLfoG);
+        sLfoG.connect(gain.gain);
+        sLfo.start();
+        osc.connect(gain);
+        gain.connect(reverb);
+        osc.start();
+        return { osc, gain, lfo: sLfo };
+      });
+    }
+
+    // ── Opening phrase — played on first activation ───────
+    function playOpeningPhrase() {
+      const melody   = [0, 2, 4, 5, 7, 5, 4, 2]; // indices in SCALE
+      const pans     = [-0.6, -0.3, 0, 0.3, 0.5, 0.2, -0.2, -0.5];
+      const timing   = [0, 0.55, 1.0, 1.5, 2.1, 2.7, 3.3, 4.0];
+      const vols     = [0.07, 0.06, 0.075, 0.065, 0.08, 0.065, 0.06, 0.05];
+      melody.forEach((noteIdx, i) => {
+        playNote(SCALE[noteIdx], pans[i], vols[i], timing[i]);
+      });
+    }
+
+    // ── Scroll-reactive pitch shift on drone ──────────────
+    let scrollTicking = false;
+    window.addEventListener('scroll', () => {
+      if (!soundActive || !audioCtx || !droneNodes.length) return;
+      if (!scrollTicking) {
+        requestAnimationFrame(() => {
+          const progress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+          // Drone slowly rises as user scrolls deeper
+          droneNodes.forEach(({ osc }, i) => {
+            if (i < 5 && osc.detune) {
+              osc.detune.linearRampToValueAtTime(
+                osc.detune.value + progress * 8,
+                audioCtx.currentTime + 2
+              );
+            }
+          });
+          scrollTicking = false;
+        });
+        scrollTicking = true;
+      }
+    }, { passive: true });
+
+    // ── Toggle sound ──────────────────────────────────────
+    let reverb = null;
+    const soundBtn = document.getElementById('sound-btn');
+    const soundVu  = document.getElementById('sound-vu');
+
+    soundBtn.addEventListener('click', () => {
+      if (!audioCtx) {
+        // First activation — create context
+        audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.85;
+        masterGain.connect(audioCtx.destination);
+
+        reverb = buildReverb(audioCtx, 5, 2);
+        const reverbGain = audioCtx.createGain();
+        reverbGain.gain.value = 0.45;
+        reverb.connect(reverbGain);
+        reverbGain.connect(masterGain);
+
+        startDrone();
+        startShimmer();
+        playOpeningPhrase();
+
+        soundActive = true;
+        soundBtn.classList.add('active');
+        soundVu.classList.add('active');
+      } else if (soundActive) {
+        // Mute — fade out
+        masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
+        soundActive = false;
+        soundBtn.classList.remove('active');
+        soundVu.classList.remove('active');
+      } else {
+        // Unmute — fade back in
+        masterGain.gain.linearRampToValueAtTime(0.85, audioCtx.currentTime + 1.2);
+        soundActive = true;
+        soundBtn.classList.add('active');
+        soundVu.classList.add('active');
+        playOpeningPhrase();
+      }
+    });
   </script>
 </body>
 </html>

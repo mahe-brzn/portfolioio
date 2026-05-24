@@ -51,27 +51,7 @@ async function loadEquipePage() {
     grid.appendChild(article);
   });
 
-  // Carte "Nous recrutons" toujours à la fin
-  const joinCard = document.createElement('article');
-  joinCard.className = 'equipe-card tilt-card reveal reveal-d2';
-  joinCard.setAttribute('aria-label', "Rejoindre l'équipe");
-  joinCard.innerHTML = `
-    <div class="equipe-card-img-wrap" style="background:var(--bg-2);display:flex;align-items:center;justify-content:center;height:clamp(280px,35vw,420px);">
-      <div style="text-align:center;padding:32px;">
-        <div style="width:64px;height:64px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-        </div>
-        <p style="font-size:0.85rem;color:var(--text-muted);">Nous recrutons</p>
-      </div>
-    </div>
-    <div class="equipe-card-body">
-      <h3 class="equipe-card-name">Vous ?</h3>
-      <p class="equipe-card-role">Poste à pourvoir</p>
-      <p class="equipe-card-desc">Passionné de mécanique et prêt à rejoindre une équipe dynamique en Tarentaise ? Contactez-nous !</p>
-    </div>`;
-  grid.appendChild(joinCard);
+
 
   // Réinitialiser les animations (le script.js observe le DOM au chargement)
   if (typeof initReveal === 'function') initReveal();

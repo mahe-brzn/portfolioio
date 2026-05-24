@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    if (sessionStorage.getItem('garage_auth') !== 'romain') {
+      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
+      if (pwd === 'romain') {
+        sessionStorage.setItem('garage_auth', 'romain');
+      } else {
+        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
+        throw new Error('Unauthorized');
+      }
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title>Le Garage Alpin — L'Excellence Mécanique | Séez, Tarentaise</title>
+  <meta name="description" content="Le Garage Alpin à Séez (73700) — Entretien, réparation toutes marques, diagnostic électronique. 7 techniciens experts au cœur de la Tarentaise." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.legaragealpin.fr/" />
+
+  <meta property="og:title"       content="Le Garage Alpin — L'Excellence Mécanique" />
+  <meta property="og:description" content="Entretien, réparation et diagnostic à Séez, Savoie. Garage indépendant depuis 2018." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://www.legaragealpin.fr/" />
+  <meta name="theme-color"        content="#07070a" />
+
+  <link rel="icon" type="image/png" href="images/logo_preloader.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="loading">
+
+  <!-- ══ GRAIN ══ -->
+  <div id="grain" aria-hidden="true"></div>
+
+  <!-- ══ CUSTOM CURSOR ══ -->
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- ══ PRELOADER ══ -->
+  <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
+    <div class="pre-logo">Garage<span>.</span>Alpin</div>
+    <div class="pre-bar-wrap" aria-hidden="true">
+      <div class="pre-bar"></div>
+    </div>
+    <span class="pre-counter" aria-hidden="true">0%</span>
+  </div>
+
+  <!-- ══ HEADER / NAV ══ -->
+  <header role="banner">
+    <nav id="nav" aria-label="Navigation principale">
+      <div class="wrap nav-row">
+
+        <a href="index.html" class="nav-logo" aria-label="Le Garage Alpin — Accueil">
+          Garage<span>.</span>Alpin
+        </a>
+
+        <ul class="nav-links" role="list">
+          <li><a href="#services"  id="nl-services">Services</a></li>
+          <li><a href="#about"     id="nl-about">À propos</a></li>
+          <li><a href="equipe.html" id="nl-equipe">Notre équipe</a></li>
+          <li><a href="location.html" id="nl-location">Nous trouver</a></li>
+        </ul>
+
+        <div class="nav-right">
+          <div class="nav-status" role="status" aria-label="Statut : ouvert">
+            <span class="nav-dot" aria-hidden="true"></span>
+            <span>Ouvert</span>
+          </div>
+          <button
+            class="nav-burger"
+            aria-label="Ouvrir le menu"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+          >
+            <span class="burger-bar" aria-hidden="true"></span>
+            <span class="burger-bar" aria-hidden="true"></span>
+            <span class="burger-bar" aria-hidden="true"></span>
+          </button>
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- ══ MOBILE MENU ══ -->
+  <div id="mobile-menu" class="mob-menu" role="dialog" aria-label="Menu de navigation" aria-modal="true" hidden>
+    <nav aria-label="Navigation mobile">
+      <ul class="mob-nav-links" role="list">
+        <li><a href="#services"   class="mob-link"><span class="link-num">01</span>Services</a></li>
+        <li><a href="#about"      class="mob-link"><span class="link-num">02</span>À propos</a></li>
+        <li><a href="equipe.html" class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
+        <li><a href="location.html" class="mob-link"><span class="link-num">04</span>Localisation</a></li>
+        <li><a href="contact.html"  class="mob-link"><span class="link-num">05</span>Contact</a></li>
+      </ul>
+    </nav>
+    <div class="mob-footer" aria-label="Contact rapide">
+      <a href="tel:+33479417373" class="mob-footer-tel">04 79 41 73 73</a>
+      <p class="mob-footer-meta">Garage Alpin · Séez, Tarentaise 🏔️</p>
+    </div>
+  </div>
+
+  <main id="main-content">
+
+    <!-- ══════════════════════════════════════════════════
+         HERO
+    ══════════════════════════════════════════════════ -->
+    <section id="hero" aria-labelledby="hero-h1">
+      <h1 id="hero-h1" class="sr-only">Le Garage Alpin — Excellence mécanique à Séez, Tarentaise</h1>
+
+      <!-- Ambient orbs (parallax) -->
+      <div class="hero-ambient" aria-hidden="true">
+        <div class="amb-orb amb-1"></div>
+        <div class="amb-orb amb-2"></div>
+      </div>
+
+      <!-- Grid background -->
+      <div class="hero-grid" aria-hidden="true"></div>
+
+      <!-- Canvas particles -->
+      <canvas id="hero-canvas" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
+
+      <!-- Massive name -->
+      <div class="hero-name-wrap" aria-hidden="true" style="position:relative;z-index:2;">
+        <span class="hero-name-line">
+          <span class="hero-name-inner solid">Garage</span>
+        </span>
+        <span class="hero-name-line">
+          <span class="hero-name-inner outline" style="transition-delay:0.1s;">Alpin</span>
+        </span>
+        <div class="play-bar reveal" style="transition-delay:0.2s;">
+          <div class="play-bar-inner"></div>
+        </div>
+      </div>
+
+      <!-- Animated divider line -->
+      <div class="hero-line-wrap" style="position:relative;z-index:2;" aria-hidden="true">
+        <div class="hero-line">
+          <div class="hero-line-orb"></div>
+        </div>
+      </div>
+
+      <!-- Bottom content -->
+      <div class="hero-bottom" style="position:relative;z-index:2;">
+
+        <div class="hero-meta">
+          <div class="hero-eyebrow" aria-hidden="true">
+            <span class="eyebrow-line"></span>
+            <span class="eyebrow-text">Depuis 2018 — Séez, Tarentaise, Savoie</span>
+          </div>
+          <p class="hero-desc">
+            Garage <strong>indépendant</strong> spécialisé dans l'entretien et la réparation
+            <strong>toutes marques</strong>. De la révision au diagnostic électronique,
+            nous prenons soin de votre véhicule avec <strong>précision</strong>.
+          </p>
+          <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="contact.html" class="btn-magnetic" id="hero-cta">
+              Prendre RDV
+              <span class="btn-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </a>
+            <a href="tel:+33479417373" class="btn-outline" id="hero-tel">04 79 41 73 73</a>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:36px;">
+          <dl class="hero-stats">
+            <div class="hero-stat">
+              <dt class="stat-label">Création</dt>
+              <dd class="stat-num" data-count="2018" data-suffix="">
+                <span class="n">0</span>
+              </dd>
+            </div>
+            <div class="hero-stat">
+              <dt class="stat-label">Techniciens experts</dt>
+              <dd class="stat-num" data-count="7" data-suffix="+">
+                <span class="n">0</span><span class="accent-num">+</span>
+              </dd>
+            </div>
+            <div class="hero-stat">
+              <dt class="stat-label">Marques maîtrisées</dt>
+              <dd class="stat-num" data-count="100" data-suffix="+">
+                <span class="n">0</span><span class="accent-num">+</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="hero-scroll" aria-hidden="true">
+        <span class="scroll-label">Scroll</span>
+        <div class="scroll-bar">
+          <div class="scroll-progress"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         MARQUEE — Compétences défilantes
+    ══════════════════════════════════════════════════ -->
+    <div class="marquee-section" aria-hidden="true">
+      <div class="marquee-wrap">
+        <div class="marquee-track" role="presentation">
+          <div class="marquee-copy">
+            <span class="m-word">Révision</span><span class="m-sep">·</span>
+            <span class="m-word">Diagnostic</span><span class="m-sep">·</span>
+            <span class="m-word">Mécanique Lourde</span><span class="m-sep">·</span>
+            <span class="m-word">Freinage</span><span class="m-sep">·</span>
+            <span class="m-word">Distribution</span><span class="m-sep">·</span>
+            <span class="m-word">Climatisation</span><span class="m-sep">·</span>
+            <span class="m-word">Toutes Marques</span><span class="m-sep">·</span>
+            <span class="m-word">Embrayage</span><span class="m-sep">·</span>
+          </div>
+          <div class="marquee-copy" aria-hidden="true">
+            <span class="m-word">Révision</span><span class="m-sep">·</span>
+            <span class="m-word">Diagnostic</span><span class="m-sep">·</span>
+            <span class="m-word">Mécanique Lourde</span><span class="m-sep">·</span>
+            <span class="m-word">Freinage</span><span class="m-sep">·</span>
+            <span class="m-word">Distribution</span><span class="m-sep">·</span>
+            <span class="m-word">Climatisation</span><span class="m-sep">·</span>
+            <span class="m-word">Toutes Marques</span><span class="m-sep">·</span>
+            <span class="m-word">Embrayage</span><span class="m-sep">·</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         SERVICES
+    ══════════════════════════════════════════════════ -->
+    <section id="services" aria-labelledby="services-title">
+      <div class="wrap" style="padding-top:clamp(80px,12vw,160px);">
+        <p class="s-label reveal" data-num="01" aria-hidden="true">Nos Services</p>
+        <h2 id="services-title" class="sr-only">Services du Garage Alpin — Révision, diagnostic, mécanique</h2>
+      </div>
+
+      <div class="wrap" style="padding-bottom:clamp(80px,12vw,160px);">
+        <div class="services-grid">
+
+          <div class="service-card tilt-card reveal">
+            <span class="service-num">01</span>
+            <div class="service-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <h3 class="service-title">Révision &amp; Entretien</h3>
+            <p class="service-desc">Vidange, filtres, bougies. Nous respectons scrupuleusement le cahier des charges constructeur pour préserver votre garantie et prolonger la vie de votre véhicule.</p>
+          </div>
+
+          <div class="service-card tilt-card reveal reveal-d1">
+            <span class="service-num">02</span>
+            <div class="service-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <h3 class="service-title">Diagnostic Électronique</h3>
+            <p class="service-desc">Recherche de pannes précise grâce à notre matériel de diagnostic multimarque de dernière génération. Lecture et effacement de codes défauts.</p>
+          </div>
+
+          <div class="service-card tilt-card reveal reveal-d2">
+            <span class="service-num">03</span>
+            <div class="service-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+            <h3 class="service-title">Mécanique Lourde</h3>
+            <p class="service-desc">Distribution, embrayage, remplacement moteur ou boîte de vitesses. L'ADN de notre métier, maîtrisé par des techniciens expérimentés.</p>
+          </div>
+
+          <div class="service-card tilt-card reveal reveal-d3">
+            <span class="service-num">04</span>
+            <div class="service-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3 class="service-title">Sécurité &amp; Liaison</h3>
+            <p class="service-desc">Freinage, amortisseurs, géométrie et direction. Sur nos routes de montagne alpines, ne laissez aucune place au doute.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════════════
+         À PROPOS / HISTOIRE
+    ══════════════════════════════════════════════════ -->
+    <section id="about" aria-labelledby="about-title">
+      <div class="wrap" style="padding-top:clamp(80px,12vw,160px);padding-bottom:clamp(80px,12vw,160px);">
+
+        <p class="s-label reveal" data-num="02" aria-hidden="true">Notre Histoire</p>
+
+        <div class="about-grid">
+
+          <!-- Left: image -->
+          <div class="reveal">
+            <div class="about-img-wrap">
+              <img src="images/atelier1.avif" alt="Atelier du Garage Alpin" class="about-img" loading="lazy" />
+              <div class="about-img-overlay" aria-hidden="true"></div>
+              <div class="about-img-tag" aria-hidden="true">Séez, Tarentaise · 73700</div>
+            </div>
+          </div>
+
+          <!-- Right: text -->
+          <div class="reveal reveal-d1">
+            <h2 class="about-title split-text" id="about-title">
+              Des hommes<br>
+              de <span class="accent">l'art.</span>
+            </h2>
+
+            <dl class="about-facts">
+              <div class="fact-row">
+                <dt class="fact-label">Fondé en</dt>
+                <dd class="fact-value">2018 par Romain Bouvet &amp; Jonathan Courtois</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Localisation</dt>
+                <dd class="fact-value">Zone artisanale, 73700 Séez</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Équipe</dt>
+                <dd class="fact-value">7 techniciens indépendants</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Spécialité</dt>
+                <dd class="fact-value">Toutes marques — Diagnostic avancé</dd>
+              </div>
+              <div class="fact-row">
+                <dt class="fact-label">Contact</dt>
+                <dd class="fact-value">04 79 41 73 73</dd>
+              </div>
+            </dl>
+
+            <div class="about-stats">
+              <div class="a-stat reveal reveal-d1">
+                <span class="a-stat-num" data-target="2018" data-suffix="">0</span>
+                <span class="a-stat-label">Création</span>
+              </div>
+              <div class="a-stat reveal reveal-d2">
+                <span class="a-stat-num" data-target="7" data-suffix="+">0</span>
+                <span class="a-stat-label">Experts</span>
+              </div>
+              <div class="a-stat reveal reveal-d3">
+                <span class="a-stat-num" data-target="100" data-suffix="+">0</span>
+                <span class="a-stat-label">Marques</span>
+              </div>
+            </div>
+
+            <div style="margin-top:48px;">
+              <a href="equipe.html" class="btn-outline" id="about-cta">
+                Découvrir l'équipe
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════════════
+         GALERIE ATELIER (images qui bougent)
+    ══════════════════════════════════════════════════ -->
+    <section id="galerie" aria-label="Galerie de l'atelier" style="padding:clamp(80px,10vw,140px) 0;overflow:hidden;">
+      <div class="wrap">
+        <p class="s-label reveal" data-num="03" aria-hidden="true">L'Atelier</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:48px;" class="reveal">
+        <div style="overflow:hidden;height:clamp(200px,28vw,360px);">
+          <img src="images/atelier2.avif" alt="Atelier 2" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+        <div style="overflow:hidden;height:clamp(200px,28vw,360px);">
+          <img src="images/atelier3.avif" alt="Atelier 3" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+        <div style="overflow:hidden;height:clamp(200px,28vw,360px);">
+          <img src="images/atelier4.avif" alt="Atelier 4" loading="lazy"
+               style="width:100%;height:100%;object-fit:cover;display:block;" />
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════════════
+         CTA — Contact
+    ══════════════════════════════════════════════════ -->
+    <section id="cta" aria-labelledby="cta-title">
+      <div class="cta-bg-orb" aria-hidden="true"></div>
+      <div class="wrap" style="position:relative;z-index:2;">
+        <p class="cta-over reveal" aria-hidden="true">Garage indépendant — Séez, Savoie 🏔️</p>
+        <h2 class="cta-title split-text" id="cta-title">Prenons<br>rendez-vous.</h2>
+        <div class="cta-actions reveal reveal-d1">
+          <a href="tel:+33479417373" class="cta-tel" id="cta-tel">04 79 41 73 73</a>
+        </div>
+        <div class="cta-actions reveal reveal-d2" style="margin-top:32px;">
+          <a href="contact.html" class="btn-magnetic" id="cta-btn-contact">
+            Formulaire de contact
+            <span class="btn-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </a>
+          <a href="location.html" class="btn-outline" id="cta-btn-location">Nous trouver</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-grid reveal">
+        <div>
+          <div class="footer-logo">Garage<span>.</span>Alpin</div>
+          <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="equipe.html">L'Équipe</a></li>
+            <li><a href="location.html">Nous trouver</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="tel:+33479417373">04 79 41 73 73</a></li>
+            <li><a href="mailto:contact@legaragealpin.fr">contact@legaragealpin.fr</a></li>
+            <li><span style="color:var(--text-muted);">Zone artisanale<br>73700 Séez</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom reveal">
+        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
+        <div style="display:flex;gap:24px;">
+          <a href="#">Mentions légales</a>
+          <a href="#">Confidentialité</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -203,25 +203,21 @@
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
       
       // Mettre à jour l'indicateur visuel sur la page
-      document.addEventListener('DOMContentLoaded', () => {
-        const indicator = document.getElementById('app-status');
-        if (indicator) {
-          indicator.textContent = 'v1.1 (Supabase OK)';
-          indicator.style.color = '#22c55e';
-          indicator.style.borderColor = 'rgba(34,197,94,0.3)';
-        }
-      });
+      const indicator = document.getElementById('app-status');
+      if (indicator) {
+        indicator.textContent = 'v1.1 (Supabase OK)';
+        indicator.style.color = '#22c55e';
+        indicator.style.borderColor = 'rgba(34,197,94,0.3)';
+      }
     } catch (e) {
       console.error(e);
-      document.addEventListener('DOMContentLoaded', () => {
-        setStatus(e.message, 'error');
-        const indicator = document.getElementById('app-status');
-        if (indicator) {
-          indicator.textContent = 'v1.1 (Supabase Bloqué)';
-          indicator.style.color = 'var(--red)';
-          indicator.style.borderColor = 'var(--red)';
-        }
-      });
+      setStatus(e.message, 'error');
+      const indicator = document.getElementById('app-status');
+      if (indicator) {
+        indicator.textContent = 'v1.1 (Supabase Bloqué)';
+        indicator.style.color = 'var(--red)';
+        indicator.style.borderColor = 'var(--red)';
+      }
     }
     // ────────────────────────────────────────────────────────────────
 

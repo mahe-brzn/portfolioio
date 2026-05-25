@@ -135,7 +135,7 @@ async function loadVehiculesPage() {
 
 // Update status badges across all pages
 async function loadRealtimeStatus() {
-  const { data, error } = await supabaseClient.from('horaires').select('*').order('sort_order');
+  const { data, error } = await window._supabase.from('horaires').select('*').order('sort_order');
   if (error || !data || data.length === 0) return;
 
   // Obtenir le jour et l'heure actuels à Paris
@@ -200,7 +200,7 @@ async function loadLocationHours() {
   const table = document.getElementById('horaires-dynamic-table');
   if (!table) return;
 
-  const { data, error } = await supabaseClient.from('horaires').select('*').order('sort_order');
+  const { data, error } = await window._supabase.from('horaires').select('*').order('sort_order');
   if (error || !data) return;
 
   table.innerHTML = '';

@@ -128,7 +128,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   pointer-events: none;
   z-index: 9997;
   transform: translate(-50%, -50%);
-  transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   will-change: width, height, top, left, transform;
 }
 #cursor-ring.glow {
@@ -211,7 +211,7 @@ header {
   top: 0; left: 0; right: 0;
   height: var(--nav-h);
   z-index: 500;
-  transition: background 0.4s var(--ease);
+  transition: background-color 0.4s var(--ease);
 }
 header.scrolled {
   background: rgba(7,7,10,0.85);
@@ -294,11 +294,12 @@ nav#nav .nav-row {
   width: 7px; height: 7px;
   background: #22c55e;
   border-radius: 50%;
+  will-change: transform, opacity;
   animation: pulse-dot 2s ease infinite;
 }
 @keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
-  50%       { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.8); opacity: 0.4; }
 }
 
 /* Mobile burger */
@@ -603,15 +604,17 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
 }
 .scroll-progress {
   position: absolute;
-  top: -100%;
+  top: 0;
   width: 100%;
   height: 100%;
   background: var(--red);
+  will-change: transform;
+  transform: translateY(-100%);
   animation: scroll-anim 1.8s ease-in-out infinite;
 }
 @keyframes scroll-anim {
-  0%   { top: -100%; }
-  100% { top: 100%; }
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -721,7 +724,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   padding: 13px 26px;
   border-radius: 100px;
   border: 1px solid var(--border);
-  transition: border-color 0.3s, background 0.3s;
+  transition: border-color 0.3s, background-color 0.3s;
 }
 .btn-outline:hover {
   border-color: rgba(255,255,255,0.3);
@@ -743,7 +746,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   background: var(--surface);
   border: 1px solid var(--border);
   padding: clamp(32px, 5vw, 64px);
-  transition: background 0.4s var(--ease), border-color 0.4s;
+  transition: background-color 0.4s var(--ease), border-color 0.4s;
   position: relative;
   overflow: hidden;
 }
@@ -775,7 +778,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   justify-content: center;
   color: var(--red);
   margin-bottom: 24px;
-  transition: transform 0.4s var(--ease), background 0.3s;
+  transition: transform 0.4s var(--ease), background-color 0.3s;
 }
 .service-card:hover .service-icon-wrap {
   transform: scale(1.1) rotate(-5deg);
@@ -1019,11 +1022,12 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  will-change: transform;
   animation: cta-pulse 4s ease-in-out infinite;
 }
 @keyframes cta-pulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50%       { transform: translate(-50%, -50%) scale(1.15); }
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  50%       { transform: translate(-50%, -50%) scale(1.15); opacity: 0.3; }
 }
 .cta-over {
   font-size: 0.8rem;
@@ -1344,7 +1348,7 @@ footer {
   font-family: var(--font-body);
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.3s, background 0.3s;
+  transition: border-color 0.3s, background-color 0.3s;
   resize: none;
 }
 .form-input:focus, .form-textarea:focus {
@@ -1620,7 +1624,7 @@ footer {
 .vehicle-card-hz:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.1); }
 /* Accordion Vehicle Details */
 .veh-hz-top {
-  display: flex; flex-direction: row; align-items: stretch; width: 100%; cursor: pointer; transition: background 0.3s;
+  display: flex; flex-direction: row; align-items: stretch; width: 100%; cursor: pointer; transition: background-color 0.3s;
 }
 .veh-hz-top:hover { background: rgba(255,255,255,0.02); }
 
@@ -1664,7 +1668,7 @@ footer {
   position: absolute; top: 24px; right: 24px; width: 40px; height: 40px;
   background: rgba(255,255,255,0.1); border: none; border-radius: 50%; color: #fff;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
-  z-index: 10; transition: background 0.3s, transform 0.3s;
+  z-index: 10; transition: background-color 0.3s, transform 0.3s;
 }
 .veh-modal-close:hover { background: var(--red); transform: rotate(90deg); }
 

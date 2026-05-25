@@ -284,8 +284,8 @@
           this.y = init ? Math.random() * H : (Math.random() > 0.5 ? -100 : H + 100);
           this.vx = (Math.random() - 0.5) * 0.4; 
           this.vy = (Math.random() - 0.5) * 0.4;
-          this.r = Math.random() * 2.5 + 1.5; 
-          this.a = Math.random() * 0.5 + 0.25;
+          this.r = Math.random() * 1.5 + 0.8; 
+          this.a = Math.random() * 0.4 + 0.15;
           this.isRed = Math.random() < 0.2;
         }
         update() {
@@ -316,7 +316,7 @@
         }
       }
 
-      for (let i = 0; i < 120; i++) particles.push(new Particle());
+      for (let i = 0; i < 90; i++) particles.push(new Particle());
 
       let rafId;
       function rafLoop() {
@@ -343,7 +343,7 @@
               ctx.quadraticCurveTo(midX + offset, midY - offset, p2.x, visY2);
               
               let alpha = (120 - dist) / 120;
-              ctx.strokeStyle = `rgba(227,0,15,${alpha * 0.25})`;
+              ctx.strokeStyle = `rgba(227,0,15,${alpha * 0.1})`;
               ctx.lineWidth = 1;
               ctx.stroke();
             }

@@ -417,17 +417,7 @@ nav#nav .nav-row {
   background: radial-gradient(circle, rgba(227,0,15,0.06) 0%, transparent 70%);
 }
 
-/* Hero grid lines */
-.hero-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-  background-size: 80px 80px;
-  pointer-events: none;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 20%, transparent 100%);
-}
+
 
 /* Hero name */
 .hero-name-wrap {

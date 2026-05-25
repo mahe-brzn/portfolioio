@@ -448,6 +448,7 @@ async function loadHoraires() {
   });
   
   loadHolidays();
+  loadCustomDates();
 }
 
 function toggleDayRow(day, isOpen) {
@@ -632,7 +633,114 @@ async function saveHolidayOverride(dateStr) {
       afternoon_open: isClosed ? null : ao, afternoon_close: isClosed ? null : ac
     }], { onConflict: 'day' });
     
-    if (error) showToast('Erreur : ' + error.message, 'error');
-    else { showToast('Exception sauvegardée !'); loadHolidays(); }
+    if (error) { showToast('Erreur : ' + error.message, 'error'); }
+    else { showToast('Exception sauvegardée !'); loadHolidays(); loadCustomDates(); }
+  }
+}
+
+async function loadCustomDates() {
+  const container = document.getElementById('custom-dates-list');
+  if (!container) return;
+  
+  const { data: overrides, error } = await supabaseClient.from('horaires').select('*');
+  if (error || !overrides) {
+    container.innerHTML = '<span style="font-size:0.85rem;color:var(--red);">Erreur de chargement</span>';
+    return;
+  }
+  
+  const customDates = overrides.filter(d => d.day.match(/^\d{4}-\d{2}-\d{2}$/));
+  
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  
+  const futureDates = customDates.filter(d => new Date(d.day) >= now);
+  
+  if (futureDates.length === 0) {
+    container.innerHTML = '<span style="font-size:0.85rem;color:var(--text-muted);">Aucune date configurée</span>';
+    return;
+  }
+  
+  futureDates.sort((a, b) => new Date(a.day) - new Date(b.day));
+  
+  container.innerHTML = '';
+  futureDates.forEach(override => {
+    const d = new Date(override.day);
+    const mo = override.morning_open || '08:00';
+    const mc = override.morning_close || '12:00';
+    const ao = override.afternoon_open || '14:00';
+    const ac = override.afternoon_close || '18:00';
+    
+    const overrideMode = override.closed ? 'closed' : 'custom';
+    
+    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    const dateFr = d.toLocaleDateString('fr-FR', options);
+    
+    const daysDiff = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+    const countdown = daysDiff === 0 ? "Aujourd'hui" : (daysDiff === 1 ? "Demain" : `Dans ${daysDiff} j.`);
+    
+    const h = { dateStr: override.day, name: 'Date personnalisée' };
+    
+    const item = document.createElement('div');
+    item.style.cssText = 'background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; font-size:0.85rem; border:1px solid rgba(255,255,255,0.05);';
+    
+    item.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleHolidayDetails('${h.dateStr}')">
+        <div>
+          <span style="font-weight:600; color:var(--white); display:block;">${h.name}</span>
+          <span style="color:var(--text-muted); text-transform:capitalize; font-size:0.8rem;">${dateFr}</span>
+        </div>
+        <div style="text-align:right;">
+          <span style="color:var(--red); font-weight:600; font-size:0.8rem; display:block;">${countdown}</span>
+          <span style="color:${overrideMode === 'closed' ? 'var(--red)' : 'var(--green)'}; font-size:0.75rem;">
+            ${overrideMode === 'closed' ? 'Fermé' : 'Aménagé'}
+          </span>
+        </div>
+      </div>
+      
+      <div id="hol-details-${h.dateStr}" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);">
+        <div style="display:flex; gap:12px; margin-bottom:12px;">
+          <label style="cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <input type="radio" name="mode-${h.dateStr}" value="normal" onchange="toggleHolidayMode('${h.dateStr}')" /> Supprimer
+          </label>
+          <label style="cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <input type="radio" name="mode-${h.dateStr}" value="closed" ${overrideMode === 'closed' ? 'checked' : ''} onchange="toggleHolidayMode('${h.dateStr}')" /> Fermé
+          </label>
+          <label style="cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <input type="radio" name="mode-${h.dateStr}" value="custom" ${overrideMode === 'custom' ? 'checked' : ''} onchange="toggleHolidayMode('${h.dateStr}')" /> Aménagé
+          </label>
+        </div>
+        
+        <div id="hol-times-${h.dateStr}" style="display:${overrideMode === 'custom' ? 'grid' : 'none'}; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+          <div><label style="font-size:0.75rem;">Matin ouvre</label><input type="time" id="hol-mo-${h.dateStr}" value="${mo}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+          <div><label style="font-size:0.75rem;">Matin ferme</label><input type="time" id="hol-mc-${h.dateStr}" value="${mc}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+          <div><label style="font-size:0.75rem;">A-midi ouvre</label><input type="time" id="hol-ao-${h.dateStr}" value="${ao}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+          <div><label style="font-size:0.75rem;">A-midi ferme</label><input type="time" id="hol-ac-${h.dateStr}" value="${ac}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+        </div>
+        
+        <button class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem; width:100%;" onclick="saveHolidayOverride('${h.dateStr}')">Enregistrer</button>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+async function addCustomDate() {
+  const input = document.getElementById('custom-date-input');
+  const dateStr = input.value;
+  if (!dateStr) {
+    showToast('Veuillez sélectionner une date.', 'error');
+    return;
+  }
+  
+  const { error } = await supabaseClient.from('horaires').upsert([{
+    day: dateStr, sort_order: 999, closed: true
+  }], { onConflict: 'day' });
+  
+  if (error) {
+    showToast('Erreur : ' + error.message, 'error');
+  } else {
+    showToast('Date ajoutée avec succès !');
+    input.value = '';
+    loadCustomDates();
   }
 }

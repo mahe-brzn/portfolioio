@@ -288,7 +288,7 @@ async function loadVehicules() {
       <div class="admin-card-body">
         <span class="badge-dispo ${available ? 'yes' : 'no'}">${available ? '● Disponible' : '○ Indisponible'}</span>
         <div class="admin-card-title">${v.model}</div>
-        <div class="admin-card-sub">${v.category} · ${v.year || '—'} · ${v.price_per_day ? v.price_per_day + '€/j' : '—'}</div>
+        <div class="admin-card-sub">${v.category} · ${v.year || '—'} · ${v.price_per_day ? v.price_per_day + '€/j' : (v.price ? v.price + '€' : '—')}</div>
         <div class="admin-card-desc">${features.slice(0,3).join(' · ') || '—'}</div>
         <div class="admin-card-actions">
           <button class="btn btn-ghost" onclick="openModal('vehicle', JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(v)).replace(/'/g, '%27')}')))">✏️ Modifier</button>

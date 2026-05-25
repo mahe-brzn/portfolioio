@@ -7,7 +7,7 @@
    Animations: Curseur, Preloader, Orbes, Parallax, Marquee, Reveal
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap');
+/* Fonts loaded via HTML <link> — no @import to avoid double-loading */
 
 :root {
   --bg:         #07070a;
@@ -87,6 +87,10 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   pointer-events: none;
   z-index: 9999;
   animation: grain-shift 0.15s steps(1) infinite;
+  /* Disabled on mobile — saves ~6s TBT */
+}
+@media (max-width: 768px) {
+  #grain { display: none; }
 }
 @keyframes grain-shift {
   0%   { transform: translate(0,0); }
@@ -1403,11 +1407,54 @@ footer {
   .team-grid { grid-template-columns: 1fr 1fr; }
   .equipe-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+
+  /* ── PERFORMANCE MOBILE ── */
+
+  /* Désactiver les animations coûteuses sur mobile */
+  .tilt-card { transform: none !important; transition: none !important; }
+  .tilt-glow { display: none; }
+
+  /* Réduire les transitions */
+  .reveal { transition-duration: 0.4s !important; }
+
+  /* Supprimer will-change sur les éléments non-animés en mobile */
+  #cursor-dot, #cursor-ring { display: none !important; }
+  body { cursor: auto; }
+  button { cursor: pointer; }
+
+  /* Optimiser le hero canvas */
+  #hero-canvas { display: none; }
+
+  /* Améliorer les touch targets (min 44px) */
+  .nav-burger { min-width: 44px; min-height: 44px; }
+  .mob-link { min-height: 44px; display: flex; align-items: center; }
+  .btn-magnetic, .btn-outline { min-height: 48px; padding: 14px 28px; }
+
+  /* Modal vehicules: plein écran sur mobile */
+  .veh-modal-overlay { padding: 0; align-items: flex-end; }
+  .veh-modal-content { border-radius: 24px 24px 0 0; max-height: 90vh; }
+  .veh-modal-hero { height: 220px; }
+  .veh-modal-body { padding: 24px; }
+
+  /* Véhicules cards */
+  .veh-hz-img { width: 80px; height: 80px; min-width: 80px; }
+  .veh-hz-title { font-size: 1rem; }
+
+  /* Sections: content-visibility pour éviter le rendu hors-écran */
+  #services, #about, #team, #cta {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 400px;
+  }
 }
+
 @media (max-width: 480px) {
   .team-grid { grid-template-columns: 1fr; }
   .hero-stats { flex-direction: column; }
   .cta-actions { flex-direction: column; align-items: center; }
+
+  /* Plus petit padding sur très petits écrans */
+  :root { --pad: 16px; }
+  section { padding: 60px 0; }
 }
 
 /* ═══════════════════════════════════════════════════════

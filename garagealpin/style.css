@@ -10,11 +10,11 @@
 /* Fonts loaded via HTML <link> — no @import to avoid double-loading */
 
 :root {
-  --bg:         #f8fafc;
+  --bg:         #f4f6f8;
   --bg-2:       #ffffff;
-  --surface:    rgba(0,0,0,0.03);
-  --border:     rgba(0,0,0,0.08);
-  --text:       #0f172a;
+  --surface:    rgba(255,255,255,0.6);
+  --border:     rgba(255,255,255,0.9);
+  --text:       #09090b;
   --text-muted: #64748b;
   --red:        #e3000f;
   --red-dim:    rgba(227, 0, 15, 0.15);
@@ -83,7 +83,8 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   inset: -200%;
   width: 400%; height: 400%;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.028;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
   pointer-events: none;
   z-index: 9999;
   animation: grain-shift 0.15s steps(1) infinite;
@@ -136,7 +137,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   height: 150px;
   background: rgba(255, 255, 255, 0.03);
   border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 50px 15px rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 50px 15px rgba(227, 0, 15, 0.15);
   backdrop-filter: blur(2px);
 }
 #cursor-ring.hover {
@@ -762,7 +763,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   transition: opacity 0.4s;
 }
 .service-card:hover::before { opacity: 1; }
-.service-card:hover { border-color: rgba(0,0,0,0.12); }
+.service-card:hover { border-color: var(--border); box-shadow: 0 10px 40px rgba(227,0,15,0.1); }
 .service-num {
   font-family: var(--font-display);
   font-size: 0.75rem;
@@ -1203,7 +1204,7 @@ footer {
   border: 1px solid var(--border);
   transition: border-color 0.4s;
 }
-.equipe-card:hover { border-color: rgba(0,0,0,0.15); }
+.equipe-card:hover { border-color: var(--border); box-shadow: 0 10px 40px rgba(227,0,15,0.1); }
 .equipe-card-img-wrap { overflow: hidden; height: clamp(280px, 35vw, 420px); }
 .equipe-card-img {
   width: 100%;
@@ -1459,7 +1460,7 @@ footer {
   .hero-stats { flex-direction: column; }
   .cta-actions { flex-direction: column; align-items: center; }
 
-  /* Plus petit padding sur très petits écrans */
+
   :root { --pad: 16px; }
   section { padding: 60px 0; }
 }
@@ -1624,7 +1625,7 @@ footer {
   transition: transform 0.4s var(--ease), box-shadow 0.4s;
 }
 @media (min-width: 768px) { .vehicle-card-hz { flex-direction: row; align-items: stretch; } }
-.vehicle-card-hz:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1); }
+.vehicle-card-hz:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(227,0,15,0.12); border-color: var(--border); }
 /* Accordion Vehicle Details */
 .veh-hz-top {
   display: flex; flex-direction: row; align-items: stretch; width: 100%; cursor: pointer; transition: background-color 0.3s;

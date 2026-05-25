@@ -154,10 +154,13 @@ async function loadRealtimeStatus() {
     if (p.type === 'minute') currentMinute = parseInt(p.value, 10);
   });
 
+  const exceptionnel = data.find(d => d.day === 'Exceptionnel');
+  const isExceptionnelClosed = exceptionnel && exceptionnel.closed;
+
   const today = data.find(d => d.day === currentDay);
   let isOpen = false;
 
-  if (today && !today.closed) {
+  if (!isExceptionnelClosed && today && !today.closed) {
     const timeToMin = (t) => {
       if (!t) return 0;
       const [h, m] = t.split(':');
@@ -182,16 +185,26 @@ async function loadRealtimeStatus() {
     const text = el.querySelector('span:not(.nav-dot)');
     if (dot) dot.style.backgroundColor = isOpen ? 'var(--green)' : 'var(--red)';
     if (text) {
-      text.textContent = isOpen ? 'Ouvert' : 'Fermé';
-      text.style.color = isOpen ? 'var(--green)' : 'var(--red)';
+      if (isExceptionnelClosed) {
+        text.textContent = 'Fermeture exceptionnelle';
+        text.style.color = 'var(--red)';
+      } else {
+        text.textContent = isOpen ? 'Ouvert' : 'Fermé';
+        text.style.color = isOpen ? 'var(--green)' : 'var(--red)';
+      }
     }
   });
 
   // Update specific info badge in location.html if it exists
   const infoStatus = document.getElementById('location-current-status');
   if (infoStatus) {
-    infoStatus.textContent = isOpen ? 'Ouvert ●' : 'Fermé ●';
-    infoStatus.style.color = isOpen ? '#22c55e' : '#ff5252';
+    if (isExceptionnelClosed) {
+      infoStatus.textContent = 'Fermeture exceptionnelle ●';
+      infoStatus.style.color = '#ff5252';
+    } else {
+      infoStatus.textContent = isOpen ? 'Ouvert ●' : 'Fermé ●';
+      infoStatus.style.color = isOpen ? '#22c55e' : '#ff5252';
+    }
   }
 }
 
@@ -203,8 +216,10 @@ async function loadLocationHours() {
   const { data, error } = await window._supabase.from('horaires').select('*').order('sort_order');
   if (error || !data) return;
 
+  const publicData = data.filter(d => d.day !== 'Exceptionnel');
+
   table.innerHTML = '';
-  data.forEach(h => {
+  publicData.forEach(h => {
     const row = document.createElement('div');
     row.className = 'horaire-row';
     const formatTime = (t) => t ? t.substring(0, 5).replace(':', 'h') : '';

@@ -396,8 +396,27 @@ async function loadHoraires() {
   const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
   
   const { data, error } = await supabaseClient.from('horaires').select('*').order('sort_order');
+  
+  // Exceptionnel logic
+  const exceptionnelRow = data && data.find(d => d.day === 'Exceptionnel');
+  const isExceptionnelClosed = exceptionnelRow ? exceptionnelRow.closed : false;
+  
+  const toggleExc = document.getElementById('toggle-exceptionnel');
+  if (toggleExc) toggleExc.checked = isExceptionnelClosed;
+  
+  const statusTextExc = document.getElementById('exceptionnel-status-text');
+  if (statusTextExc) {
+    if (isExceptionnelClosed) {
+      statusTextExc.textContent = 'Fermeture forcée !';
+      statusTextExc.style.color = 'var(--red)';
+    } else {
+      statusTextExc.textContent = 'Désactivée';
+      statusTextExc.style.color = 'var(--text-muted)';
+    }
+  }
 
-  const horaires = data && data.length ? data : DAYS.map((d, i) => ({
+  const publicData = data ? data.filter(d => d.day !== 'Exceptionnel') : [];
+  const horaires = publicData.length ? publicData : DAYS.map((d, i) => ({
     day: d, sort_order: i + 1,
     morning_open: '08:00', morning_close: '12:00',
     afternoon_open: '14:00', afternoon_close: '18:00',
@@ -427,6 +446,8 @@ async function loadHoraires() {
       </div>`;
     form.appendChild(row);
   });
+  
+  loadHolidays();
 }
 
 function toggleDayRow(day, isOpen) {
@@ -446,6 +467,29 @@ function toggleDayRow(day, isOpen) {
   }
 }
 
+async function toggleExceptionnel(isClosed) {
+  const statusText = document.getElementById('exceptionnel-status-text');
+  if (isClosed) {
+    statusText.textContent = 'Fermeture forcée !';
+    statusText.style.color = 'var(--red)';
+  } else {
+    statusText.textContent = 'Désactivée';
+    statusText.style.color = 'var(--text-muted)';
+  }
+  
+  const { error } = await supabaseClient.from('horaires').upsert([{
+    day: 'Exceptionnel',
+    sort_order: 99,
+    closed: isClosed
+  }], { onConflict: 'day' });
+  
+  if (error) {
+    showToast('Erreur sauvegarde exceptionnelle', 'error');
+  } else {
+    showToast('Mode exceptionnel mis à jour !');
+  }
+}
+
 async function saveHoraires() {
   const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
   const rows = DAYS.map((day, i) => ({
@@ -462,4 +506,50 @@ async function saveHoraires() {
   const { error } = await supabaseClient.from('horaires').upsert(rows, { onConflict: 'day' });
   if (error) { showToast('Erreur sauvegarde horaires : ' + error.message, 'error'); return; }
   showToast('Horaires mis à jour !');
+}
+
+async function loadHolidays() {
+  const container = document.getElementById('holidays-list');
+  if (!container) return;
+  
+  try {
+    const res = await fetch('https://calendrier.api.gouv.fr/jours-feries/metropole.json');
+    const data = await res.json();
+    
+    const now = new Date();
+    // Zero out hours for fair day comparison
+    now.setHours(0,0,0,0);
+    
+    const holidays = Object.keys(data)
+      .map(dateStr => ({ date: new Date(dateStr), name: data[dateStr] }))
+      .filter(h => h.date >= now)
+      .sort((a, b) => a.date - b.date)
+      .slice(0, 3);
+      
+    if (holidays.length === 0) {
+      container.innerHTML = '<span style="font-size:0.85rem;color:var(--text-muted);">Aucun jour férié à venir</span>';
+      return;
+    }
+    
+    container.innerHTML = '';
+    holidays.forEach(h => {
+      const daysDiff = Math.ceil((h.date - now) / (1000 * 60 * 60 * 24));
+      const options = { weekday: 'long', day: 'numeric', month: 'long' };
+      const dateStr = h.date.toLocaleDateString('fr-FR', options);
+      
+      const item = document.createElement('div');
+      item.style.cssText = 'background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; font-size:0.85rem; display:flex; flex-direction:column; gap:4px; border:1px solid rgba(255,255,255,0.05);';
+      
+      item.innerHTML = `
+        <span style="font-weight:600; color:var(--white);">${h.name}</span>
+        <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-top:2px;">
+          <span style="text-transform:capitalize;">${dateStr}</span>
+          <span style="color:var(--red); font-weight:600;">Dans ${daysDiff} j.</span>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+  } catch (err) {
+    container.innerHTML = '<span style="font-size:0.85rem;color:var(--red);">Erreur de chargement</span>';
+  }
 }

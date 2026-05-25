@@ -1599,15 +1599,33 @@ footer {
 .veh-spec-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); }
 .veh-spec-item svg { color: var(--white); opacity: 0.6; }
 
-.veh-hz-details {
-  display: none; padding: 0 32px 32px; border-top: 1px solid transparent; cursor: default;
-  background: transparent; animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* Vehicle Modal / Pop-up */
+.veh-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  z-index: 99999; display: flex; align-items: center; justify-content: center;
+  padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.4s var(--ease);
 }
-.veh-hz-details.open { display: block; border-color: rgba(255,255,255,0.05); margin-top: 16px; padding-top: 32px; }
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.veh-modal-overlay.open { opacity: 1; pointer-events: auto; }
+.veh-modal-content {
+  background: var(--bg-card); width: 100%; max-width: 800px; max-height: 90vh;
+  border-radius: 24px; border: 1px solid var(--border); overflow-y: auto;
+  transform: translateY(20px) scale(0.95); transition: all 0.4s var(--ease);
+  position: relative;
 }
+.veh-modal-overlay.open .veh-modal-content { transform: translateY(0) scale(1); }
+.veh-modal-close {
+  position: absolute; top: 24px; right: 24px; width: 40px; height: 40px;
+  background: rgba(255,255,255,0.1); border: none; border-radius: 50%; color: #fff;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  z-index: 10; transition: background 0.3s, transform 0.3s;
+}
+.veh-modal-close:hover { background: var(--red); transform: rotate(90deg); }
+
+.veh-modal-hero { width: 100%; height: 300px; position: relative; }
+.veh-modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+.veh-modal-body { padding: 40px; }
+.veh-modal-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 8px; }
+.veh-modal-price { font-family: var(--font-display); font-size: 1.5rem; color: var(--red); margin-bottom: 24px; }
 
 .v-contact-form {
   background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);

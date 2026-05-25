@@ -150,7 +150,7 @@ function renderVehicleCard(v, index, type) {
 
   return `
     <div class="vehicle-card-hz reveal ${delay}" id="veh-card-${v.id}">
-      <div class="veh-hz-top" onclick="toggleVehicleDetails('${v.id}')">
+      <div class="veh-hz-top" onclick="openVehicleModal('${v.id}')">
         ${imgHtml}
         <div class="veh-hz-body">
           <div class="veh-hz-header">
@@ -164,71 +164,94 @@ function renderVehicleCard(v, index, type) {
           </div>
           
           <div class="veh-hz-expand-icon">
-            <svg id="veh-icon-${v.id}" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
           </div>
         </div>
-      </div>
-      
-      <!-- Accordion Details -->
-      <div class="veh-hz-details" id="veh-details-${v.id}">
-        <div class="veh-hz-specs">
-          ${v.mileage ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>${v.mileage.toLocaleString('fr-FR')} km</div>` : ''}
-          ${v.fuel_type ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M13 11h4v4h-4z"/></svg>${v.fuel_type}</div>` : ''}
-          ${v.transmission ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>${v.transmission}</div>` : ''}
-          ${v.power ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${v.power}</div>` : ''}
-        </div>
-        
-        <h4 style="font-size:1.1rem; margin-bottom:16px;">Équipements</h4>
-        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;">
-          ${featHtml}
-        </div>
-
-        <form action="https://formspree.io/f/meoqzzvw" method="POST" class="v-contact-form">
-          <h4 style="margin-bottom:16px; font-size:1.2rem;">${type === 'vente' ? 'Être recontacté pour ce véhicule' : 'Réserver ce véhicule'}</h4>
-          <input type="hidden" name="Sujet" value="Demande pour ${type === 'vente' ? 'Achat' : 'Location'} : ${v.model}" />
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:16px;">
-            <div><label>Nom complet</label><input type="text" name="Nom" required /></div>
-            <div><label>Téléphone</label><input type="tel" name="Telephone" required /></div>
-          </div>
-          <div style="margin-bottom:16px;">
-            <label>E-mail</label>
-            <input type="email" name="Email" required />
-          </div>
-          <div style="margin-bottom:24px;">
-            <label>Message</label>
-            <textarea name="Message" rows="4" placeholder="Bonjour, je souhaite avoir plus d'informations..." required></textarea>
-          </div>
-          <button type="submit" class="btn-magnetic" style="width:100%; justify-content:center;">Envoyer la demande</button>
-        </form>
       </div>
     </div>
   `;
 }
 
-window.toggleVehicleDetails = function(id) {
-  const detailsBlock = document.getElementById(`veh-details-${id}`);
-  const icon = document.getElementById(`veh-icon-${id}`);
-  if (!detailsBlock) return;
+// ── Modale Véhicules ────────────────────────────────────────────────────────
+function createVehicleModalContainer() {
+  if (document.getElementById('vehicle-modal-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'vehicle-modal-overlay';
+  overlay.className = 'veh-modal-overlay';
+  overlay.onclick = (e) => { if (e.target === overlay) closeVehicleModal(); };
+  overlay.innerHTML = `
+    <div class="veh-modal-content" id="vehicle-modal-content">
+      <!-- Rempli dynamiquement -->
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
 
-  if (detailsBlock.classList.contains('open')) {
-    detailsBlock.classList.remove('open');
-    if (icon) icon.classList.remove('open');
-  } else {
-    // Close others
-    document.querySelectorAll('.veh-hz-details.open').forEach(el => {
-      el.classList.remove('open');
-      const bid = el.id.replace('veh-details-', '');
-      const ic = document.getElementById(`veh-icon-${bid}`);
-      if(ic) ic.classList.remove('open');
-    });
-    
-    detailsBlock.classList.add('open');
-    if (icon) icon.classList.add('open');
-    
-    // Scroll to it
-    setTimeout(() => {
-      detailsBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 400);
+window.openVehicleModal = function(id) {
+  createVehicleModalContainer();
+  const v = allVehicles.find(veh => veh.id === id);
+  if (!v) return;
+
+  const priceDisplay = v.type === 'vente' 
+    ? (v.price ? `${v.price}€` : 'Sur demande')
+    : (v.price_per_day ? `${v.price_per_day}€<small>/j</small>` : 'Sur demande');
+
+  const feats = Array.isArray(v.features) ? v.features : [];
+  const featHtml = feats.length 
+    ? feats.map(f => `<span style="padding:6px 12px;background:rgba(255,255,255,0.05);border-radius:20px;font-size:0.8rem;border:1px solid var(--border);">${f}</span>`).join('')
+    : '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun équipement spécifié</span>';
+
+  const modalHtml = `
+    <button class="veh-modal-close" onclick="closeVehicleModal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+    ${v.image_url ? `<div class="veh-modal-hero"><img src="${v.image_url}" alt="${v.model}"></div>` : ''}
+    <div class="veh-modal-body">
+      <h2 class="veh-modal-title">${v.model}</h2>
+      <div class="veh-modal-price">${priceDisplay}</div>
+      
+      <div class="veh-hz-specs" style="margin-bottom:24px;">
+        ${v.mileage ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>${v.mileage.toLocaleString('fr-FR')} km</div>` : ''}
+        ${v.fuel_type ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M13 11h4v4h-4z"/></svg>${v.fuel_type}</div>` : ''}
+        ${v.transmission ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>${v.transmission}</div>` : ''}
+        ${v.power ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${v.power}</div>` : ''}
+      </div>
+
+      <p style="color:var(--text-muted); line-height:1.6; margin-bottom:32px;">${v.description ? v.description.replace(/\n/g, '<br>') : 'Aucune description fournie.'}</p>
+      
+      <h4 style="font-size:1.1rem; margin-bottom:16px;">Équipements</h4>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;">
+        ${featHtml}
+      </div>
+
+      <form action="https://formspree.io/f/meoqzzvw" method="POST" class="v-contact-form">
+        <h4 style="margin-bottom:16px; font-size:1.2rem;">${v.type === 'vente' ? 'Être recontacté pour ce véhicule' : 'Réserver ce véhicule'}</h4>
+        <input type="hidden" name="Sujet" value="Demande pour ${v.type === 'vente' ? 'Achat' : 'Location'} : ${v.model}" />
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:16px;">
+          <div><label>Nom complet</label><input type="text" name="Nom" required /></div>
+          <div><label>Téléphone</label><input type="tel" name="Telephone" required /></div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label>E-mail</label>
+          <input type="email" name="Email" required />
+        </div>
+        <div style="margin-bottom:24px;">
+          <label>Message</label>
+          <textarea name="Message" rows="4" placeholder="Bonjour, je souhaite avoir plus d'informations..." required></textarea>
+        </div>
+        <button type="submit" class="btn-magnetic" style="width:100%; justify-content:center;">Envoyer la demande</button>
+      </form>
+    </div>
+  `;
+
+  document.getElementById('vehicle-modal-content').innerHTML = modalHtml;
+  document.getElementById('vehicle-modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeVehicleModal = function() {
+  const overlay = document.getElementById('vehicle-modal-overlay');
+  if (overlay) {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
   }
 };
 

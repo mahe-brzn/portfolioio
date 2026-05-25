@@ -10,12 +10,12 @@
 /* Fonts loaded via HTML <link> — no @import to avoid double-loading */
 
 :root {
-  --bg:         #07070a;
-  --bg-2:       #0e0e14;
-  --surface:    rgba(255,255,255,0.04);
-  --border:     rgba(255,255,255,0.07);
-  --text:       #f0f0f0;
-  --text-muted: #666672;
+  --bg:         #f8fafc;
+  --bg-2:       #ffffff;
+  --surface:    rgba(0,0,0,0.03);
+  --border:     rgba(0,0,0,0.08);
+  --text:       #0f172a;
+  --text-muted: #64748b;
   --red:        #e3000f;
   --red-dim:    rgba(227, 0, 15, 0.15);
   --red-glow:   rgba(227, 0, 15, 0.3);
@@ -42,7 +42,7 @@ html { scroll-behavior: smooth; font-size: 16px; }
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
 
 body {
   font-family: var(--font-body);
@@ -123,7 +123,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
 #cursor-ring {
   position: fixed;
   width: 36px; height: 36px;
-  border: 1.5px solid rgba(255,255,255,0.5);
+  border: 1.5px solid rgba(0,0,0,0.15);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9997;
@@ -214,7 +214,7 @@ header {
   transition: background-color 0.4s var(--ease);
 }
 header.scrolled {
-  background: rgba(7,7,10,0.85);
+  background: rgba(248,250,252,0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
@@ -242,6 +242,7 @@ nav#nav .nav-row {
   width: auto;
   display: block;
   color: #ffffff; /* Uses currentColor in SVG */
+  filter: brightness(0.1);
 }
 .pre-logo .site-logo-img {
   height: 80px;
@@ -413,8 +414,8 @@ nav#nav .nav-row {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
   background-size: 80px 80px;
   pointer-events: none;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 20%, transparent 100%);
@@ -456,7 +457,7 @@ body:not(.loading) .hero-name-inner { transform: translateY(0); }
 .hero-name-inner.solid { color: var(--white); }
 .hero-name-inner.outline {
   color: transparent;
-  -webkit-text-stroke: 2px rgba(255,255,255,0.25);
+  -webkit-text-stroke: 2px rgba(0,0,0,0.1);
 }
 
 /* Hero line separator */
@@ -693,7 +694,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
   transform: translateX(-100%) skewX(-15deg);
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -729,7 +730,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   transition: border-color 0.3s, background-color 0.3s;
 }
 .btn-outline:hover {
-  border-color: rgba(255,255,255,0.3);
+  border-color: rgba(0,0,0,0.2);
   background: var(--surface);
 }
 
@@ -761,7 +762,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   transition: opacity 0.4s;
 }
 .service-card:hover::before { opacity: 1; }
-.service-card:hover { border-color: rgba(255,255,255,0.12); }
+.service-card:hover { border-color: rgba(0,0,0,0.12); }
 .service-num {
   font-family: var(--font-display);
   font-size: 0.75rem;
@@ -862,12 +863,12 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
 .about-img-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(7,7,10,0.5) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(248,250,252,0.5) 0%, transparent 60%);
 }
 .about-img-tag {
   position: absolute;
   bottom: 20px; left: 20px;
-  background: rgba(7,7,10,0.8);
+  background: rgba(248,250,252,0.8);
   backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   border-radius: 100px;
@@ -980,7 +981,7 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
 .team-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(7,7,10,0.95) 0%, rgba(7,7,10,0.2) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(248,250,252,0.95) 0%, rgba(248,250,252,0.2) 60%, transparent 100%);
   transition: opacity 0.4s;
 }
 .team-card-info {
@@ -1177,7 +1178,7 @@ footer {
   color: var(--white);
   line-height: 0.92;
 }
-.page-title span { color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,0.2); }
+.page-title span { color: transparent; -webkit-text-stroke: 2px rgba(0,0,0,0.15); }
 .page-subtitle {
   font-size: clamp(1rem, 1.5vw, 1.15rem);
   color: var(--text-muted);
@@ -1202,7 +1203,7 @@ footer {
   border: 1px solid var(--border);
   transition: border-color 0.4s;
 }
-.equipe-card:hover { border-color: rgba(255,255,255,0.15); }
+.equipe-card:hover { border-color: rgba(0,0,0,0.15); }
 .equipe-card-img-wrap { overflow: hidden; height: clamp(280px, 35vw, 420px); }
 .equipe-card-img {
   width: 100%;
@@ -1342,7 +1343,7 @@ footer {
 }
 .form-input, .form-textarea {
   width: 100%;
-  background: rgba(255,255,255,0.03);
+  background: rgba(0,0,0,0.03);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 14px 18px;
@@ -1480,7 +1481,7 @@ footer {
   position: absolute;
   inset: 0;
   /* La lueur interne de la carte, plus subtile, la grosse lueur venant du curseur */
-  background: radial-gradient(circle 200px at var(--gx, 50px) var(--gy, 50px), rgba(255,255,255,0.06) 0%, transparent 100%);
+  background: radial-gradient(circle 200px at var(--gx, 50px) var(--gy, 50px), rgba(0,0,0,0.06) 0%, transparent 100%);
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
@@ -1587,7 +1588,7 @@ footer {
 }
 .vehicle-features span {
   padding: 4px 10px; border-radius: 20px;
-  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  background: rgba(0,0,0,0.02); border: 1px solid var(--border);
   font-size: 0.75rem; color: var(--text-muted);
 }
 .vehicle-card-desc {
@@ -1623,12 +1624,12 @@ footer {
   transition: transform 0.4s var(--ease), box-shadow 0.4s;
 }
 @media (min-width: 768px) { .vehicle-card-hz { flex-direction: row; align-items: stretch; } }
-.vehicle-card-hz:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.1); }
+.vehicle-card-hz:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1); }
 /* Accordion Vehicle Details */
 .veh-hz-top {
   display: flex; flex-direction: row; align-items: stretch; width: 100%; cursor: pointer; transition: background-color 0.3s;
 }
-.veh-hz-top:hover { background: rgba(255,255,255,0.02); }
+.veh-hz-top:hover { background: rgba(0,0,0,0.02); }
 
 .veh-hz-img { width: 100px; height: 100px; flex-shrink: 0; border-radius: 12px; margin: 24px; position: relative; overflow: hidden; }
 @media (min-width: 768px) { .veh-hz-img { width: 160px; height: 160px; margin: 32px; } }
@@ -1648,7 +1649,7 @@ footer {
 .veh-hz-expand-icon { position: absolute; bottom: 24px; right: 32px; color: var(--text-muted); transition: transform 0.3s; }
 .veh-hz-expand-icon.open { transform: rotate(180deg); }
 
-.veh-hz-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; padding: 24px; background: rgba(255,255,255,0.02); border-radius: 12px; }
+.veh-hz-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; padding: 24px; background: rgba(0,0,0,0.02); border-radius: 12px; }
 .veh-spec-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); }
 .veh-spec-item svg { color: var(--white); opacity: 0.6; }
 
@@ -1668,7 +1669,7 @@ footer {
 .veh-modal-overlay.open .veh-modal-content { transform: translateY(0) scale(1); }
 .veh-modal-close {
   position: absolute; top: 24px; right: 24px; width: 40px; height: 40px;
-  background: rgba(255,255,255,0.1); border: none; border-radius: 50%; color: #fff;
+  background: rgba(0,0,0,0.1); border: none; border-radius: 50%; color: var(--text);
   display: flex; align-items: center; justify-content: center; cursor: pointer;
   z-index: 10; transition: background-color 0.3s, transform 0.3s;
 }
@@ -1681,12 +1682,12 @@ footer {
 .veh-modal-price { font-family: var(--font-display); font-size: 1.5rem; color: var(--red); margin-bottom: 24px; }
 
 .v-contact-form {
-  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
   padding: 24px; border-radius: 16px; margin-top: 32px;
 }
 .v-contact-form input, .v-contact-form textarea {
   width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2);
-  border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.1); color: var(--text); border-radius: 8px;
   font-family: inherit; font-size: 0.9rem; transition: border-color 0.3s;
 }
 .v-contact-form input:focus, .v-contact-form textarea:focus {

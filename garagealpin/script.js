@@ -284,7 +284,7 @@
         draw() {
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-          ctx.fillStyle = this.isRed ? `rgba(227,0,15,${this.a})` : `rgba(255,255,255,${this.a})`;
+          ctx.fillStyle = this.isRed ? `rgba(227,0,15,${this.a})` : `rgba(15,23,42,${this.a})`;
           ctx.fill();
         }
       }

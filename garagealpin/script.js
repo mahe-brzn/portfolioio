@@ -269,32 +269,87 @@
       resize();
       window.addEventListener('resize', resize, { passive: true });
 
+      let canvasMouse = { x: -1000, y: -1000 };
+      window.addEventListener('mousemove', e => {
+        canvasMouse.x = e.clientX;
+        canvasMouse.y = e.clientY;
+      });
+      let scrollY = 0;
+      window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
       class Particle {
-        constructor() { this.reset(); }
-        reset() {
-          this.x = Math.random() * W; this.y = Math.random() * H;
-          this.vx = (Math.random() - 0.5) * 0.3; this.vy = (Math.random() - 0.5) * 0.3;
-          this.r = Math.random() * 1.5 + 0.5; this.a = Math.random() * 0.4 + 0.05;
-          this.isRed = Math.random() < 0.15;
+        constructor() { this.reset(true); }
+        reset(init = false) {
+          this.x = Math.random() * W; 
+          this.y = init ? Math.random() * H : (Math.random() > 0.5 ? -100 : H + 100);
+          this.vx = (Math.random() - 0.5) * 0.4; 
+          this.vy = (Math.random() - 0.5) * 0.4;
+          this.r = Math.random() * 1.5 + 0.5; 
+          this.a = Math.random() * 0.4 + 0.1;
+          this.isRed = Math.random() < 0.2;
         }
         update() {
           this.x += this.vx; this.y += this.vy;
-          if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+          
+          let visY = this.y - scrollY * 0.3;
+          if (visY < -150) this.y += H + 300;
+          if (visY > H + 150) this.y -= H + 300;
+          if (this.x < -150) this.x += W + 300;
+          if (this.x > W + 150) this.x -= W + 300;
+
+          // Flee mouse
+          let dx = this.x - canvasMouse.x;
+          let dy = visY - canvasMouse.y;
+          let dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 150) {
+            let force = (150 - dist) / 150;
+            this.x += (dx / dist) * force * 2;
+            this.y += (dy / dist) * force * 2;
+          }
         }
         draw() {
+          let visY = this.y - scrollY * 0.3;
           ctx.beginPath();
-          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+          ctx.arc(this.x, visY, this.r, 0, Math.PI * 2);
           ctx.fillStyle = this.isRed ? `rgba(227,0,15,${this.a})` : `rgba(227,0,15,${this.a * 0.25})`;
           ctx.fill();
         }
       }
-      // Fewer particles = lighter
-      for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+      for (let i = 0; i < 45; i++) particles.push(new Particle());
 
       let rafId;
       function rafLoop() {
         ctx.clearRect(0, 0, W, H);
-        particles.forEach(p => { p.update(); p.draw(); });
+        particles.forEach(p => p.update());
+        
+        // Draw irregular curved connections
+        for (let i = 0; i < particles.length; i++) {
+          let p1 = particles[i];
+          let visY1 = p1.y - scrollY * 0.3;
+          for (let j = i + 1; j < particles.length; j++) {
+            let p2 = particles[j];
+            let visY2 = p2.y - scrollY * 0.3;
+            let dx = p1.x - p2.x;
+            let dy = visY1 - visY2;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(p1.x, visY1);
+              let midX = (p1.x + p2.x) / 2;
+              let midY = (visY1 + visY2) / 2;
+              let offset = dist * 0.25; // Organic curve
+              ctx.quadraticCurveTo(midX + offset, midY - offset, p2.x, visY2);
+              
+              let alpha = (120 - dist) / 120;
+              ctx.strokeStyle = `rgba(227,0,15,${alpha * 0.08})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          }
+        }
+        particles.forEach(p => p.draw());
         rafId = requestAnimationFrame(rafLoop);
       }
       rafLoop();

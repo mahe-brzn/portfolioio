@@ -128,7 +128,7 @@ async function loadVehiculesPage() {
     listLocation.innerHTML = locations.map((v, i) => renderVehicleCard(v, i, 'location')).join('');
   }
 
-  if (typeof initReveal === 'function') initReveal();
+  if (typeof window.initReveal === 'function') window.initReveal();
 }
 
 function renderVehicleCard(v, index, type) {

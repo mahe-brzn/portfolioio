@@ -142,6 +142,7 @@
 
     document.querySelectorAll('.reveal, .split-text').forEach(el => observer.observe(el));
   }
+  window.initReveal = initReveal;
 
   /* ──────────────────────────────────────────────
      7. ANIMATED COUNTERS

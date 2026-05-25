@@ -40,11 +40,11 @@
   </style>
 
   <!-- Main CSS: non-blocking via media trick -->
-  <link rel="preload" as="style" href="style.css?v=8" />
-  <link rel="stylesheet" href="style.css?v=8" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="style.css?v=8" /></noscript>
+  <!-- Main CSS: bloquant mais préchargé — évite le CLS causé par le FOUC -->
+  <link rel="preload" as="style" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=9" />
 
-  <!-- Fonts non-blocking -->
+  <!-- Fonts: non-blocking (pas de CLS car du texte) -->
   <link rel="icon" type="image/png" href="images/logo_preloader.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

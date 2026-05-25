@@ -654,11 +654,13 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
 .reveal, .split-text {
   opacity: 0;
   transform: translateY(40px);
+  will-change: opacity, transform;
   transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
 }
 .reveal.active, .split-text.active {
   opacity: 1;
   transform: translateY(0);
+  will-change: auto; /* libère la couche GPU après l'animation */
 }
 .reveal-d1 { transition-delay: 0.1s; }
 .reveal-d2 { transition-delay: 0.2s; }

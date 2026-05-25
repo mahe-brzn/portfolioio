@@ -415,7 +415,7 @@ async function loadHoraires() {
     }
   }
 
-  const publicData = data ? data.filter(d => d.day !== 'Exceptionnel') : [];
+  const publicData = data ? data.filter(d => d.day !== 'Exceptionnel' && !d.day.match(/^\d{4}-\d{2}-\d{2}$/)) : [];
   const horaires = publicData.length ? publicData : DAYS.map((d, i) => ({
     day: d, sort_order: i + 1,
     morning_open: '08:00', morning_close: '12:00',
@@ -514,14 +514,16 @@ async function loadHolidays() {
   
   try {
     const res = await fetch('https://calendrier.api.gouv.fr/jours-feries/metropole.json');
-    const data = await res.json();
+    const apiData = await res.json();
+    
+    const { data: overrides, error } = await supabaseClient.from('horaires').select('*');
+    const dbOverrides = overrides || [];
     
     const now = new Date();
-    // Zero out hours for fair day comparison
     now.setHours(0,0,0,0);
     
-    const holidays = Object.keys(data)
-      .map(dateStr => ({ date: new Date(dateStr), name: data[dateStr] }))
+    const holidays = Object.keys(apiData)
+      .map(dateStr => ({ date: new Date(dateStr), dateStr: dateStr, name: apiData[dateStr] }))
       .filter(h => h.date >= now)
       .sort((a, b) => a.date - b.date)
       .slice(0, 3);
@@ -533,23 +535,104 @@ async function loadHolidays() {
     
     container.innerHTML = '';
     holidays.forEach(h => {
+      const override = dbOverrides.find(d => d.day === h.dateStr);
+      let overrideMode = 'normal';
+      if (override) {
+        overrideMode = override.closed ? 'closed' : 'custom';
+      }
+      
+      const mo = override?.morning_open || '08:00';
+      const mc = override?.morning_close || '12:00';
+      const ao = override?.afternoon_open || '14:00';
+      const ac = override?.afternoon_close || '18:00';
+      
       const daysDiff = Math.ceil((h.date - now) / (1000 * 60 * 60 * 24));
       const options = { weekday: 'long', day: 'numeric', month: 'long' };
-      const dateStr = h.date.toLocaleDateString('fr-FR', options);
+      const dateFr = h.date.toLocaleDateString('fr-FR', options);
       
       const item = document.createElement('div');
-      item.style.cssText = 'background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; font-size:0.85rem; display:flex; flex-direction:column; gap:4px; border:1px solid rgba(255,255,255,0.05);';
+      item.style.cssText = 'background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; font-size:0.85rem; border:1px solid rgba(255,255,255,0.05);';
       
       item.innerHTML = `
-        <span style="font-weight:600; color:var(--white);">${h.name}</span>
-        <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-top:2px;">
-          <span style="text-transform:capitalize;">${dateStr}</span>
-          <span style="color:var(--red); font-weight:600;">Dans ${daysDiff} j.</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleHolidayDetails('${h.dateStr}')">
+          <div>
+            <span style="font-weight:600; color:var(--white); display:block;">${h.name}</span>
+            <span style="color:var(--text-muted); text-transform:capitalize; font-size:0.8rem;">${dateFr}</span>
+          </div>
+          <div style="text-align:right;">
+            <span style="color:var(--red); font-weight:600; font-size:0.8rem; display:block;">Dans ${daysDiff} j.</span>
+            <span style="color:${overrideMode === 'normal' ? 'var(--text-muted)' : (overrideMode === 'closed' ? 'var(--red)' : 'var(--green)')}; font-size:0.75rem;">
+              ${overrideMode === 'normal' ? 'Horaires habituels' : (overrideMode === 'closed' ? 'Fermé' : 'Aménagé')}
+            </span>
+          </div>
+        </div>
+        
+        <div id="hol-details-${h.dateStr}" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);">
+          <div style="display:flex; gap:12px; margin-bottom:12px;">
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <input type="radio" name="mode-${h.dateStr}" value="normal" ${overrideMode === 'normal' ? 'checked' : ''} onchange="toggleHolidayMode('${h.dateStr}')" /> Normal
+            </label>
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <input type="radio" name="mode-${h.dateStr}" value="closed" ${overrideMode === 'closed' ? 'checked' : ''} onchange="toggleHolidayMode('${h.dateStr}')" /> Fermé
+            </label>
+            <label style="cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <input type="radio" name="mode-${h.dateStr}" value="custom" ${overrideMode === 'custom' ? 'checked' : ''} onchange="toggleHolidayMode('${h.dateStr}')" /> Aménagé
+            </label>
+          </div>
+          
+          <div id="hol-times-${h.dateStr}" style="display:${overrideMode === 'custom' ? 'grid' : 'none'}; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div><label style="font-size:0.75rem;">Matin ouvre</label><input type="time" id="hol-mo-${h.dateStr}" value="${mo}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+            <div><label style="font-size:0.75rem;">Matin ferme</label><input type="time" id="hol-mc-${h.dateStr}" value="${mc}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+            <div><label style="font-size:0.75rem;">A-midi ouvre</label><input type="time" id="hol-ao-${h.dateStr}" value="${ao}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+            <div><label style="font-size:0.75rem;">A-midi ferme</label><input type="time" id="hol-ac-${h.dateStr}" value="${ac}" style="padding:4px; font-size:0.8rem; width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;" /></div>
+          </div>
+          
+          <button class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem; width:100%;" onclick="saveHolidayOverride('${h.dateStr}')">Enregistrer pour ce jour</button>
         </div>
       `;
       container.appendChild(item);
     });
   } catch (err) {
     container.innerHTML = '<span style="font-size:0.85rem;color:var(--red);">Erreur de chargement</span>';
+  }
+}
+
+function toggleHolidayDetails(dateStr) {
+  const el = document.getElementById(`hol-details-${dateStr}`);
+  if (el) {
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function toggleHolidayMode(dateStr) {
+  const mode = document.querySelector(`input[name="mode-${dateStr}"]:checked`).value;
+  const timesEl = document.getElementById(`hol-times-${dateStr}`);
+  if (timesEl) {
+    timesEl.style.display = mode === 'custom' ? 'grid' : 'none';
+  }
+}
+
+async function saveHolidayOverride(dateStr) {
+  const mode = document.querySelector(`input[name="mode-${dateStr}"]:checked`).value;
+  
+  if (mode === 'normal') {
+    const { error } = await supabaseClient.from('horaires').delete().eq('day', dateStr);
+    if (error) showToast('Erreur : ' + error.message, 'error');
+    else { showToast('Horaire réinitialisé !'); loadHolidays(); }
+  } else {
+    const isClosed = mode === 'closed';
+    const mo = document.getElementById(`hol-mo-${dateStr}`)?.value || null;
+    const mc = document.getElementById(`hol-mc-${dateStr}`)?.value || null;
+    const ao = document.getElementById(`hol-ao-${dateStr}`)?.value || null;
+    const ac = document.getElementById(`hol-ac-${dateStr}`)?.value || null;
+    
+    const { error } = await supabaseClient.from('horaires').upsert([{
+      day: dateStr, sort_order: 999, closed: isClosed,
+      morning_open: isClosed ? null : mo, morning_close: isClosed ? null : mc,
+      afternoon_open: isClosed ? null : ao, afternoon_close: isClosed ? null : ac
+    }], { onConflict: 'day' });
+    
+    if (error) showToast('Erreur : ' + error.message, 'error');
+    else { showToast('Exception sauvegardée !'); loadHolidays(); }
   }
 }

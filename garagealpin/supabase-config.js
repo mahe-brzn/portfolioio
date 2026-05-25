@@ -157,7 +157,16 @@ async function loadRealtimeStatus() {
   const exceptionnel = data.find(d => d.day === 'Exceptionnel');
   const isExceptionnelClosed = exceptionnel && exceptionnel.closed;
 
-  const today = data.find(d => d.day === currentDay);
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const currentDateStr = `${yyyy}-${mm}-${dd}`;
+
+  let today = data.find(d => d.day === currentDateStr);
+  if (!today) {
+    today = data.find(d => d.day === currentDay);
+  }
+
   let isOpen = false;
 
   if (!isExceptionnelClosed && today && !today.closed) {
@@ -216,7 +225,7 @@ async function loadLocationHours() {
   const { data, error } = await window._supabase.from('horaires').select('*').order('sort_order');
   if (error || !data) return;
 
-  const publicData = data.filter(d => d.day !== 'Exceptionnel');
+  const publicData = data.filter(d => d.day !== 'Exceptionnel' && !d.day.match(/^\d{4}-\d{2}-\d{2}$/));
 
   table.innerHTML = '';
   publicData.forEach(h => {

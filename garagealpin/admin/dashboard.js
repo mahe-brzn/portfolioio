@@ -91,8 +91,17 @@ function openModal(type, data = null) {
     document.getElementById('vehicle-id').value        = data?.id        ?? '';
     document.getElementById('vehicle-model').value     = data?.model     ?? '';
     document.getElementById('vehicle-category').value  = data?.category  ?? 'citadine';
-    document.getElementById('vehicle-price').value     = data?.price_per_day ?? '';
+    
+    const type = data?.type ?? 'location';
+    document.getElementById('vehicle-type').value      = type;
+    document.getElementById('vehicle-price').value     = type === 'vente' ? (data?.price ?? '') : (data?.price_per_day ?? '');
+    document.getElementById('label-price').textContent = type === 'vente' ? 'Prix de vente (€)' : 'Prix / jour (€)';
+    
     document.getElementById('vehicle-year').value      = data?.year      ?? '';
+    document.getElementById('vehicle-mileage').value   = data?.mileage   ?? '';
+    document.getElementById('vehicle-fuel').value      = data?.fuel_type ?? '';
+    document.getElementById('vehicle-transmission').value = data?.transmission ?? '';
+    document.getElementById('vehicle-power').value     = data?.power     ?? '';
     document.getElementById('vehicle-features').value  = (data?.features ?? []).join(', ');
     document.getElementById('vehicle-desc').value      = data?.description ?? '';
     document.getElementById('vehicle-available').checked = data?.available ?? true;
@@ -306,11 +315,20 @@ async function saveVehicle() {
   const featuresRaw = document.getElementById('vehicle-features').value;
   const features    = featuresRaw.split(',').map(f => f.trim()).filter(Boolean);
 
+  const type = document.getElementById('vehicle-type').value;
+  const priceVal = parseFloat(document.getElementById('vehicle-price').value) || null;
+
   const payload = {
     model:         document.getElementById('vehicle-model').value,
     category:      document.getElementById('vehicle-category').value,
-    price_per_day: parseFloat(document.getElementById('vehicle-price').value) || null,
+    type:          type,
+    price_per_day: type === 'location' ? priceVal : null,
+    price:         type === 'vente' ? priceVal : null,
     year:          parseInt(document.getElementById('vehicle-year').value) || null,
+    mileage:       parseInt(document.getElementById('vehicle-mileage').value) || null,
+    fuel_type:     document.getElementById('vehicle-fuel').value || null,
+    transmission:  document.getElementById('vehicle-transmission').value || null,
+    power:         document.getElementById('vehicle-power').value || null,
     features,
     description:   document.getElementById('vehicle-desc').value,
     available:     document.getElementById('vehicle-available').checked,

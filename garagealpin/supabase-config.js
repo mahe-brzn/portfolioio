@@ -89,9 +89,16 @@ async function loadEquipePage() {
 }
 
 // ─── CHARGEMENT VÉHICULES ────────────────────────────────────────────────────
+let allVehicles = []; // Store globally for modal access
+
 async function loadVehiculesPage() {
-  const grid = document.getElementById('vehicules-grid');
-  if (!grid || !window._supabase) return;
+  const loading = document.getElementById('vehicules-loading');
+  const sectionVente = document.getElementById('section-vente');
+  const sectionLocation = document.getElementById('section-location');
+  const listVente = document.getElementById('vehicules-vente-list');
+  const listLocation = document.getElementById('vehicules-location-list');
+
+  if (!loading || !window._supabase) return;
 
   const { data, error } = await window._supabase
     .from('vehicles')
@@ -99,41 +106,106 @@ async function loadVehiculesPage() {
     .eq('available', true)
     .order('created_at');
 
+  loading.style.display = 'none';
+
   if (error || !data || data.length === 0) {
-    grid.innerHTML = '<p style="color:rgba(255,255,255,0.4);text-align:center;padding:40px 0;grid-column:1/-1;">Aucun véhicule disponible pour le moment.</p>';
+    loading.style.display = 'block';
+    loading.innerHTML = '<p style="color:var(--text-muted);">Aucun véhicule disponible pour le moment.</p>';
     return;
   }
 
-  grid.innerHTML = '';
+  allVehicles = data;
 
-  const delays = ['', 'reveal-d1', 'reveal-d2'];
-  data.forEach((v, i) => {
-    const features = Array.isArray(v.features) ? v.features : [];
-    const card     = document.createElement('div');
-    card.className = `vehicle-card tilt-card reveal ${delays[i % 3]}`;
+  const ventes = data.filter(v => v.type === 'vente');
+  const locations = data.filter(v => v.type === 'location' || !v.type);
 
-    card.innerHTML = `
-      ${v.image_url
-        ? `<div class="vehicle-card-img-wrap"><img src="${v.image_url}" alt="${v.model}" loading="lazy" /></div>`
-        : `<div class="vehicle-card-img-wrap" style="background:var(--bg-2);height:220px;display:flex;align-items:center;justify-content:center;">
-             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-           </div>`}
-      <div class="vehicle-card-body">
-        <div class="vehicle-card-header">
-          <h3 class="vehicle-card-model">${v.model}</h3>
-          ${v.price_per_day ? `<span class="vehicle-price">${v.price_per_day}€<small>/j</small></span>` : ''}
-        </div>
-        <div class="vehicle-card-meta">${v.category}${v.year ? ' · ' + v.year : ''}</div>
-        ${features.length ? `<div class="vehicle-features">${features.map(f => `<span>${f}</span>`).join('')}</div>` : ''}
-        ${v.description ? `<p class="vehicle-card-desc">${v.description}</p>` : ''}
-        <a href="contact.html" class="btn-vehicle">Demander ce véhicule</a>
-      </div>`;
-
-    grid.appendChild(card);
-  });
+  if (ventes.length > 0) {
+    sectionVente.style.display = 'block';
+    listVente.innerHTML = ventes.map((v, i) => renderVehicleCard(v, i, 'vente')).join('');
+  }
+  if (locations.length > 0) {
+    sectionLocation.style.display = 'block';
+    listLocation.innerHTML = locations.map((v, i) => renderVehicleCard(v, i, 'location')).join('');
+  }
 
   if (typeof initReveal === 'function') initReveal();
 }
+
+function renderVehicleCard(v, index, type) {
+  const delays = ['', 'reveal-d1', 'reveal-d2'];
+  const delay = delays[index % 3];
+  
+  const priceDisplay = type === 'vente' 
+    ? (v.price ? `${v.price}€` : 'Sur demande')
+    : (v.price_per_day ? `${v.price_per_day}€<small>/j</small>` : 'Sur demande');
+
+  const imgHtml = v.image_url 
+    ? `<div class="veh-hz-img"><img src="${v.image_url}" alt="${v.model}" loading="lazy" /></div>`
+    : `<div class="veh-hz-img" style="background:var(--bg-2);display:flex;align-items:center;justify-content:center;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>`;
+
+  return `
+    <div class="vehicle-card-hz reveal ${delay}">
+      ${imgHtml}
+      <div class="veh-hz-body">
+        <div class="veh-hz-header">
+          <h3 class="veh-hz-title">${v.model}</h3>
+          <div class="veh-hz-price">${priceDisplay}</div>
+        </div>
+        <div class="veh-hz-meta">${v.category}${v.year ? ' · ' + v.year : ''}</div>
+        
+        <div class="veh-hz-specs">
+          ${v.mileage ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>${v.mileage.toLocaleString('fr-FR')} km</div>` : ''}
+          ${v.fuel_type ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M13 11h4v4h-4z"/></svg>${v.fuel_type}</div>` : ''}
+          ${v.transmission ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>${v.transmission}</div>` : ''}
+          ${v.power ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${v.power}</div>` : ''}
+        </div>
+        
+        <div class="veh-hz-actions">
+          <button class="btn-magnetic" onclick="openVehicleModal('${v.id}')">Voir les détails</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+window.openVehicleModal = function(id) {
+  const v = allVehicles.find(veh => veh.id === id);
+  if(!v) return;
+  
+  const type = v.type || 'location';
+  const priceDisplay = type === 'vente' 
+    ? (v.price ? `${v.price}€` : 'Sur demande')
+    : (v.price_per_day ? `${v.price_per_day}€<small>/j</small>` : 'Sur demande');
+
+  document.getElementById('v-modal-img').src = v.image_url || '';
+  document.getElementById('v-modal-title').textContent = v.model;
+  document.getElementById('v-modal-price').innerHTML = priceDisplay;
+  document.getElementById('v-modal-desc').innerHTML = v.description ? v.description.replace(/\n/g, '<br>') : 'Aucune description fournie.';
+  
+  document.getElementById('v-modal-mileage').textContent = v.mileage ? v.mileage.toLocaleString('fr-FR') + ' km' : '-';
+  document.getElementById('v-modal-fuel').textContent = v.fuel_type || '-';
+  document.getElementById('v-modal-trans').textContent = v.transmission || '-';
+  document.getElementById('v-modal-power').textContent = v.power || '-';
+  document.getElementById('v-modal-year').textContent = v.year || '-';
+  
+  const feats = Array.isArray(v.features) ? v.features : [];
+  const featHtml = feats.length 
+    ? feats.map(f => `<span style="padding:6px 12px;background:var(--bg-2);border-radius:20px;font-size:0.8rem;border:1px solid var(--border);">${f}</span>`).join('')
+    : '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun équipement spécifié</span>';
+  document.getElementById('v-modal-features').innerHTML = featHtml;
+  
+  document.getElementById('v-contact-subject').value = `Demande pour ${type === 'vente' ? 'Achat' : 'Location'} : ${v.model}`;
+  document.getElementById('v-modal-btn-text').textContent = type === 'vente' ? 'Être recontacté pour ce véhicule' : 'Nous contacter pour ce véhicule';
+  document.getElementById('v-contact-form').classList.remove('open');
+  
+  document.getElementById('v-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeVModal = function() {
+  document.getElementById('v-modal').classList.remove('open');
+  document.body.style.overflow = '';
+};
 
 // ── HORAIRES & LIVE STATUS ──────────────────────────────────────────
 

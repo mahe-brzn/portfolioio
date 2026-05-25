@@ -1561,10 +1561,60 @@ footer {
 }
 
 /* ═══════════════════════════════════════════════════════
-   VEHICLE GRID (section dynamique dans location.html)
+   VEHICULES - LIST HORIZONTALE & MODALES
 ══════════════════════════════════════════════════════ */
-#vehicules-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+.vehicules-list { display: flex; flex-direction: column; gap: 32px; }
+.vehicle-card-hz {
+  display: flex; flex-direction: column; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 24px; overflow: hidden;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s;
 }
+@media (min-width: 768px) { .vehicle-card-hz { flex-direction: row; align-items: stretch; } }
+.vehicle-card-hz:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.1); }
+.veh-hz-img { width: 100%; height: 250px; flex-shrink: 0; position: relative; overflow: hidden; }
+@media (min-width: 768px) { .veh-hz-img { width: 40%; height: auto; min-height: 300px; } }
+.veh-hz-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+.vehicle-card-hz:hover .veh-hz-img img { transform: scale(1.05); }
+
+.veh-hz-body { padding: 32px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.veh-hz-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px; }
+.veh-hz-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; margin: 0; }
+.veh-hz-price { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--red); white-space: nowrap; }
+.veh-hz-price small { font-size: 0.6em; color: var(--text-muted); }
+.veh-hz-meta { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+
+.veh-hz-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.veh-spec-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); }
+.veh-spec-item svg { color: var(--white); opacity: 0.6; }
+
+.veh-hz-actions { margin-top: auto; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+/* Modal Véhicule Détail */
+.v-modal-overlay {
+  position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.v-modal-overlay.open { opacity: 1; pointer-events: auto; }
+.v-modal-content {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 24px; width: 100%; max-width: 900px;
+  max-height: 90vh; overflow-y: auto; position: relative; transform: scale(0.95) translateY(20px); transition: all 0.3s var(--ease);
+}
+.v-modal-overlay.open .v-modal-content { transform: scale(1) translateY(0); }
+.v-modal-close {
+  position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); border: none; color: white;
+  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px); z-index: 10; transition: background 0.2s;
+}
+.v-modal-close:hover { background: var(--red); }
+.v-modal-hero { height: clamp(250px, 40vw, 400px); width: 100%; overflow: hidden; position: relative; }
+.v-modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+.v-modal-body { padding: clamp(24px, 5vw, 40px); }
+.v-modal-specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin: 32px 0; }
+.v-modal-spec-box { background: var(--bg-card); border: 1px solid var(--border); padding: 16px; border-radius: 12px; text-align: center; }
+.v-modal-spec-val { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.v-modal-spec-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Contact Form Modal */
+.v-contact-form { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: 16px; margin-top: 32px; display: none; }
+.v-contact-form.open { display: block; animation: fadeUp 0.4s ease forwards; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

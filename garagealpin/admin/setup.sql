@@ -24,6 +24,12 @@ create table if not exists public.vehicles (
   features      text[] default '{}',
   description   text,
   available     boolean default true,
+  type          text default 'location',
+  price         numeric(10,2),
+  mileage       int,
+  fuel_type     text,
+  transmission  text,
+  power         text,
   image_url     text,
   created_at    timestamptz default now()
 );

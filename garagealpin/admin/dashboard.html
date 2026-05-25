@@ -478,15 +478,53 @@
           </select>
         </div>
       </div>
+      </div>
       <div class="form-row">
         <div class="form-group">
-          <label>Prix / jour (€)</label>
+          <label>Type d'annonce</label>
+          <select id="vehicle-type" onchange="document.getElementById('label-price').textContent = this.value === 'vente' ? 'Prix de vente (€)' : 'Prix / jour (€)'">
+            <option value="location">Location</option>
+            <option value="vente">Vente (Occasion)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label id="label-price">Prix / jour (€)</label>
           <input type="number" id="vehicle-price" placeholder="45" min="0" />
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group">
           <label>Année</label>
           <input type="number" id="vehicle-year" placeholder="2022" />
         </div>
+        <div class="form-group">
+          <label>Kilométrage</label>
+          <input type="number" id="vehicle-mileage" placeholder="ex: 45000" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Carburant</label>
+          <select id="vehicle-fuel">
+            <option value="">(Non spécifié)</option>
+            <option value="Essence">Essence</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Hybride">Hybride</option>
+            <option value="Électrique">Électrique</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Boîte de vitesse</label>
+          <select id="vehicle-transmission">
+            <option value="">(Non spécifié)</option>
+            <option value="Manuelle">Manuelle</option>
+            <option value="Automatique">Automatique</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Puissance</label>
+        <input type="text" id="vehicle-power" placeholder="ex: 110ch" />
       </div>
       <div class="form-group">
         <label>Caractéristiques (séparées par des virgules)</label>

@@ -82,18 +82,83 @@
       </div>
     </section>
 
-    <!-- VEHICLES GRID -->
-    <section aria-labelledby="vehicules-title" style="padding:clamp(80px,10vw,140px) 0;">
+    <!-- VEHICULES VENTE -->
+    <section aria-labelledby="vehicules-vente-title" style="padding:clamp(60px,8vw,100px) 0 40px; display:none;" id="section-vente">
       <div class="wrap">
-        <h2 id="vehicules-title" class="sr-only">Véhicules en location</h2>
-        <div id="vehicules-grid">
-          <!-- Chargé dynamiquement depuis Supabase -->
-          <div class="skeleton" style="height:350px;"></div>
-          <div class="skeleton" style="height:350px;"></div>
-          <div class="skeleton" style="height:350px;"></div>
+        <p class="s-label reveal" data-num="01" aria-hidden="true">Acheter</p>
+        <h2 id="vehicules-vente-title" style="font-family:var(--font-display);font-size:2.5rem;margin-bottom:48px;" class="reveal">Véhicules d'Occasion</h2>
+        <div id="vehicules-vente-list" class="vehicules-list">
+          <!-- Chargé dynamiquement -->
         </div>
       </div>
     </section>
+
+    <!-- VEHICULES LOCATION -->
+    <section aria-labelledby="vehicules-location-title" style="padding:clamp(40px,8vw,100px) 0 100px; display:none;" id="section-location">
+      <div class="wrap">
+        <p class="s-label reveal" data-num="02" aria-hidden="true">Louer</p>
+        <h2 id="vehicules-location-title" style="font-family:var(--font-display);font-size:2.5rem;margin-bottom:48px;" class="reveal">Véhicules en Location</h2>
+        <div id="vehicules-location-list" class="vehicules-list">
+          <!-- Chargé dynamiquement -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SPINNER GLOBAL CHARGEMENT -->
+    <div id="vehicules-loading" style="text-align:center; padding:100px 0;">
+      <p style="color:var(--text-muted);">Recherche des véhicules en cours...</p>
+    </div>
+
+    <!-- MODAL VEHICULE DETAILS -->
+    <div class="v-modal-overlay" id="v-modal">
+      <div class="v-modal-content">
+        <button class="v-modal-close" onclick="closeVModal()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="v-modal-hero" id="v-modal-hero">
+          <img id="v-modal-img" src="" alt="Véhicule" />
+        </div>
+        <div class="v-modal-body">
+          <h2 id="v-modal-title" style="font-family:var(--font-display); font-size:2.5rem; margin-bottom:8px;">Modèle</h2>
+          <div id="v-modal-price" class="veh-hz-price" style="margin-bottom:16px;">Prix</div>
+          <p id="v-modal-desc" style="color:var(--text-muted); line-height:1.6; margin-bottom:32px;">Description...</p>
+
+          <h3 style="font-size:1.1rem; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:24px;">Caractéristiques</h3>
+          <div class="v-modal-specs-grid">
+            <div class="v-modal-spec-box"><div class="v-modal-spec-val" id="v-modal-mileage">-</div><div class="v-modal-spec-lbl">Kilométrage</div></div>
+            <div class="v-modal-spec-box"><div class="v-modal-spec-val" id="v-modal-fuel">-</div><div class="v-modal-spec-lbl">Carburant</div></div>
+            <div class="v-modal-spec-box"><div class="v-modal-spec-val" id="v-modal-trans">-</div><div class="v-modal-spec-lbl">Boîte</div></div>
+            <div class="v-modal-spec-box"><div class="v-modal-spec-val" id="v-modal-power">-</div><div class="v-modal-spec-lbl">Puissance</div></div>
+            <div class="v-modal-spec-box"><div class="v-modal-spec-val" id="v-modal-year">-</div><div class="v-modal-spec-lbl">Année</div></div>
+          </div>
+
+          <h3 style="font-size:1.1rem; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px;">Équipements</h3>
+          <div id="v-modal-features" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+
+          <button class="btn-magnetic" style="width:100%; justify-content:center; margin-top:32px;" onclick="document.getElementById('v-contact-form').classList.toggle('open')">
+            <span id="v-modal-btn-text">Nous contacter pour ce véhicule</span>
+          </button>
+
+          <form action="https://formspree.io/f/meoqzzvw" method="POST" class="v-contact-form" id="v-contact-form">
+            <h4 style="margin-bottom:16px;">Demande d'information</h4>
+            <input type="hidden" name="Sujet" id="v-contact-subject" value="Demande Véhicule" />
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+              <div><label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Nom complet</label><input type="text" name="Nom" required style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);color:white;border-radius:8px;" /></div>
+              <div><label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Téléphone</label><input type="tel" name="Telephone" required style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);color:white;border-radius:8px;" /></div>
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">E-mail</label>
+              <input type="email" name="Email" required style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);color:white;border-radius:8px;" />
+            </div>
+            <div style="margin-bottom:24px;">
+              <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Message</label>
+              <textarea name="Message" rows="4" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);color:white;border-radius:8px;resize:vertical;" placeholder="Bonjour, je souhaite avoir plus d'informations..."></textarea>
+            </div>
+            <button type="submit" class="btn-magnetic">Envoyer la demande</button>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <!-- CTA -->
     <section id="cta" style="position:relative;" aria-labelledby="cta-equipe">

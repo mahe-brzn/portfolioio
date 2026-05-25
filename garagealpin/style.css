@@ -1589,32 +1589,36 @@ footer {
 
 .veh-hz-actions { margin-top: auto; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 
-/* Modal Véhicule Détail */
-.v-modal-overlay {
-  position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+/* Accordion Vehicle Details */
+.veh-hz-top {
+  display: flex; flex-direction: column; width: 100%;
 }
-.v-modal-overlay.open { opacity: 1; pointer-events: auto; }
-.v-modal-content {
-  background: var(--bg); border: 1px solid var(--border); border-radius: 24px; width: 100%; max-width: 900px;
-  max-height: 90vh; overflow-y: auto; position: relative; transform: scale(0.95) translateY(20px); transition: all 0.3s var(--ease);
+@media (min-width: 768px) {
+  .veh-hz-top { flex-direction: row; align-items: stretch; }
 }
-.v-modal-overlay.open .v-modal-content { transform: scale(1) translateY(0); }
-.v-modal-close {
-  position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); border: none; color: white;
-  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(4px); z-index: 10; transition: background 0.2s;
-}
-.v-modal-close:hover { background: var(--red); }
-.v-modal-hero { height: clamp(250px, 40vw, 400px); width: 100%; overflow: hidden; position: relative; }
-.v-modal-hero img { width: 100%; height: 100%; object-fit: cover; }
-.v-modal-body { padding: clamp(24px, 5vw, 40px); }
-.v-modal-specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin: 32px 0; }
-.v-modal-spec-box { background: var(--bg-card); border: 1px solid var(--border); padding: 16px; border-radius: 12px; text-align: center; }
-.v-modal-spec-val { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-.v-modal-spec-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* Contact Form Modal */
-.v-contact-form { background: var(--bg-card); border: 1px solid var(--border); padding: 24px; border-radius: 16px; margin-top: 32px; display: none; }
-.v-contact-form.open { display: block; animation: fadeUp 0.4s ease forwards; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.veh-hz-details {
+  display: none; padding: 32px; border-top: 1px solid rgba(255,255,255,0.05);
+  background: var(--bg-card); animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.veh-hz-details.open { display: block; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.v-contact-form {
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+  padding: 24px; border-radius: 16px; margin-top: 32px;
+}
+.v-contact-form input, .v-contact-form textarea {
+  width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;
+  font-family: inherit; font-size: 0.9rem; transition: border-color 0.3s;
+}
+.v-contact-form input:focus, .v-contact-form textarea:focus {
+  border-color: var(--red); outline: none;
+}
+.v-contact-form label {
+  display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;
+}

@@ -143,68 +143,93 @@ function renderVehicleCard(v, index, type) {
     ? `<div class="veh-hz-img"><img src="${v.image_url}" alt="${v.model}" loading="lazy" /></div>`
     : `<div class="veh-hz-img" style="background:var(--bg-2);display:flex;align-items:center;justify-content:center;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>`;
 
+  const feats = Array.isArray(v.features) ? v.features : [];
+  const featHtml = feats.length 
+    ? feats.map(f => `<span style="padding:6px 12px;background:rgba(255,255,255,0.05);border-radius:20px;font-size:0.8rem;border:1px solid var(--border);">${f}</span>`).join('')
+    : '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun équipement spécifié</span>';
+
   return `
-    <div class="vehicle-card-hz reveal ${delay}">
-      ${imgHtml}
-      <div class="veh-hz-body">
-        <div class="veh-hz-header">
-          <h3 class="veh-hz-title">${v.model}</h3>
-          <div class="veh-hz-price">${priceDisplay}</div>
+    <div class="vehicle-card-hz reveal ${delay}" id="veh-card-${v.id}">
+      <div class="veh-hz-top">
+        ${imgHtml}
+        <div class="veh-hz-body">
+          <div class="veh-hz-header">
+            <h3 class="veh-hz-title">${v.model}</h3>
+            <div class="veh-hz-price">${priceDisplay}</div>
+          </div>
+          <div class="veh-hz-meta">${v.category}${v.year ? ' · ' + v.year : ''}</div>
+          
+          <div class="veh-hz-specs">
+            ${v.mileage ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>${v.mileage.toLocaleString('fr-FR')} km</div>` : ''}
+            ${v.fuel_type ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M13 11h4v4h-4z"/></svg>${v.fuel_type}</div>` : ''}
+            ${v.transmission ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>${v.transmission}</div>` : ''}
+            ${v.power ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${v.power}</div>` : ''}
+          </div>
+          
+          <div class="veh-hz-actions">
+            <button class="btn-magnetic" onclick="toggleVehicleDetails('${v.id}')">
+              <span id="veh-btn-text-${v.id}">Voir les détails</span>
+            </button>
+          </div>
         </div>
-        <div class="veh-hz-meta">${v.category}${v.year ? ' · ' + v.year : ''}</div>
+      </div>
+      
+      <!-- Accordion Details -->
+      <div class="veh-hz-details" id="veh-details-${v.id}">
+        <p style="color:var(--text-muted); line-height:1.6; margin-bottom:24px;">${v.description ? v.description.replace(/\n/g, '<br>') : 'Aucune description fournie.'}</p>
         
-        <div class="veh-hz-specs">
-          ${v.mileage ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>${v.mileage.toLocaleString('fr-FR')} km</div>` : ''}
-          ${v.fuel_type ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M13 11h4v4h-4z"/></svg>${v.fuel_type}</div>` : ''}
-          ${v.transmission ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>${v.transmission}</div>` : ''}
-          ${v.power ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${v.power}</div>` : ''}
+        <h4 style="font-size:1.1rem; margin-bottom:16px;">Équipements</h4>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;">
+          ${featHtml}
         </div>
-        
-        <div class="veh-hz-actions">
-          <button class="btn-magnetic" onclick="openVehicleModal('${v.id}')">Voir les détails</button>
-        </div>
+
+        <form action="https://formspree.io/f/meoqzzvw" method="POST" class="v-contact-form">
+          <h4 style="margin-bottom:16px; font-size:1.2rem;">${type === 'vente' ? 'Être recontacté pour ce véhicule' : 'Réserver ce véhicule'}</h4>
+          <input type="hidden" name="Sujet" value="Demande pour ${type === 'vente' ? 'Achat' : 'Location'} : ${v.model}" />
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:16px;">
+            <div><label>Nom complet</label><input type="text" name="Nom" required /></div>
+            <div><label>Téléphone</label><input type="tel" name="Telephone" required /></div>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label>E-mail</label>
+            <input type="email" name="Email" required />
+          </div>
+          <div style="margin-bottom:24px;">
+            <label>Message</label>
+            <textarea name="Message" rows="4" placeholder="Bonjour, je souhaite avoir plus d'informations..." required></textarea>
+          </div>
+          <button type="submit" class="btn-magnetic" style="width:100%; justify-content:center;">Envoyer la demande</button>
+        </form>
       </div>
     </div>
   `;
 }
 
-window.openVehicleModal = function(id) {
-  const v = allVehicles.find(veh => veh.id === id);
-  if(!v) return;
-  
-  const type = v.type || 'location';
-  const priceDisplay = type === 'vente' 
-    ? (v.price ? `${v.price}€` : 'Sur demande')
-    : (v.price_per_day ? `${v.price_per_day}€<small>/j</small>` : 'Sur demande');
+window.toggleVehicleDetails = function(id) {
+  const detailsBlock = document.getElementById(`veh-details-${id}`);
+  const btnText = document.getElementById(`veh-btn-text-${id}`);
+  if (!detailsBlock) return;
 
-  document.getElementById('v-modal-img').src = v.image_url || '';
-  document.getElementById('v-modal-title').textContent = v.model;
-  document.getElementById('v-modal-price').innerHTML = priceDisplay;
-  document.getElementById('v-modal-desc').innerHTML = v.description ? v.description.replace(/\n/g, '<br>') : 'Aucune description fournie.';
-  
-  document.getElementById('v-modal-mileage').textContent = v.mileage ? v.mileage.toLocaleString('fr-FR') + ' km' : '-';
-  document.getElementById('v-modal-fuel').textContent = v.fuel_type || '-';
-  document.getElementById('v-modal-trans').textContent = v.transmission || '-';
-  document.getElementById('v-modal-power').textContent = v.power || '-';
-  document.getElementById('v-modal-year').textContent = v.year || '-';
-  
-  const feats = Array.isArray(v.features) ? v.features : [];
-  const featHtml = feats.length 
-    ? feats.map(f => `<span style="padding:6px 12px;background:var(--bg-2);border-radius:20px;font-size:0.8rem;border:1px solid var(--border);">${f}</span>`).join('')
-    : '<span style="color:var(--text-muted);font-size:0.85rem;">Aucun équipement spécifié</span>';
-  document.getElementById('v-modal-features').innerHTML = featHtml;
-  
-  document.getElementById('v-contact-subject').value = `Demande pour ${type === 'vente' ? 'Achat' : 'Location'} : ${v.model}`;
-  document.getElementById('v-modal-btn-text').textContent = type === 'vente' ? 'Être recontacté pour ce véhicule' : 'Nous contacter pour ce véhicule';
-  document.getElementById('v-contact-form').classList.remove('open');
-  
-  document.getElementById('v-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-};
-
-window.closeVModal = function() {
-  document.getElementById('v-modal').classList.remove('open');
-  document.body.style.overflow = '';
+  if (detailsBlock.classList.contains('open')) {
+    detailsBlock.classList.remove('open');
+    btnText.textContent = "Voir les détails";
+  } else {
+    // Close others
+    document.querySelectorAll('.veh-hz-details.open').forEach(el => {
+      el.classList.remove('open');
+      const bid = el.id.replace('veh-details-', '');
+      const bt = document.getElementById(`veh-btn-text-${bid}`);
+      if(bt) bt.textContent = "Voir les détails";
+    });
+    
+    detailsBlock.classList.add('open');
+    btnText.textContent = "Masquer les détails";
+    
+    // Scroll to it
+    setTimeout(() => {
+      detailsBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }
 };
 
 // ── HORAIRES & LIVE STATUS ──────────────────────────────────────────
@@ -329,7 +354,7 @@ async function loadLocationHours() {
 // Auto-détection de la page et chargement
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('equipe-grid'))    loadEquipePage();
-  if (document.getElementById('vehicules-grid')) loadVehiculesPage();
+  if (document.getElementById('vehicules-loading')) loadVehiculesPage();
   
   // Call globally
   loadRealtimeStatus();

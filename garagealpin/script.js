@@ -284,8 +284,8 @@
           this.y = init ? Math.random() * H : (Math.random() > 0.5 ? -100 : H + 100);
           this.vx = (Math.random() - 0.5) * 0.4; 
           this.vy = (Math.random() - 0.5) * 0.4;
-          this.r = Math.random() * 1.5 + 0.5; 
-          this.a = Math.random() * 0.4 + 0.1;
+          this.r = Math.random() * 2 + 1.2; 
+          this.a = Math.random() * 0.5 + 0.2;
           this.isRed = Math.random() < 0.2;
         }
         update() {
@@ -311,12 +311,12 @@
           let visY = this.y - scrollY * 0.3;
           ctx.beginPath();
           ctx.arc(this.x, visY, this.r, 0, Math.PI * 2);
-          ctx.fillStyle = this.isRed ? `rgba(227,0,15,${this.a})` : `rgba(227,0,15,${this.a * 0.25})`;
+          ctx.fillStyle = this.isRed ? `rgba(227,0,15,${this.a})` : `rgba(227,0,15,${this.a * 0.45})`;
           ctx.fill();
         }
       }
 
-      for (let i = 0; i < 45; i++) particles.push(new Particle());
+      for (let i = 0; i < 75; i++) particles.push(new Particle());
 
       let rafId;
       function rafLoop() {
@@ -343,7 +343,7 @@
               ctx.quadraticCurveTo(midX + offset, midY - offset, p2.x, visY2);
               
               let alpha = (120 - dist) / 120;
-              ctx.strokeStyle = `rgba(227,0,15,${alpha * 0.08})`;
+              ctx.strokeStyle = `rgba(227,0,15,${alpha * 0.18})`;
               ctx.lineWidth = 1;
               ctx.stroke();
             }

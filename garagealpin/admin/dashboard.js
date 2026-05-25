@@ -36,11 +36,27 @@ async function logout() {
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.querySelector('.sidebar-overlay');
+  if (sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('show');
+  } else {
+    sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('show');
+  }
+}
+
 function showPage(pageId, navEl) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   if (navEl) navEl.classList.add('active');
+  
+  if (window.innerWidth <= 768) {
+    toggleSidebar();
+  }
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
@@ -377,6 +393,8 @@ const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
 
 async function loadHoraires() {
   const form = document.getElementById('horaires-form');
+  const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  
   const { data, error } = await supabaseClient.from('horaires').select('*').order('sort_order');
 
   const horaires = data && data.length ? data : DAYS.map((d, i) => ({
@@ -393,11 +411,13 @@ async function loadHoraires() {
     row.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
         <span style="font-family:Syne,sans-serif;font-weight:700;">${h.day}</span>
-        <label class="toggle" title="Fermé ce jour">
-          <input type="checkbox" id="closed-${h.day}" ${h.closed ? 'checked' : ''} onchange="toggleDayRow('${h.day}', this.checked)" />
-          <span class="toggle-slider"></span>
-        </label>
-        <span style="font-size:0.75rem;color:rgba(255,255,255,0.4);">Fermé</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="status-text-${h.day}" style="font-size:0.85rem;font-weight:600;color:${!h.closed ? 'var(--green)' : 'var(--red)'};">${!h.closed ? 'Ouvert' : 'Fermé'}</span>
+          <label class="toggle" title="Ouvert ce jour">
+            <input type="checkbox" id="open-${h.day}" ${!h.closed ? 'checked' : ''} onchange="toggleDayRow('${h.day}', this.checked)" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
       </div>
       <div id="times-${h.day}" style="${h.closed ? 'display:none' : 'display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;'}">
         <div><label>Matin ouvre</label><input type="time" id="mo-${h.day}" value="${h.morning_open || '08:00'}" /></div>
@@ -409,18 +429,29 @@ async function loadHoraires() {
   });
 }
 
-function toggleDayRow(day, closed) {
+function toggleDayRow(day, isOpen) {
   const el = document.getElementById(`times-${day}`);
-  el.style.display = closed ? 'none' : 'grid';
-  el.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
-  el.style.gap = '10px';
+  const statusText = document.getElementById(`status-text-${day}`);
+  
+  if (isOpen) {
+    el.style.display = 'grid';
+    el.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
+    el.style.gap = '10px';
+    statusText.textContent = 'Ouvert';
+    statusText.style.color = 'var(--green)';
+  } else {
+    el.style.display = 'none';
+    statusText.textContent = 'Fermé';
+    statusText.style.color = 'var(--red)';
+  }
 }
 
 async function saveHoraires() {
+  const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
   const rows = DAYS.map((day, i) => ({
     day,
     sort_order: i + 1,
-    closed: document.getElementById(`closed-${day}`)?.checked ?? false,
+    closed: !(document.getElementById(`open-${day}`)?.checked ?? false),
     morning_open:     document.getElementById(`mo-${day}`)?.value || null,
     morning_close:    document.getElementById(`mc-${day}`)?.value || null,
     afternoon_open:   document.getElementById(`ao-${day}`)?.value || null,

@@ -131,8 +131,107 @@ async function loadVehiculesPage() {
   if (typeof initReveal === 'function') initReveal();
 }
 
+// ── HORAIRES & LIVE STATUS ──────────────────────────────────────────
+
+// Update status badges across all pages
+async function loadRealtimeStatus() {
+  const { data, error } = await supabaseClient.from('horaires').select('*').order('sort_order');
+  if (error || !data || data.length === 0) return;
+
+  // Obtenir le jour et l'heure actuels à Paris
+  const now = new Date();
+  const options = { timeZone: 'Europe/Paris', weekday: 'long', hour: 'numeric', minute: 'numeric', hour12: false };
+  const formatter = new Intl.DateTimeFormat('fr-FR', options);
+  const parts = formatter.formatToParts(now);
+  
+  let currentDay = '';
+  let currentHour = 0;
+  let currentMinute = 0;
+
+  parts.forEach(p => {
+    if (p.type === 'weekday') currentDay = p.value.charAt(0).toUpperCase() + p.value.slice(1);
+    if (p.type === 'hour') currentHour = parseInt(p.value, 10);
+    if (p.type === 'minute') currentMinute = parseInt(p.value, 10);
+  });
+
+  const today = data.find(d => d.day === currentDay);
+  let isOpen = false;
+
+  if (today && !today.closed) {
+    const timeToMin = (t) => {
+      if (!t) return 0;
+      const [h, m] = t.split(':');
+      return parseInt(h, 10) * 60 + parseInt(m, 10);
+    };
+    const currentMin = currentHour * 60 + currentMinute;
+    
+    const mo = timeToMin(today.morning_open);
+    const mc = timeToMin(today.morning_close);
+    const ao = timeToMin(today.afternoon_open);
+    const ac = timeToMin(today.afternoon_close);
+
+    if ((currentMin >= mo && currentMin <= mc) || (currentMin >= ao && currentMin <= ac)) {
+      isOpen = true;
+    }
+  }
+
+  // Update DOM badges
+  document.querySelectorAll('.nav-status').forEach(el => {
+    el.setAttribute('aria-label', isOpen ? 'Statut : ouvert' : 'Statut : fermé');
+    const dot = el.querySelector('.nav-dot');
+    const text = el.querySelector('span:not(.nav-dot)');
+    if (dot) dot.style.backgroundColor = isOpen ? 'var(--green)' : 'var(--red)';
+    if (text) {
+      text.textContent = isOpen ? 'Ouvert' : 'Fermé';
+      text.style.color = isOpen ? 'var(--green)' : 'var(--red)';
+    }
+  });
+
+  // Update specific info badge in location.html if it exists
+  const infoStatus = document.getElementById('location-current-status');
+  if (infoStatus) {
+    infoStatus.textContent = isOpen ? 'Ouvert ●' : 'Fermé ●';
+    infoStatus.style.color = isOpen ? '#22c55e' : '#ff5252';
+  }
+}
+
+// Populate the dynamic hours table in location.html
+async function loadLocationHours() {
+  const table = document.getElementById('horaires-dynamic-table');
+  if (!table) return;
+
+  const { data, error } = await supabaseClient.from('horaires').select('*').order('sort_order');
+  if (error || !data) return;
+
+  table.innerHTML = '';
+  data.forEach(h => {
+    const row = document.createElement('div');
+    row.className = 'horaire-row';
+    const formatTime = (t) => t ? t.substring(0, 5).replace(':', 'h') : '';
+    
+    if (h.closed) {
+      row.innerHTML = `<span class="horaire-day">${h.day}</span><span class="horaire-closed">Fermé</span>`;
+    } else {
+      let timeStr = '';
+      if (h.morning_open && h.morning_close) {
+        timeStr += `${formatTime(h.morning_open)} – ${formatTime(h.morning_close)}`;
+      }
+      if (h.afternoon_open && h.afternoon_close) {
+        if (timeStr) timeStr += ' / ';
+        timeStr += `${formatTime(h.afternoon_open)} – ${formatTime(h.afternoon_close)}`;
+      }
+      row.innerHTML = `<span class="horaire-day">${h.day}</span><span class="horaire-time">${timeStr}</span>`;
+    }
+    table.appendChild(row);
+  });
+}
+
 // Auto-détection de la page et chargement
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('equipe-grid'))    loadEquipePage();
   if (document.getElementById('vehicules-grid')) loadVehiculesPage();
+  
+  // Call globally
+  loadRealtimeStatus();
+  if (document.getElementById('horaires-dynamic-table')) loadLocationHours();
 });

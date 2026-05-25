@@ -133,7 +133,7 @@
                 </span>
                 <div>
                   <span class="info-label">Statut actuel</span>
-                  <span class="info-value" style="color:#22c55e;font-weight:600;">Ouvert ●</span>
+                  <span id="location-current-status" class="info-value" style="color:#22c55e;font-weight:600;">Ouvert ●</span>
                 </div>
               </div>
             </div>
@@ -141,14 +141,8 @@
             <!-- Horaires -->
             <div class="location-info reveal reveal-d1" style="margin-top:2px;">
               <h3>Horaires d'ouverture</h3>
-              <div class="horaires-table" role="table" aria-label="Horaires d'ouverture">
-                <div class="horaire-row"><span class="horaire-day">Lundi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Mardi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Mercredi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Jeudi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Vendredi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 17h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Samedi</span><span class="horaire-closed">Sur rendez-vous</span></div>
-                <div class="horaire-row"><span class="horaire-day">Dimanche</span><span class="horaire-closed">Fermé</span></div>
+              <div id="horaires-dynamic-table" class="horaires-table" role="table" aria-label="Horaires d'ouverture">
+                <!-- Les horaires seront injectés ici par JavaScript -->
               </div>
             </div>
           </div>
@@ -254,6 +248,8 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js?v=5"></script>
   <script src="script.js?v=2"></script>
 </body>
 </html>

@@ -191,10 +191,26 @@
     /* ── RESPONSIVE ───────────────────────────────── */
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); transition: transform 0.3s var(--ease); }
-      .sidebar.open { transform: translateX(0); }
-      .main { margin-left: 0; padding: 24px 20px; }
+      .sidebar.open { transform: translateX(0); z-index: 1000; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+      .main { margin-left: 0; padding: 24px 20px; padding-top: 80px; }
       .form-row { grid-template-columns: 1fr; }
+      .mobile-header { display: flex; }
+      
+      /* Overlay to close sidebar on mobile */
+      .sidebar-overlay {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999; opacity: 0; transition: opacity 0.3s;
+      }
+      .sidebar-overlay.show { display: block; opacity: 1; }
     }
+    
+    .mobile-header {
+      display: none; justify-content: space-between; align-items: center;
+      position: fixed; top: 0; left: 0; right: 0; height: 60px;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 0 20px; z-index: 900;
+    }
+    .mobile-header .site-logo-img { height: 40px; }
+    .mobile-menu-btn { background: none; border: none; color: var(--white); cursor: pointer; padding: 5px; }
   </style>
 </head>
 <body>
@@ -236,8 +252,17 @@
       </div>
     </aside>
 
+    <!-- ── SIDEBAR OVERLAY ── -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- ── MAIN ── -->
     <main class="main">
+      <div class="mobile-header">
+        <div><img src="../images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" style="height:32px;" /></div>
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
 
       <!-- PAGE : ÉQUIPE -->
       <div id="page-equipe" class="page active">
@@ -476,6 +501,6 @@
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="dashboard.js?v=9"></script>
+  <script src="dashboard.js?v=10"></script>
 </body>
 </html>

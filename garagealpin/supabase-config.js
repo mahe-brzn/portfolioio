@@ -150,7 +150,7 @@ function renderVehicleCard(v, index, type) {
 
   return `
     <div class="vehicle-card-hz reveal ${delay}" id="veh-card-${v.id}">
-      <div class="veh-hz-top">
+      <div class="veh-hz-top" onclick="toggleVehicleDetails('${v.id}')">
         ${imgHtml}
         <div class="veh-hz-body">
           <div class="veh-hz-header">
@@ -159,24 +159,24 @@ function renderVehicleCard(v, index, type) {
           </div>
           <div class="veh-hz-meta">${v.category}${v.year ? ' · ' + v.year : ''}</div>
           
-          <div class="veh-hz-specs">
-            ${v.mileage ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>${v.mileage.toLocaleString('fr-FR')} km</div>` : ''}
-            ${v.fuel_type ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M13 11h4v4h-4z"/></svg>${v.fuel_type}</div>` : ''}
-            ${v.transmission ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>${v.transmission}</div>` : ''}
-            ${v.power ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${v.power}</div>` : ''}
+          <div class="veh-hz-shortdesc">
+            ${v.description ? v.description : 'Aucune description courte disponible.'}
           </div>
           
-          <div class="veh-hz-actions">
-            <button class="btn-magnetic" onclick="toggleVehicleDetails('${v.id}')">
-              <span id="veh-btn-text-${v.id}">Voir les détails</span>
-            </button>
+          <div class="veh-hz-expand-icon">
+            <svg id="veh-icon-${v.id}" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
         </div>
       </div>
       
       <!-- Accordion Details -->
       <div class="veh-hz-details" id="veh-details-${v.id}">
-        <p style="color:var(--text-muted); line-height:1.6; margin-bottom:24px;">${v.description ? v.description.replace(/\n/g, '<br>') : 'Aucune description fournie.'}</p>
+        <div class="veh-hz-specs">
+          ${v.mileage ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>${v.mileage.toLocaleString('fr-FR')} km</div>` : ''}
+          ${v.fuel_type ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M13 11h4v4h-4z"/></svg>${v.fuel_type}</div>` : ''}
+          ${v.transmission ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>${v.transmission}</div>` : ''}
+          ${v.power ? `<div class="veh-spec-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${v.power}</div>` : ''}
+        </div>
         
         <h4 style="font-size:1.1rem; margin-bottom:16px;">Équipements</h4>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px;">
@@ -207,28 +207,28 @@ function renderVehicleCard(v, index, type) {
 
 window.toggleVehicleDetails = function(id) {
   const detailsBlock = document.getElementById(`veh-details-${id}`);
-  const btnText = document.getElementById(`veh-btn-text-${id}`);
+  const icon = document.getElementById(`veh-icon-${id}`);
   if (!detailsBlock) return;
 
   if (detailsBlock.classList.contains('open')) {
     detailsBlock.classList.remove('open');
-    btnText.textContent = "Voir les détails";
+    if (icon) icon.classList.remove('open');
   } else {
     // Close others
     document.querySelectorAll('.veh-hz-details.open').forEach(el => {
       el.classList.remove('open');
       const bid = el.id.replace('veh-details-', '');
-      const bt = document.getElementById(`veh-btn-text-${bid}`);
-      if(bt) bt.textContent = "Voir les détails";
+      const ic = document.getElementById(`veh-icon-${bid}`);
+      if(ic) ic.classList.remove('open');
     });
     
     detailsBlock.classList.add('open');
-    btnText.textContent = "Masquer les détails";
+    if (icon) icon.classList.add('open');
     
     // Scroll to it
     setTimeout(() => {
       detailsBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+    }, 400);
   }
 };
 

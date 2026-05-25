@@ -2,17 +2,6 @@
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <script>
-    if (sessionStorage.getItem('garage_auth') !== 'romain') {
-      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
-      if (pwd === 'romain') {
-        sessionStorage.setItem('garage_auth', 'romain');
-      } else {
-        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
-        throw new Error('Unauthorized');
-      }
-    }
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
@@ -34,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body class="loading">
 
@@ -47,7 +36,7 @@
 
   <!-- ══ PRELOADER ══ -->
   <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
-    <div class="pre-logo">Garage<span>.</span>Alpin</div>
+    <div class="pre-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></div>
     <div class="pre-bar-wrap" aria-hidden="true">
       <div class="pre-bar"></div>
     </div>
@@ -60,7 +49,7 @@
       <div class="wrap nav-row">
 
         <a href="index.html" class="nav-logo" aria-label="Le Garage Alpin — Accueil">
-          Garage<span>.</span>Alpin
+          <img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" />
         </a>
 
         <ul class="nav-links" role="list">
@@ -441,7 +430,7 @@
     <div class="wrap">
       <div class="footer-grid reveal">
         <div>
-          <div class="footer-logo">Garage<span>.</span>Alpin</div>
+          <div class="footer-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></div>
           <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
         </div>
         <div class="footer-col">
@@ -463,7 +452,7 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a></span>
         <div style="display:flex;gap:24px;">
           <a href="#">Mentions légales</a>
           <a href="#">Confidentialité</a>
@@ -472,6 +461,6 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>

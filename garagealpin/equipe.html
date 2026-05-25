@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
-  <script>
-    if (sessionStorage.getItem('garage_auth') !== 'romain') {
-      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
-      if (pwd === 'romain') {
-        sessionStorage.setItem('garage_auth', 'romain');
-      } else {
-        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
-        throw new Error('Unauthorized');
-      }
-    }
-  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notre Équipe — Le Garage Alpin | Séez, Tarentaise</title>
@@ -23,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body class="loading">
 
@@ -32,7 +21,7 @@
   <div id="cursor-ring" aria-hidden="true"></div>
 
   <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
-    <div class="pre-logo">Garage<span>.</span>Alpin</div>
+    <div class="pre-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></div>
     <div class="pre-bar-wrap" aria-hidden="true"><div class="pre-bar"></div></div>
     <span class="pre-counter" aria-hidden="true">0%</span>
   </div>
@@ -40,7 +29,7 @@
   <header role="banner">
     <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
-        <a href="index.html" class="nav-logo">Garage<span>.</span>Alpin</a>
+        <a href="index.html" class="nav-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></a>
         <ul class="nav-links" role="list">
           <li><a href="index.html#services">Services</a></li>
           <li><a href="index.html#about">À propos</a></li>
@@ -121,82 +110,11 @@
     <section aria-labelledby="equipe-title" style="padding:clamp(80px,10vw,140px) 0;">
       <div class="wrap">
         <h2 id="equipe-title" class="sr-only">Équipe du Garage Alpin</h2>
-
-        <div class="equipe-grid">
-
-          <article class="equipe-card tilt-card reveal" aria-label="Romain Bouvet, Co-fondateur">
-            <div class="equipe-card-img-wrap">
-              <img src="images/equipe1.avif" alt="Romain Bouvet" class="equipe-card-img" loading="lazy" />
-            </div>
-            <div class="equipe-card-body">
-              <h3 class="equipe-card-name">Romain Bouvet</h3>
-              <p class="equipe-card-role">Co-fondateur &amp; Chef mécanicien</p>
-              <p class="equipe-card-desc">Expert en mécanique lourde et diagnostic avancé. Romain dirige l'atelier avec une rigueur et une passion communicatives depuis la création du garage.</p>
-            </div>
-          </article>
-
-          <article class="equipe-card tilt-card reveal reveal-d1" aria-label="Jonathan Courtois, Co-fondateur">
-            <div class="equipe-card-img-wrap">
-              <img src="images/equipe2.avif" alt="Jonathan Courtois" class="equipe-card-img" loading="lazy" />
-            </div>
-            <div class="equipe-card-body">
-              <h3 class="equipe-card-name">Jonathan Courtois</h3>
-              <p class="equipe-card-role">Co-fondateur &amp; Électronicien</p>
-              <p class="equipe-card-desc">Spécialiste du diagnostic électronique et des systèmes embarqués. Jonathan maîtrise les dernières technologies des véhicules modernes.</p>
-            </div>
-          </article>
-
-          <article class="equipe-card tilt-card reveal reveal-d2" aria-label="Élie, Technicien">
-            <div class="equipe-card-img-wrap">
-              <img src="images/elie.avif" alt="Élie" class="equipe-card-img" loading="lazy" />
-            </div>
-            <div class="equipe-card-body">
-              <h3 class="equipe-card-name">Élie</h3>
-              <p class="equipe-card-role">Technicien mécanicien</p>
-              <p class="equipe-card-desc">Passionné de mécanique depuis toujours, Élie intervient sur toutes les marques avec une minutie remarquable.</p>
-            </div>
-          </article>
-
-          <article class="equipe-card tilt-card reveal" aria-label="Technicien, Distribution">
-            <div class="equipe-card-img-wrap">
-              <img src="images/equipe3.avif" alt="Technicien distribution" class="equipe-card-img" loading="lazy" />
-            </div>
-            <div class="equipe-card-body">
-              <h3 class="equipe-card-name">Technicien</h3>
-              <p class="equipe-card-role">Spécialiste Distribution</p>
-              <p class="equipe-card-desc">Expert en distribution et transmission, il assure la fiabilité et la sécurité des moteurs sur le long terme.</p>
-            </div>
-          </article>
-
-          <article class="equipe-card tilt-card reveal reveal-d1" aria-label="Technicien, Freinage">
-            <div class="equipe-card-img-wrap">
-              <img src="images/equipe4.avif" alt="Technicien freinage" class="equipe-card-img" loading="lazy" />
-            </div>
-            <div class="equipe-card-body">
-              <h3 class="equipe-card-name">Technicien</h3>
-              <p class="equipe-card-role">Sécurité &amp; Freinage</p>
-              <p class="equipe-card-desc">Sur nos routes de montagne, le freinage ne souffre aucune approximation. Il en fait sa spécialité au quotidien.</p>
-            </div>
-          </article>
-
-          <article class="equipe-card tilt-card reveal reveal-d2" aria-label="Rejoindre l'équipe">
-            <div class="equipe-card-img-wrap" style="background:var(--bg-2);display:flex;align-items:center;justify-content:center;height:clamp(280px,35vw,420px);">
-              <div style="text-align:center;padding:32px;">
-                <div style="width:64px;height:64px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                  </svg>
-                </div>
-                <p style="font-size:0.85rem;color:var(--text-muted);">Nous recrutons</p>
-              </div>
-            </div>
-            <div class="equipe-card-body">
-              <h3 class="equipe-card-name">Vous ?</h3>
-              <p class="equipe-card-role">Poste à pourvoir</p>
-              <p class="equipe-card-desc">Passionné de mécanique et prêt à rejoindre une équipe dynamique en Tarentaise ? Contactez-nous !</p>
-            </div>
-          </article>
-
+        <div class="equipe-grid" id="equipe-grid">
+          <!-- Chargé dynamiquement depuis Supabase -->
+          <div class="equipe-card skeleton-card" style="height:400px;"></div>
+          <div class="equipe-card skeleton-card" style="height:400px;"></div>
+          <div class="equipe-card skeleton-card" style="height:400px;"></div>
         </div>
       </div>
     </section>
@@ -227,7 +145,7 @@
     <div class="wrap">
       <div class="footer-grid reveal">
         <div>
-          <div class="footer-logo">Garage<span>.</span>Alpin</div>
+          <div class="footer-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></div>
           <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
         </div>
         <div class="footer-col">
@@ -249,7 +167,7 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a></span>
         <div style="display:flex;gap:24px;">
           <a href="#">Mentions légales</a>
           <a href="#">Confidentialité</a>
@@ -258,6 +176,8 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js?v=4"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>

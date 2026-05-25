@@ -2,17 +2,6 @@
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <script>
-    if (sessionStorage.getItem('garage_auth') !== 'romain') {
-      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
-      if (pwd === 'romain') {
-        sessionStorage.setItem('garage_auth', 'romain');
-      } else {
-        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
-        throw new Error('Unauthorized');
-      }
-    }
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nous Trouver — Le Garage Alpin | Séez, Tarentaise</title>
   <meta name="description" content="Retrouvez le Garage Alpin à Séez (73700), zone artisanale de Tarentaise. Horaires, itinéraire et contact." />
@@ -23,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body class="loading">
 
@@ -32,7 +21,7 @@
   <div id="cursor-ring" aria-hidden="true"></div>
 
   <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
-    <div class="pre-logo">Garage<span>.</span>Alpin</div>
+    <div class="pre-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></div>
     <div class="pre-bar-wrap" aria-hidden="true"><div class="pre-bar"></div></div>
     <span class="pre-counter" aria-hidden="true">0%</span>
   </div>
@@ -40,7 +29,7 @@
   <header role="banner">
     <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
-        <a href="index.html" class="nav-logo">Garage<span>.</span>Alpin</a>
+        <a href="index.html" class="nav-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></a>
         <ul class="nav-links" role="list">
           <li><a href="index.html#services">Services</a></li>
           <li><a href="index.html#about">À propos</a></li>
@@ -168,11 +157,15 @@
           <div class="map-wrap reveal reveal-d2">
             <iframe
               title="Carte du Garage Alpin à Séez"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2758.123!2d6.769!3d45.617!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47899f6aef8ab935%3A0x0!2sSéez%2C%2073700!5e0!3m2!1sfr!2sfr!4v1716000000000"
+              src="https://maps.google.com/maps?q=Le+Garage+Alpin,+10+Rue+des+Gli%C3%A8res,+73700+S%C3%A9ez&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              width="600"
+              height="450"
+              style="border:0;"
+              allowfullscreen=""
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
-              aria-label="Carte Google Maps — Garage Alpin, Séez"
-            ></iframe>
+              aria-label="Carte Google Maps — Garage Alpin, Séez">
+            </iframe>
           </div>
 
         </div>
@@ -180,7 +173,7 @@
         <!-- CTA Get Directions -->
         <div class="reveal" style="margin-top:48px;text-align:center;">
           <a
-            href="https://www.google.com/maps/dir/?api=1&destination=Zone+artisanale+73700+Séez"
+            href="https://www.google.com/maps/dir/?api=1&destination=10+Rue+des+Glères,+73700+Séez"
             target="_blank"
             rel="noopener noreferrer"
             class="btn-magnetic"
@@ -230,7 +223,7 @@
     <div class="wrap">
       <div class="footer-grid reveal">
         <div>
-          <div class="footer-logo">Garage<span>.</span>Alpin</div>
+          <div class="footer-logo"><img src="images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></div>
           <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
         </div>
         <div class="footer-col">
@@ -252,7 +245,7 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a></span>
         <div style="display:flex;gap:24px;">
           <a href="#">Mentions légales</a>
           <a href="#">Confidentialité</a>
@@ -261,6 +254,6 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>

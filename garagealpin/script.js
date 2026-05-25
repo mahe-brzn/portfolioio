@@ -52,7 +52,7 @@
     });
 
     function lerpCursor() {
-      rx += (mx - rx) * 0.08; // Plus élastique et organique (au lieu de 0.12)
+      rx += (mx - rx) * 0.08; // Élasticité d'origine
       ry += (my - ry) * 0.08;
       ring.style.left = rx + 'px';
       ring.style.top  = ry + 'px';
@@ -216,19 +216,45 @@
      10. MAGNETIC BUTTONS (Refonte Robuste)
   ────────────────────────────────────────────── */
   document.querySelectorAll('.btn-magnetic').forEach(btn => {
-    // Aucune manipulation de innerHTML pour ne pas détruire les tags existants
+    let isGrabbed = false;
+    let currX = 0;
+    let currY = 0;
+    
+    // Effet "grab" au clic
+    btn.addEventListener('mousedown', () => {
+      isGrabbed = true;
+      btn.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      btn.style.transform = `translate(${currX}px, ${currY}px) scale(0.92)`;
+    });
+    
+    btn.addEventListener('mouseup', () => {
+      isGrabbed = false;
+      btn.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      btn.style.transform = `translate(${currX}px, ${currY}px) scale(1)`;
+    });
+
     btn.addEventListener('mousemove', e => {
       const rect = btn.getBoundingClientRect();
       const x = e.clientX - (rect.left + rect.width / 2);
       const y = e.clientY - (rect.top + rect.height / 2);
+      currX = x * 0.3;
+      currY = y * 0.3;
       
-      btn.style.transition = 'none';
-      btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+      if (isGrabbed) {
+         btn.style.transition = 'transform 0.1s ease-out';
+         btn.style.transform = `translate(${currX}px, ${currY}px) scale(0.92)`;
+      } else {
+         btn.style.transition = 'transform 0.1s ease-out';
+         btn.style.transform = `translate(${currX}px, ${currY}px) scale(1)`;
+      }
     });
 
     btn.addEventListener('mouseleave', () => {
+      isGrabbed = false;
+      currX = 0;
+      currY = 0;
       btn.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      btn.style.transform = `translate(0px, 0px)`;
+      btn.style.transform = `translate(0px, 0px) scale(1)`;
     });
   });
 
@@ -301,15 +327,11 @@
   ────────────────────────────────────────────── */
   document.querySelectorAll('.tilt-card').forEach(card => {
     
-    // Ajout unique du glow (sans déplacer le contenu)
     if (!card.querySelector('.tilt-glow')) {
       const glow = document.createElement('div');
       glow.className = 'tilt-glow';
       card.appendChild(glow);
     }
-    
-    // Le contenu existant reste tel quel. 
-    // Les SVG, balises A, etc. ne sont pas altérés.
 
     card.addEventListener('mousemove', e => {
       const rect = card.getBoundingClientRect();
@@ -322,17 +344,19 @@
       const dx = x - xc;
       const dy = y - yc;
       
-      // Limiter la rotation max à 5 degrés (subtil et élégant)
-      const rotateY = (dx / xc) * 5; 
-      const rotateX = -(dy / yc) * 5;
+      // Angle plus marqué (15 degrés) pour sentir que ça va "jusqu'au fond"
+      const rotateY = (dx / xc) * 15; 
+      const rotateX = -(dy / yc) * 15;
       
-      card.style.transition = 'transform 0.15s ease-out';
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;
+      // Transition extrêmement courte/nulle pour que la carte suive le curseur de manière instantanée
+      card.style.transition = 'none';
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
       card.style.setProperty('--gx', `${x}px`);
       card.style.setProperty('--gy', `${y}px`);
     });
 
     card.addEventListener('mouseleave', () => {
+      // Retour fluide quand on quitte
       card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
       card.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
     });

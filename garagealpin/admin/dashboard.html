@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Garage Alpin Admin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="../images/logo_preloader.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@300;400;500;600&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07070a; --bg-2: #0f0f14; --bg-3: #15151c; --border: rgba(255,255,255,0.08);
+      --text: rgba(255,255,255,0.85); --text-muted: rgba(255,255,255,0.4);
+      --white: #fff; --red: #e3000f; --red-dark: #b0000b; --green: #22c55e;
+      --ease: cubic-bezier(0.16,1,0.3,1);
+      --sidebar: 260px;
+    }
+    .site-logo-img { height: 60px; width: auto; display: block; color: #fff; }
+    html, body { height: 100%; background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; font-size: 15px; }
+
+    /* ── LAYOUT ──────────────────────────────────── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar); background: var(--bg-2); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 32px 20px;
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
+    }
+    .sidebar-logo {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem;
+      letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .sidebar-logo span { color: var(--red); }
+    .sidebar-sub { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 40px; }
+
+    .nav-section { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; margin-top: 24px; padding-left: 12px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: 10px; cursor: pointer; transition: background 0.2s;
+      font-size: 0.88rem; color: var(--text-muted); user-select: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+    .nav-item.active { background: rgba(227,0,15,0.1); color: var(--white); }
+    .nav-item.active svg path, .nav-item.active svg circle, .nav-item.active svg line, .nav-item.active svg polyline, .nav-item.active svg rect { stroke: var(--red); }
+    .nav-item svg { flex-shrink: 0; }
+
+    .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; }
+    .user-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .user-avatar {
+      width: 36px; height: 36px; background: var(--red); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+    }
+    .user-name { font-size: 0.82rem; font-weight: 600; }
+    .user-email { font-size: 0.72rem; color: var(--text-muted); }
+    .btn-logout {
+      width: 100%; padding: 9px; background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-muted); font-size: 0.82rem; cursor: pointer;
+      transition: all 0.2s; font-family: 'Inter', sans-serif;
+    }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── MAIN ────────────────────────────────────── */
+    .main { margin-left: var(--sidebar); flex: 1; padding: 40px 48px; max-width: 1200px; }
+    .page { display: none; animation: fadeIn 0.4s var(--ease); }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .page-header { margin-bottom: 40px; }
+    .page-header h1 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; }
+    .page-header p { color: var(--text-muted); font-size: 0.88rem; margin-top: 6px; }
+
+    /* ── CARDS GRID ──────────────────────────────── */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+    .admin-card {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; transition: border-color 0.3s, transform 0.3s;
+    }
+    .admin-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-3px); }
+    .admin-card-img { width: 100%; height: 200px; object-fit: cover; display: block; background: var(--bg-3); }
+    .admin-card-img-placeholder {
+      width: 100%; height: 200px; background: var(--bg-3); display: flex;
+      align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.82rem;
+      flex-direction: column; gap: 8px;
+    }
+    .admin-card-body { padding: 20px; }
+    .admin-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .admin-card-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
+    .admin-card-desc { font-size: 0.82rem; color: var(--text); line-height: 1.6; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .admin-card-actions { display: flex; gap: 8px; }
+    .badge-dispo { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; margin-bottom: 10px; }
+    .badge-dispo.yes { background: rgba(34,197,94,0.1); color: var(--green); }
+    .badge-dispo.no  { background: rgba(255,82,82,0.1); color: #ff5252; }
+
+    /* ── BUTTONS ──────────────────────────────────── */
+    .btn { padding: 8px 16px; border-radius: 8px; font-size: 0.82rem; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; border: none; font-weight: 500; }
+    .btn-primary { background: var(--red); color: white; }
+    .btn-primary:hover { background: var(--red-dark); }
+    .btn-ghost { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+    .btn-danger { background: rgba(255,82,82,0.1); color: #ff5252; }
+    .btn-danger:hover { background: rgba(255,82,82,0.2); }
+    .btn-add {
+      display: flex; align-items: center; gap: 10px; padding: 14px 20px;
+      background: transparent; border: 2px dashed var(--border); border-radius: 16px;
+      color: var(--text-muted); cursor: pointer; transition: all 0.3s; font-size: 0.88rem;
+      font-family: 'Inter', sans-serif; width: 100%; justify-content: center;
+    }
+    .btn-add:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── MODAL ────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: 20px;
+      padding: 40px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+      transform: scale(0.95) translateY(20px); transition: transform 0.3s var(--ease);
+    }
+    .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .modal-title { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.4rem; line-height: 1; }
+    .modal-close:hover { color: var(--white); }
+
+    /* ── FORM ─────────────────────────────────────── */
+    .form-group { margin-bottom: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 8px; }
+    input[type=text], input[type=email], input[type=number], input[type=url], textarea, select {
+      width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; color: var(--white); font-size: 0.9rem;
+      font-family: 'Inter', sans-serif; transition: border-color 0.3s; outline: none; resize: vertical;
+    }
+    input:focus, textarea:focus, select:focus { border-color: rgba(227,0,15,0.5); }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    select option { background: var(--bg-2); }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 24px;
+      cursor: pointer; transition: background 0.3s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
+      background: white; border-radius: 50%; transition: transform 0.3s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--green); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* Image upload */
+    .img-upload-zone {
+      border: 2px dashed var(--border); border-radius: 12px; padding: 32px;
+      text-align: center; cursor: pointer; transition: all 0.3s;
+    }
+    .img-upload-zone:hover, .img-upload-zone.dragover { border-color: var(--red); background: rgba(227,0,15,0.05); }
+    .img-upload-zone p { font-size: 0.82rem; color: var(--text-muted); margin-top: 8px; }
+    .img-preview { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-top: 12px; display: none; }
+
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+
+    /* ── TOAST ────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; z-index: 999;
+      padding: 14px 20px; border-radius: 12px; font-size: 0.88rem; font-weight: 500;
+      transform: translateY(100px); opacity: 0; transition: all 0.4s var(--ease);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
+    .toast.error   { background: rgba(255,82,82,0.15);  border: 1px solid rgba(255,82,82,0.3);  color: #ff5252; }
+
+    /* ── LOADING ──────────────────────────────────── */
+    .loading-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg-3) 50%, var(--bg-2) 75%);
+      background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 16px;
+    }
+    @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .section-header h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+
+    /* ── RESPONSIVE ───────────────────────────────── */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s var(--ease); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding: 24px 20px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-logo"><img src="../images/logo.svg" alt="Le Garage Alpin" class="site-logo-img" /></div>
+        <div class="sidebar-sub">Panneau Admin</div>
+
+        <div class="nav-section">Contenu</div>
+        <div class="nav-item active" onclick="showPage('page-equipe', this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Équipe
+        </div>
+        <div class="nav-item" onclick="showPage('page-vehicules', this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Véhicules
+        </div>
+        <div class="nav-item" onclick="showPage('page-services', this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Services
+        </div>
+        <div class="nav-item" onclick="showPage('page-horaires', this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Horaires
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-row">
+          <div class="user-avatar" id="user-avatar">A</div>
+          <div>
+            <div class="user-name" id="user-name">Admin</div>
+            <div class="user-email" id="user-email">—</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+      </div>
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="main">
+
+      <!-- PAGE : ÉQUIPE -->
+      <div id="page-equipe" class="page active">
+        <div class="page-header">
+          <h1>Notre Équipe</h1>
+          <p>Gérez les membres de l'équipe du Garage Alpin</p>
+        </div>
+        
+        <!-- Paramètres de Recrutement -->
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+          <h3 style="font-size: 1rem; margin-bottom: 16px; font-weight: 600;">Carte "Nous recrutons"</h3>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <div class="toggle-row" style="padding: 0; margin-bottom: 12px; justify-content: flex-start; gap: 16px;">
+              <label class="toggle">
+                <input type="checkbox" id="recruit-active-toggle" onchange="updateRecruitmentSettings()" />
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="font-size: 0.85rem; color: var(--text);">Activer la carte "Nous recrutons" à la fin de l'équipe</span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="recruit-url-input">Lien de recrutement (ex: Google Form, page web)</label>
+            <div style="display: flex; gap: 12px;">
+              <input type="url" id="recruit-url-input" placeholder="https://..." style="flex: 1;" />
+              <button class="btn btn-ghost" onclick="updateRecruitmentSettings()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h2 id="equipe-count">0 membres</h2>
+          <button class="btn btn-primary" onclick="openModal('employee')">+ Ajouter un membre</button>
+        </div>
+        <div class="cards-grid" id="equipe-grid">
+          <!-- Rempli dynamiquement -->
+        </div>
+        <button class="btn-add" style="margin-top:20px;" onclick="openModal('employee')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ajouter un nouveau membre
+        </button>
+      </div>
+
+      <!-- PAGE : VÉHICULES -->
+      <div id="page-vehicules" class="page">
+        <div class="page-header">
+          <h1>Véhicules de Location</h1>
+          <p>Gérez les véhicules disponibles à la location</p>
+        </div>
+        <div class="section-header">
+          <h2 id="vehicules-count">0 véhicules</h2>
+          <button class="btn btn-primary" onclick="openModal('vehicle')">+ Ajouter un véhicule</button>
+        </div>
+        <div class="cards-grid" id="vehicules-grid">
+          <!-- Rempli dynamiquement -->
+        </div>
+        <button class="btn-add" style="margin-top:20px;" onclick="openModal('vehicle')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ajouter un nouveau véhicule
+        </button>
+      </div>
+
+      <!-- PAGE : SERVICES -->
+      <div id="page-services" class="page">
+        <div class="page-header">
+          <h1>Services</h1>
+          <p>Modifiez les prestations affichées sur la page d'accueil</p>
+        </div>
+        <div class="section-header">
+          <h2 id="services-count">0 services</h2>
+          <button class="btn btn-primary" onclick="openModal('service')">+ Ajouter</button>
+        </div>
+        <div class="cards-grid" id="services-grid"></div>
+      </div>
+
+      <!-- PAGE : HORAIRES -->
+      <div id="page-horaires" class="page">
+        <div class="page-header">
+          <h1>Horaires d'ouverture</h1>
+          <p>Mettez à jour les horaires affichés sur le site</p>
+        </div>
+        <div id="horaires-form" style="max-width:600px;">
+          <!-- Rempli dynamiquement -->
+        </div>
+        <button class="btn btn-primary" style="margin-top:32px;" onclick="saveHoraires()">Enregistrer les horaires</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ── MODAL EMPLOYÉ ── -->
+  <div class="modal-overlay" id="modal-employee">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-employee-title">Nouveau membre</span>
+        <button class="modal-close" onclick="closeModal('employee')">×</button>
+      </div>
+      <input type="hidden" id="employee-id" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prénom & Nom</label>
+          <input type="text" id="employee-name" placeholder="ex: Romain Bouvet" />
+        </div>
+        <div class="form-group">
+          <label>Rôle / Poste</label>
+          <input type="text" id="employee-role" placeholder="ex: Co-fondateur & Chef mécanicien" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="employee-desc" rows="4" placeholder="Courte biographie…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Photo</label>
+        <div class="img-upload-zone" id="emp-upload-zone" onclick="document.getElementById('emp-file').click()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <p>Cliquez ou glissez une image ici<br><small>AVIF, WEBP, JPG — Max 5 MB</small></p>
+          <img id="emp-preview" class="img-preview" alt="Aperçu" />
+        </div>
+        <input type="file" id="emp-file" accept="image/*" hidden onchange="previewImage('emp-file','emp-preview','emp-upload-zone')" />
+        <div style="margin-top:10px;">
+          <label>Ou URL de l'image</label>
+          <input type="url" id="employee-img-url" placeholder="https://…" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Ordre d'affichage</label>
+        <input type="number" id="employee-order" placeholder="1" min="1" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('employee')">Annuler</button>
+        <button class="btn btn-primary" id="btn-save-employee" onclick="saveEmployee()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL VÉHICULE ── -->
+  <div class="modal-overlay" id="modal-vehicle">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-vehicle-title">Nouveau véhicule</span>
+        <button class="modal-close" onclick="closeModal('vehicle')">×</button>
+      </div>
+      <input type="hidden" id="vehicle-id" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Marque & Modèle</label>
+          <input type="text" id="vehicle-model" placeholder="ex: Renault Clio 5" />
+        </div>
+        <div class="form-group">
+          <label>Catégorie</label>
+          <select id="vehicle-category">
+            <option value="citadine">Citadine</option>
+            <option value="berline">Berline</option>
+            <option value="suv">SUV / 4x4</option>
+            <option value="utilitaire">Utilitaire</option>
+            <option value="break">Break</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prix / jour (€)</label>
+          <input type="number" id="vehicle-price" placeholder="45" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Année</label>
+          <input type="number" id="vehicle-year" placeholder="2022" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Caractéristiques (séparées par des virgules)</label>
+        <input type="text" id="vehicle-features" placeholder="ex: Automatique, Climatisation, GPS, Bluetooth" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="vehicle-desc" rows="3" placeholder="Description courte du véhicule…"></textarea>
+      </div>
+      <div class="form-group">
+        <div class="toggle-row">
+          <label style="margin:0;">Disponible à la location</label>
+          <label class="toggle">
+            <input type="checkbox" id="vehicle-available" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Photo</label>
+        <div class="img-upload-zone" id="veh-upload-zone" onclick="document.getElementById('veh-file').click()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <p>Cliquez ou glissez une image ici</p>
+          <img id="veh-preview" class="img-preview" alt="Aperçu" />
+        </div>
+        <input type="file" id="veh-file" accept="image/*" hidden onchange="previewImage('veh-file','veh-preview','veh-upload-zone')" />
+        <div style="margin-top:10px;">
+          <label>Ou URL de l'image</label>
+          <input type="url" id="vehicle-img-url" placeholder="https://…" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('vehicle')">Annuler</button>
+        <button class="btn btn-primary" id="btn-save-vehicle" onclick="saveVehicle()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL SERVICE ── -->
+  <div class="modal-overlay" id="modal-service">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-service-title">Nouveau service</span>
+        <button class="modal-close" onclick="closeModal('service')">×</button>
+      </div>
+      <input type="hidden" id="service-id" />
+      <div class="form-group">
+        <label>Nom du service</label>
+        <input type="text" id="service-name" placeholder="ex: Mécanique générale" />
+      </div>
+      <div class="form-group">
+        <label>Description courte</label>
+        <textarea id="service-desc" rows="3" placeholder="Description du service…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Ordre d'affichage</label>
+        <input type="number" id="service-order" placeholder="1" min="1" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('service')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveService()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="dashboard.js?v=9"></script>
+</body>
+</html>

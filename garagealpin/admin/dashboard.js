@@ -92,10 +92,10 @@ function openModal(type, data = null) {
     document.getElementById('vehicle-model').value     = data?.model     ?? '';
     document.getElementById('vehicle-category').value  = data?.category  ?? 'citadine';
     
-    const type = data?.type ?? 'location';
-    document.getElementById('vehicle-type').value      = type;
-    document.getElementById('vehicle-price').value     = type === 'vente' ? (data?.price ?? '') : (data?.price_per_day ?? '');
-    document.getElementById('label-price').textContent = type === 'vente' ? 'Prix de vente (€)' : 'Prix / jour (€)';
+    const vehType = data?.type ?? 'location';
+    document.getElementById('vehicle-type').value      = vehType;
+    document.getElementById('vehicle-price').value     = vehType === 'vente' ? (data?.price ?? '') : (data?.price_per_day ?? '');
+    document.getElementById('label-price').textContent = vehType === 'vente' ? 'Prix de vente (€)' : 'Prix / jour (€)';
     
     document.getElementById('vehicle-year').value      = data?.year      ?? '';
     document.getElementById('vehicle-mileage').value   = data?.mileage   ?? '';

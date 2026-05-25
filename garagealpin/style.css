@@ -12,7 +12,7 @@
 :root {
   --bg:         #f4f6f8;
   --bg-2:       #ffffff;
-  --surface:    rgba(255,255,255,0.6);
+  --surface:    linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.1) 100%);
   --border:     rgba(255,255,255,0.9);
   --text:       #09090b;
   --text-muted: #64748b;
@@ -753,6 +753,9 @@ body:not(.loading) .hero-scroll { opacity: 0.4; }
   transition: background-color 0.4s var(--ease), border-color 0.4s;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 20px rgba(255,255,255,0.3);
 }
 .service-card::before {
   content: '';
@@ -1199,10 +1202,13 @@ footer {
 }
 .equipe-card {
   position: relative;
-  overflow: hidden;
+  border-radius: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   transition: border-color 0.4s;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 20px rgba(255,255,255,0.3);
 }
 .equipe-card:hover { border-color: var(--border); box-shadow: 0 10px 40px rgba(227,0,15,0.1); }
 .equipe-card-img-wrap { overflow: hidden; height: clamp(280px, 35vw, 420px); }
@@ -1620,9 +1626,12 @@ footer {
 ══════════════════════════════════════════════════════ */
 .vehicules-list { display: flex; flex-direction: column; gap: 32px; }
 .vehicle-card-hz {
-  display: flex; flex-direction: column; background: var(--bg-card);
-  border: 1px solid var(--border); border-radius: 24px; overflow: hidden;
+  display: flex; flex-direction: column; width: 100%;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 24px;
   transition: transform 0.4s var(--ease), box-shadow 0.4s;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 20px rgba(255,255,255,0.3);
 }
 @media (min-width: 768px) { .vehicle-card-hz { flex-direction: row; align-items: stretch; } }
 .vehicle-card-hz:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(227,0,15,0.12); border-color: var(--border); }

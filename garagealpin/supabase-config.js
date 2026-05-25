@@ -45,6 +45,10 @@ async function loadEquipePage() {
       <div class="equipe-card-body">
         <h3 class="equipe-card-name">${emp.name}</h3>
         <p class="equipe-card-role">${emp.role}</p>
+        ${emp.diplomes ? `<div class="equipe-card-diplomes" style="margin-bottom:12px; font-size:0.8rem; color:var(--text-muted); display:flex; align-items:flex-start; gap:6px;">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top:2px; flex-shrink:0;"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+           <span>${emp.diplomes}</span>
+         </div>` : ''}
         ${emp.description ? `<p class="equipe-card-desc">${emp.description}</p>` : ''}
       </div>`;
 

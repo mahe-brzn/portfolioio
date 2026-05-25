@@ -8,6 +8,7 @@ create table if not exists public.employees (
   name        text not null,
   role        text not null,
   description text,
+  diplomes    text,
   image_url   text,
   sort_order  int default 99,
   created_at  timestamptz default now()

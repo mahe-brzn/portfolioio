@@ -81,6 +81,7 @@ function openModal(type, data = null) {
     document.getElementById('employee-name').value    = data?.name  ?? '';
     document.getElementById('employee-role').value    = data?.role  ?? '';
     document.getElementById('employee-desc').value    = data?.description ?? '';
+    document.getElementById('employee-diplomes').value= data?.diplomes ?? '';
     document.getElementById('employee-img-url').value = data?.image_url   ?? '';
     document.getElementById('employee-order').value   = data?.sort_order  ?? '';
     resetImgPreview('emp-preview', 'emp-upload-zone', data?.image_url);
@@ -225,6 +226,7 @@ async function saveEmployee() {
     name:        document.getElementById('employee-name').value,
     role:        document.getElementById('employee-role').value,
     description: document.getElementById('employee-desc').value,
+    diplomes:    document.getElementById('employee-diplomes').value,
     image_url:   imageUrl,
     sort_order:  parseInt(document.getElementById('employee-order').value) || 99,
   };

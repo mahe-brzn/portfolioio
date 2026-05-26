@@ -316,7 +316,7 @@
         }
       }
 
-      for (let i = 0; i < 90; i++) particles.push(new Particle());
+      for (let i = 0; i < 40; i++) particles.push(new Particle());
 
       let rafId;
       function rafLoop() {
@@ -334,7 +334,7 @@
             let dy = visY1 - visY2;
             let dist = Math.sqrt(dx*dx + dy*dy);
             
-            if (dist < 120) {
+            if (dist < 100) {
               ctx.beginPath();
               ctx.moveTo(p1.x, visY1);
               let midX = (p1.x + p2.x) / 2;
@@ -342,8 +342,8 @@
               let offset = dist * 0.25; // Organic curve
               ctx.quadraticCurveTo(midX + offset, midY - offset, p2.x, visY2);
               
-              let alpha = (120 - dist) / 120;
-              ctx.strokeStyle = `rgba(227,0,15,${alpha * 0.1})`;
+              let alpha = (100 - dist) / 100;
+              ctx.strokeStyle = `rgba(227,0,15,${alpha * 0.08})`;
               ctx.lineWidth = 1;
               ctx.stroke();
             }

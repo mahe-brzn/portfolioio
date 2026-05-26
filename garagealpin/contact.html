@@ -1,29 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
+  <script>
+    if (sessionStorage.getItem('garage_auth') !== 'romain') {
+      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
+      if (pwd === 'romain') {
+        sessionStorage.setItem('garage_auth', 'romain');
+      } else {
+        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
+        throw new Error('Unauthorized');
+      }
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact — Le Garage Alpin | Séez, Tarentaise</title>
   <meta name="description" content="Contactez le Garage Alpin à Séez (73700) pour prendre rendez-vous ou obtenir un devis. Formulaire de contact et téléphone." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.legaragealpin.fr/contact.html" />
-  <meta name="theme-color" content="#f8fafc" />
+  <meta name="theme-color" content="#07070a" />
   <link rel="icon" type="image/png" href="images/logo_preloader.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="loading">
-  <!-- Interactive Organic Network -->
-  <canvas id="hero-canvas" aria-hidden="true" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;"></canvas>
 
   <div id="grain" aria-hidden="true"></div>
   <div id="cursor-dot"  aria-hidden="true"></div>
   <div id="cursor-ring" aria-hidden="true"></div>
 
   <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
-    <div class="pre-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></div>
+    <div class="pre-logo">Garage<span>.</span>Alpin</div>
     <div class="pre-bar-wrap" aria-hidden="true"><div class="pre-bar"></div></div>
     <span class="pre-counter" aria-hidden="true">0%</span>
   </div>
@@ -31,13 +40,12 @@
   <header role="banner">
     <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
-        <a href="./" class="nav-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></a>
+        <a href="index.html" class="nav-logo">Garage<span>.</span>Alpin</a>
         <ul class="nav-links" role="list">
-          <li><a href="./#services">Services</a></li>
-          <li><a href="./#about">À propos</a></li>
-          <li><a href="equipe">Notre équipe</a></li>
-          <li><a href="vehicules">Véhicules & Location</a></li>
-          <li><a href="location">Nous trouver</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="index.html#about">À propos</a></li>
+          <li><a href="equipe.html">Notre équipe</a></li>
+          <li><a href="location.html">Nous trouver</a></li>
         </ul>
         <div class="nav-right">
           <div class="nav-status"><span class="nav-dot"></span><span>Ouvert</span></div>
@@ -52,12 +60,11 @@
   <div id="mobile-menu" class="mob-menu" role="dialog" aria-label="Menu de navigation" aria-modal="true" hidden>
     <nav aria-label="Navigation mobile">
       <ul class="mob-nav-links" role="list">
-        <li><a href="./#services" class="mob-link"><span class="link-num">01</span>Services</a></li>
-        <li><a href="./#about"    class="mob-link"><span class="link-num">02</span>À propos</a></li>
-        <li><a href="equipe"         class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
-        <li><a href="vehicules"      class="mob-link"><span class="link-num">04</span>Véhicules & Location</a></li>
-        <li><a href="location"       class="mob-link"><span class="link-num">05</span>Localisation</a></li>
-        <li><a href="contact"        class="mob-link"><span class="link-num">06</span>Contact</a></li>
+        <li><a href="index.html#services" class="mob-link"><span class="link-num">01</span>Services</a></li>
+        <li><a href="index.html#about"    class="mob-link"><span class="link-num">02</span>À propos</a></li>
+        <li><a href="equipe.html"         class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
+        <li><a href="location.html"       class="mob-link"><span class="link-num">04</span>Localisation</a></li>
+        <li><a href="contact.html"        class="mob-link"><span class="link-num">05</span>Contact</a></li>
       </ul>
     </nav>
     <div class="mob-footer">
@@ -71,7 +78,7 @@
     <!-- PAGE HERO -->
     <section class="page-hero" aria-labelledby="page-title-contact">
       <div class="page-hero-ambient" aria-hidden="true"></div>
-
+      <div class="hero-grid" style="opacity:0.5;" aria-hidden="true"></div>
       <div class="wrap page-hero-inner">
         <p class="page-tag">Contact</p>
         <h1 class="page-title split-text" id="page-title-contact">
@@ -231,14 +238,6 @@
               </div>
             </div>
 
-            <!-- Horaires -->
-            <div style="margin-top:48px;">
-              <h3 style="font-size:1rem; font-family:'Syne', sans-serif; margin-bottom:16px;">Horaires d'ouverture</h3>
-              <div id="horaires-dynamic-table" class="horaires-table" role="table" aria-label="Horaires d'ouverture">
-                <!-- Les horaires seront injectés ici par JavaScript -->
-              </div>
-            </div>
-
             <!-- Délai de réponse -->
             <div style="margin-top:auto;padding-top:48px;border-top:1px solid var(--border);">
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
@@ -261,17 +260,16 @@
     <div class="wrap">
       <div class="footer-grid reveal">
         <div>
-          <div class="footer-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></div>
+          <div class="footer-logo">Garage<span>.</span>Alpin</div>
           <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
         </div>
         <div class="footer-col">
           <h4>Navigation</h4>
           <ul>
-            <li><a href="./">Accueil</a></li>
-            <li><a href="equipe">L'Équipe</a></li>
-            <li><a href="vehicules">Véhicules & Location</a></li>
-            <li><a href="location">Nous trouver</a></li>
-            <li><a href="contact">Contact</a></li>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="equipe.html">L'Équipe</a></li>
+            <li><a href="location.html">Nous trouver</a></li>
+            <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -284,19 +282,15 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a> | v1.0.5</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
         <div style="display:flex;gap:24px;">
-          <a href="mentions-legales">Mentions légales</a>
-          <a href="confidentialite">Confidentialité</a>
-          <a href="cgv">CGV</a>
+          <a href="#">Mentions légales</a>
+          <a href="#">Confidentialité</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="supabase-config.js?v=9"></script>
-  <script src="script.js?v=2"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-

@@ -1,6 +1,3 @@
-# robots.txt — mahebrizion.fr
 User-agent: *
 Allow: /
-
-# Sitemap location
 Sitemap: https://mahebrizion.fr/sitemap.xml

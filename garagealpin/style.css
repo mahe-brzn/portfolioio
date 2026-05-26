@@ -458,6 +458,23 @@ body:not(.loading) .hero-name-inner { transform: translateY(0); }
   -webkit-text-stroke: 2px rgba(0,0,0,0.1);
 }
 
+.hero-massive-logo {
+  width: 90%;
+  max-width: 1200px;
+  height: auto;
+  filter: brightness(0.1);
+  opacity: 0;
+  transform: translateY(40px);
+  animation: heroLogoIn 1.2s var(--ease) forwards;
+}
+
+@keyframes heroLogoIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Hero line separator */
 .hero-line-wrap {
   padding: clamp(20px, 4vw, 48px) var(--pad);

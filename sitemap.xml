@@ -20,4 +20,15 @@
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
-</urlset>
+  <url>
+    <loc>https://mahebrizion.fr/TP/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mahebrizion.fr/TP/TP-Cybersecurite/</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url></urlset>

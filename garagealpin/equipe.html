@@ -1,29 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
+  <script>
+    if (sessionStorage.getItem('garage_auth') !== 'romain') {
+      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
+      if (pwd === 'romain') {
+        sessionStorage.setItem('garage_auth', 'romain');
+      } else {
+        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
+        throw new Error('Unauthorized');
+      }
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notre Équipe — Le Garage Alpin | Séez, Tarentaise</title>
   <meta name="description" content="Découvrez les 7 techniciens experts du Garage Alpin à Séez. Une équipe passionnée au service de votre véhicule." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.legaragealpin.fr/equipe.html" />
-  <meta name="theme-color" content="#f8fafc" />
+  <meta name="theme-color" content="#07070a" />
   <link rel="icon" type="image/png" href="images/logo_preloader.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="loading">
-  <!-- Interactive Organic Network -->
-  <canvas id="hero-canvas" aria-hidden="true" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;"></canvas>
 
   <div id="grain" aria-hidden="true"></div>
   <div id="cursor-dot"  aria-hidden="true"></div>
   <div id="cursor-ring" aria-hidden="true"></div>
 
   <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
-    <div class="pre-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></div>
+    <div class="pre-logo">Garage<span>.</span>Alpin</div>
     <div class="pre-bar-wrap" aria-hidden="true"><div class="pre-bar"></div></div>
     <span class="pre-counter" aria-hidden="true">0%</span>
   </div>
@@ -31,13 +40,12 @@
   <header role="banner">
     <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
-        <a href="./" class="nav-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></a>
+        <a href="index.html" class="nav-logo">Garage<span>.</span>Alpin</a>
         <ul class="nav-links" role="list">
-          <li><a href="./#services">Services</a></li>
-          <li><a href="./#about">À propos</a></li>
-          <li><a href="equipe">Notre équipe</a></li>
-          <li><a href="vehicules">Véhicules & Location</a></li>
-          <li><a href="location">Nous trouver</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="index.html#about">À propos</a></li>
+          <li><a href="equipe.html" style="color:var(--white);">Notre équipe</a></li>
+          <li><a href="location.html">Nous trouver</a></li>
         </ul>
         <div class="nav-right">
           <div class="nav-status"><span class="nav-dot"></span><span>Ouvert</span></div>
@@ -52,12 +60,11 @@
   <div id="mobile-menu" class="mob-menu" role="dialog" aria-label="Menu de navigation" aria-modal="true" hidden>
     <nav aria-label="Navigation mobile">
       <ul class="mob-nav-links" role="list">
-        <li><a href="./#services" class="mob-link"><span class="link-num">01</span>Services</a></li>
-        <li><a href="./#about"    class="mob-link"><span class="link-num">02</span>À propos</a></li>
-        <li><a href="equipe"         class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
-        <li><a href="vehicules"      class="mob-link"><span class="link-num">04</span>Véhicules & Location</a></li>
-        <li><a href="location"       class="mob-link"><span class="link-num">05</span>Localisation</a></li>
-        <li><a href="contact"        class="mob-link"><span class="link-num">06</span>Contact</a></li>
+        <li><a href="index.html#services" class="mob-link"><span class="link-num">01</span>Services</a></li>
+        <li><a href="index.html#about"    class="mob-link"><span class="link-num">02</span>À propos</a></li>
+        <li><a href="equipe.html"         class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
+        <li><a href="location.html"       class="mob-link"><span class="link-num">04</span>Localisation</a></li>
+        <li><a href="contact.html"        class="mob-link"><span class="link-num">05</span>Contact</a></li>
       </ul>
     </nav>
     <div class="mob-footer">
@@ -71,7 +78,7 @@
     <!-- PAGE HERO -->
     <section class="page-hero" aria-labelledby="page-title">
       <div class="page-hero-ambient" aria-hidden="true"></div>
-
+      <div class="hero-grid" style="opacity:0.5;" aria-hidden="true"></div>
       <div class="wrap page-hero-inner">
         <p class="page-tag">Notre Équipe</p>
         <h1 class="page-title split-text" id="page-title">
@@ -114,11 +121,82 @@
     <section aria-labelledby="equipe-title" style="padding:clamp(80px,10vw,140px) 0;">
       <div class="wrap">
         <h2 id="equipe-title" class="sr-only">Équipe du Garage Alpin</h2>
-        <div class="equipe-grid" id="equipe-grid">
-          <!-- Chargé dynamiquement depuis Supabase -->
-          <div class="equipe-card skeleton-card" style="height:400px;"></div>
-          <div class="equipe-card skeleton-card" style="height:400px;"></div>
-          <div class="equipe-card skeleton-card" style="height:400px;"></div>
+
+        <div class="equipe-grid">
+
+          <article class="equipe-card tilt-card reveal" aria-label="Romain Bouvet, Co-fondateur">
+            <div class="equipe-card-img-wrap">
+              <img src="images/equipe1.avif" alt="Romain Bouvet" class="equipe-card-img" loading="lazy" />
+            </div>
+            <div class="equipe-card-body">
+              <h3 class="equipe-card-name">Romain Bouvet</h3>
+              <p class="equipe-card-role">Co-fondateur &amp; Chef mécanicien</p>
+              <p class="equipe-card-desc">Expert en mécanique lourde et diagnostic avancé. Romain dirige l'atelier avec une rigueur et une passion communicatives depuis la création du garage.</p>
+            </div>
+          </article>
+
+          <article class="equipe-card tilt-card reveal reveal-d1" aria-label="Jonathan Courtois, Co-fondateur">
+            <div class="equipe-card-img-wrap">
+              <img src="images/equipe2.avif" alt="Jonathan Courtois" class="equipe-card-img" loading="lazy" />
+            </div>
+            <div class="equipe-card-body">
+              <h3 class="equipe-card-name">Jonathan Courtois</h3>
+              <p class="equipe-card-role">Co-fondateur &amp; Électronicien</p>
+              <p class="equipe-card-desc">Spécialiste du diagnostic électronique et des systèmes embarqués. Jonathan maîtrise les dernières technologies des véhicules modernes.</p>
+            </div>
+          </article>
+
+          <article class="equipe-card tilt-card reveal reveal-d2" aria-label="Élie, Technicien">
+            <div class="equipe-card-img-wrap">
+              <img src="images/elie.avif" alt="Élie" class="equipe-card-img" loading="lazy" />
+            </div>
+            <div class="equipe-card-body">
+              <h3 class="equipe-card-name">Élie</h3>
+              <p class="equipe-card-role">Technicien mécanicien</p>
+              <p class="equipe-card-desc">Passionné de mécanique depuis toujours, Élie intervient sur toutes les marques avec une minutie remarquable.</p>
+            </div>
+          </article>
+
+          <article class="equipe-card tilt-card reveal" aria-label="Technicien, Distribution">
+            <div class="equipe-card-img-wrap">
+              <img src="images/equipe3.avif" alt="Technicien distribution" class="equipe-card-img" loading="lazy" />
+            </div>
+            <div class="equipe-card-body">
+              <h3 class="equipe-card-name">Technicien</h3>
+              <p class="equipe-card-role">Spécialiste Distribution</p>
+              <p class="equipe-card-desc">Expert en distribution et transmission, il assure la fiabilité et la sécurité des moteurs sur le long terme.</p>
+            </div>
+          </article>
+
+          <article class="equipe-card tilt-card reveal reveal-d1" aria-label="Technicien, Freinage">
+            <div class="equipe-card-img-wrap">
+              <img src="images/equipe4.avif" alt="Technicien freinage" class="equipe-card-img" loading="lazy" />
+            </div>
+            <div class="equipe-card-body">
+              <h3 class="equipe-card-name">Technicien</h3>
+              <p class="equipe-card-role">Sécurité &amp; Freinage</p>
+              <p class="equipe-card-desc">Sur nos routes de montagne, le freinage ne souffre aucune approximation. Il en fait sa spécialité au quotidien.</p>
+            </div>
+          </article>
+
+          <article class="equipe-card tilt-card reveal reveal-d2" aria-label="Rejoindre l'équipe">
+            <div class="equipe-card-img-wrap" style="background:var(--bg-2);display:flex;align-items:center;justify-content:center;height:clamp(280px,35vw,420px);">
+              <div style="text-align:center;padding:32px;">
+                <div style="width:64px;height:64px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </div>
+                <p style="font-size:0.85rem;color:var(--text-muted);">Nous recrutons</p>
+              </div>
+            </div>
+            <div class="equipe-card-body">
+              <h3 class="equipe-card-name">Vous ?</h3>
+              <p class="equipe-card-role">Poste à pourvoir</p>
+              <p class="equipe-card-desc">Passionné de mécanique et prêt à rejoindre une équipe dynamique en Tarentaise ? Contactez-nous !</p>
+            </div>
+          </article>
+
         </div>
       </div>
     </section>
@@ -130,7 +208,7 @@
         <p class="cta-over reveal">Besoin d'un rendez-vous ?</p>
         <h2 class="cta-title split-text" id="cta-equipe">On s'en<br>occupe.</h2>
         <div class="cta-actions reveal reveal-d1">
-          <a href="contact" class="btn-magnetic" id="equipe-cta-contact">
+          <a href="contact.html" class="btn-magnetic" id="equipe-cta-contact">
             Prendre rendez-vous
             <span class="btn-icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -149,17 +227,16 @@
     <div class="wrap">
       <div class="footer-grid reveal">
         <div>
-          <div class="footer-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></div>
+          <div class="footer-logo">Garage<span>.</span>Alpin</div>
           <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
         </div>
         <div class="footer-col">
           <h4>Navigation</h4>
           <ul>
-            <li><a href="./">Accueil</a></li>
-            <li><a href="equipe">L'Équipe</a></li>
-            <li><a href="vehicules">Véhicules & Location</a></li>
-            <li><a href="location">Nous trouver</a></li>
-            <li><a href="contact">Contact</a></li>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="equipe.html">L'Équipe</a></li>
+            <li><a href="location.html">Nous trouver</a></li>
+            <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -172,18 +249,15 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a> | v1.0.9</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
         <div style="display:flex;gap:24px;">
-          <a href="mentions-legales">Mentions légales</a>
-          <a href="confidentialite">Confidentialité</a>
-          <a href="cgv">CGV</a>
+          <a href="#">Mentions légales</a>
+          <a href="#">Confidentialité</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="supabase-config.js?v=9"></script>
-  <script src="script.js?v=5"></script>
+  <script src="script.js"></script>
 </body>
 </html>

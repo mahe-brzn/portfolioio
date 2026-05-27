@@ -93,7 +93,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   opacity: 0.04;
   mix-blend-mode: multiply;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 999999;
   animation: grain-shift 0.15s steps(1) infinite;
   /* Disabled on mobile — saves ~6s TBT */
 }
@@ -123,7 +123,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   background: var(--text);
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9998;
+  z-index: 9999999;
   transform: translate(-50%, -50%);
   transition: opacity 0.3s, transform 0.1s;
   will-change: transform;
@@ -134,7 +134,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
   border: 1.5px solid rgba(0,0,0,0.15);
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9997;
+  z-index: 9999998;
   transform: translate(-50%, -50%);
   transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   will-change: width, height, top, left, transform;
@@ -1673,45 +1673,50 @@ footer {
 .veh-hz-expand-icon { position: absolute; bottom: 24px; right: 32px; color: var(--text-muted); transition: transform 0.3s; }
 .veh-hz-expand-icon.open { transform: rotate(180deg); }
 
-.veh-hz-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; padding: 24px; background: rgba(0,0,0,0.02); border-radius: 12px; }
+.veh-hz-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; padding: 24px; background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
 .veh-spec-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); }
 .veh-spec-item svg { color: var(--text); opacity: 0.6; }
 
 /* Vehicle Modal / Pop-up */
 .veh-modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  position: fixed; inset: 0; background: rgba(255, 255, 255, 0.4); 
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
   z-index: 99999; display: flex; align-items: center; justify-content: center;
   padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.4s var(--ease);
 }
 .veh-modal-overlay.open { opacity: 1; pointer-events: auto; }
 .veh-modal-content {
-  background: var(--bg-card); width: 100%; max-width: 800px; max-height: 90vh;
-  border-radius: 24px; border: 1px solid var(--border); overflow-y: auto;
+  background: rgba(255, 255, 255, 0.75); width: 100%; max-width: 900px; max-height: 90vh;
+  border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.4); overflow-y: auto;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.8);
+  backdrop-filter: blur(32px) saturate(150%); -webkit-backdrop-filter: blur(32px) saturate(150%);
   transform: translateY(20px) scale(0.95); transition: all 0.4s var(--ease);
   position: relative;
 }
 .veh-modal-overlay.open .veh-modal-content { transform: translateY(0) scale(1); }
 .veh-modal-close {
-  position: absolute; top: 24px; right: 24px; width: 40px; height: 40px;
-  background: rgba(0,0,0,0.1); border: none; border-radius: 50%; color: var(--text);
+  position: absolute; top: 24px; right: 24px; width: 44px; height: 44px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.8); border-radius: 50%; color: var(--text);
   display: flex; align-items: center; justify-content: center; cursor: pointer;
-  z-index: 10; transition: background-color 0.3s, transform 0.3s;
+  z-index: 10; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
-.veh-modal-close:hover { background: var(--red); transform: rotate(90deg); }
+.veh-modal-close:hover { background: var(--red); color: white; transform: rotate(90deg) scale(1.1); box-shadow: 0 8px 24px rgba(227,0,15,0.3); }
 
-.veh-modal-hero { width: 100%; height: 300px; position: relative; }
+.veh-modal-hero { width: 100%; height: 360px; position: relative; border-top-left-radius: 32px; border-top-right-radius: 32px; overflow: hidden; }
 .veh-modal-hero img { width: 100%; height: 100%; object-fit: cover; }
 .veh-modal-body { padding: 40px; }
 .veh-modal-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 8px; }
 .veh-modal-price { font-family: var(--font-display); font-size: 1.5rem; color: var(--red); margin-bottom: 24px; }
 
 .v-contact-form {
-  background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
-  padding: 24px; border-radius: 16px; margin-top: 32px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.8);
+  padding: 32px; border-radius: 20px; margin-top: 32px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
 }
 .v-contact-form input, .v-contact-form textarea {
-  width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2);
-  border: 1px solid rgba(0,0,0,0.1); color: var(--text); border-radius: 8px;
+  width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.08); color: var(--text); border-radius: 12px;
   font-family: inherit; font-size: 0.9rem; transition: border-color 0.3s;
 }
 .v-contact-form input:focus, .v-contact-form textarea:focus {

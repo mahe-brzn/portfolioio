@@ -523,6 +523,155 @@
 
 <div class="divider"></div>
 
+
+<section class="tech-section tp-content">
+  <div class="wrap">
+    <div class="demo-zone">
+      <div class="demo-head">
+        <span>📖</span>
+        <span class="demo-icon-label">Compte-rendu du TP</span>
+      </div>
+      <div class="demo-body">
+        <div class="markdown-content">
+          
+<h2>Informations générales</h2>
+<p>Noms des binômes : <strong>Brizion Mahé, Maxence Malo</strong><br>
+N° du poste de travail : <strong>POSTE 31</strong><br>
+Noms des machines (Host) : <strong>CL-TP-630-32</strong><br>
+Nom de l'utilisateur : <strong>Ciel</strong><br>
+Mot de passe Root / utilisateur : <strong>BacProCIel25!</strong></p>
+
+<h3>1 - Les 6 caractéristiques principales du système</h3>
+<ul>
+<li>Nom du système d'exploitation : <strong>Ubuntu 24.04.3 LTS</strong></li>
+<li>Type d'OS : <strong>64 bits</strong></li>
+<li>Processeur : <strong>Intel core i5-3470</strong></li>
+<li>Mémoire (RAM) : <strong>8 Go</strong></li>
+<li>Version de GNOME : <strong>46</strong></li>
+<li>Système de fenêtrage : <strong>Wayland</strong></li>
+</ul>
+
+<h3>2 - Mise à jour d'Ubuntu</h3>
+<div class="code-wrap"><pre><code>sudo apt update
+sudo apt upgrade -y</code></pre></div>
+
+<h3>3 - Installation du logiciel "VLC"</h3>
+<div class="code-wrap"><pre><code>sudo apt install vlc -y</code></pre></div>
+
+<h3>4 - Changement du fond d'écran</h3>
+<p>Paramètres > Personalisation > fond d’écran</p>
+
+<h3>Étape 1 : Création du dossier et explication des droits</h3>
+<p><strong>Que signifie "r", "w" et "x" pour les droits ?</strong></p>
+<ul>
+<li><strong>r (read - lecture)</strong> : Autorise la lecture d'un fichier ou de lister le contenu d'un répertoire.</li>
+<li><strong>w (write - écriture)</strong> : Autorise la modification d'un fichier ou la création/suppression dans un répertoire.</li>
+<li><strong>x (execute - exécution)</strong> : Autorise l'exécution d'un fichier (script/programme) ou donne le droit de "traverser" un répertoire pour accéder à son contenu.</li>
+</ul>
+
+<h3>Étape 2 : Création du fichier et droits</h3>
+<p><strong>Que signifie la liste "-rw-r--r--" ?</strong></p>
+<p>Cela indique les droits par défaut du fichier :</p>
+<ul>
+<li>Le <code>-</code> initial indique que c'est un fichier standard.</li>
+<li><code>rw-</code> : Le propriétaire a les droits de Lecture et Écriture.</li>
+<li><code>r--</code> : Le groupe a uniquement le droit de Lecture.</li>
+<li><code>r--</code> : Les autres utilisateurs ont uniquement le droit de Lecture.</li>
+</ul>
+
+<h3>Étape 7 : login.defs et fonctionnement des droits</h3>
+<p><strong>Expliquer le fichier "login.defs" :</strong><br>
+C'est le fichier de configuration situé dans <code>/etc/login.defs</code> qui définit les règles par défaut lors de la création de nouveaux utilisateurs. C'est notamment dans ce fichier qu'est définie la valeur par défaut de l'UMASK (ex: 022).</p>
+
+<p><strong>Expliquer comment fonctionnent les droits sur Linux :</strong><br>
+Sous Linux, les droits sont basés sur le système UGO (User/Propriétaire, Group/Groupe, Others/Autres). À chaque fichier ou dossier sont associées trois permissions : Lecture (r), Écriture (w) et Exécution (x). Chaque fois qu'un utilisateur tente une action, le système vérifie son identité (est-il le propriétaire ? appartient-il au groupe ?) et applique les droits correspondants pour autoriser ou bloquer l'action.</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.tp-content .demo-zone {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.tp-content .demo-body {
+    padding: 40px;
+}
+.markdown-content h2 {
+    font-family: var(--fd);
+    font-size: 1.8rem;
+    color: var(--white);
+    margin-bottom: 20px;
+    margin-top: 40px;
+}
+.markdown-content h2:first-child {
+    margin-top: 0;
+}
+.markdown-content h3 {
+    font-family: var(--fd);
+    font-size: 1.3rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+    margin-top: 32px;
+}
+.markdown-content h4 {
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-bottom: 12px;
+    margin-top: 24px;
+}
+.markdown-content p {
+    font-size: 0.95rem;
+    color: var(--g4);
+    line-height: 1.8;
+    margin-bottom: 16px;
+}
+.markdown-content strong {
+    color: var(--white);
+    font-weight: 500;
+}
+.markdown-content ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 24px;
+}
+.markdown-content ul li {
+    font-size: 0.95rem;
+    color: var(--g4);
+    padding: 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.markdown-content ul li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.markdown-content .code-wrap {
+    margin: 20px 0;
+}
+.markdown-content code {
+    background: none;
+    color: #c8d3f5;
+    padding: 0;
+}
+.markdown-content p code {
+    font-family: var(--fm);
+    font-size: 0.85em;
+    background: rgba(255,255,255,0.07);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+}
+</style>
+
+
 <!-- ══════════════════════════════════════════
      CONCLUSION
 ══════════════════════════════════════════ -->

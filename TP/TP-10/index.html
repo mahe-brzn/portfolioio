@@ -523,6 +523,153 @@
 
 <div class="divider"></div>
 
+
+<section class="tech-section tp-content">
+  <div class="wrap">
+    <div class="demo-zone">
+      <div class="demo-head">
+        <span>📖</span>
+        <span class="demo-icon-label">Compte-rendu du TP</span>
+      </div>
+      <div class="demo-body">
+        <div class="markdown-content">
+          
+<h2>Informations générales</h2>
+<p>Nom et prénom : <strong>BRIZION Mahé</strong><br>
+Date : <strong>Jeudi 28 Avril</strong><br>
+Poste de travail : <strong>31</strong></p>
+
+<h3>Procédure et Personnalisation :</h3>
+<p>Appareil : <strong>Raspberry Pi 4</strong><br>
+OS : <strong>Raspberry Pi OS (Legacy, 32 bit)</strong><br>
+Nom d’hôte : <strong>rasp31</strong><br>
+Utilisateur : <strong>rasp31 / Rasp31</strong><br>
+Accès à distance : <strong>activer SSH</strong></p>
+
+<h3>Questions de recherche VoIP</h3>
+<ul>
+<li><strong>Qu'est-ce que la VoIP ?</strong><br>La VoIP (Voice over IP) est une technologie qui permet de transmettre la voix et des flux multimédias via des réseaux informatiques.</li>
+<li><strong>Quel protocole pour la signalisation ?</strong><br>C'est le protocole SIP (Session Initiation Protocol).</li>
+<li><strong>Quel protocole transporte l'audio en temps réel ?</strong><br>C'est le protocole RTP (Real-time Transport Protocol).</li>
+<li><strong>Quel codec VoIP non compressé est souvent utilisé ?</strong><br>Le codec G.711.</li>
+<li><strong>Quel port UDP est par défaut utilisé par SIP ?</strong><br>Le port UDP 5060.</li>
+<li><strong>Quelle technique aide la traversée NAT ?</strong><br>Les protocoles STUN et TURN, via ICE.</li>
+<li><strong>Quelle métrique subjective mesure la qualité ?</strong><br>Le MOS (Mean Opinion Score).</li>
+<li><strong>Quel mécanisme permet de prioriser le trafic ?</strong><br>La QoS (Quality of Service).</li>
+<li><strong>Que fait une requête SIP REGISTER ?</strong><br>Elle permet à un client VoIP de s'enregistrer auprès du serveur.</li>
+<li><strong>Quelles sont les caractéristiques d'Asterisk ?</strong><br>Asterisk est un logiciel open-source qui transforme un ordinateur en PABX (support SIP/IAX, messagerie, musique d'attente...).</li>
+</ul>
+
+<h3>Installation et Configuration d'Asterisk</h3>
+<div class="code-wrap"><pre><code>sudo apt update
+sudo apt upgrade -y
+sudo apt install asterisk -y
+sudo systemctl status asterisk
+sudo asterisk -rvvv</code></pre></div>
+
+<h4>1. Déclaration des utilisateurs (/etc/asterisk/pjsip.conf)</h4>
+<p>Création des comptes pour Rémi (6001) et Paul (6002) avec le pilote PJSIP. Transport UDP sur l'IP du serveur (172.18.31.182).</p>
+
+<h4>2. Création du plan de numérotation (/etc/asterisk/extensions.conf)</h4>
+<div class="code-wrap"><pre><code>[from-internal]
+exten => 6001,1,Dial(PJSIP/6001)
+same => n,Hangup()
+exten => 6002,1,Dial(PJSIP/6002)
+same => n,Hangup()</code></pre></div>
+
+<h4>3. Résolution de problème (Crash "Bus error")</h4>
+<p>Asterisk crashait au démarrage à cause de l'architecture ARMv7 du Raspberry Pi (Alignment trap). Stabilisation du système :</p>
+<div class="code-wrap"><pre><code>echo 2 > /proc/cpu/alignment</code></pre></div>
+
+<h4>4. Test d'appel Linphone</h4>
+<p>Installation de Linphone sur 2 PC Windows. Appel passé depuis le poste 6001 vers le 6002. L'appel a abouti avec succès, audio fonctionnel !</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.tp-content .demo-zone {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.tp-content .demo-body {
+    padding: 40px;
+}
+.markdown-content h2 {
+    font-family: var(--fd);
+    font-size: 1.8rem;
+    color: var(--white);
+    margin-bottom: 20px;
+    margin-top: 40px;
+}
+.markdown-content h2:first-child {
+    margin-top: 0;
+}
+.markdown-content h3 {
+    font-family: var(--fd);
+    font-size: 1.3rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+    margin-top: 32px;
+}
+.markdown-content h4 {
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-bottom: 12px;
+    margin-top: 24px;
+}
+.markdown-content p {
+    font-size: 0.95rem;
+    color: var(--g4);
+    line-height: 1.8;
+    margin-bottom: 16px;
+}
+.markdown-content strong {
+    color: var(--white);
+    font-weight: 500;
+}
+.markdown-content ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 24px;
+}
+.markdown-content ul li {
+    font-size: 0.95rem;
+    color: var(--g4);
+    padding: 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.markdown-content ul li::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.markdown-content .code-wrap {
+    margin: 20px 0;
+}
+.markdown-content code {
+    background: none;
+    color: #c8d3f5;
+    padding: 0;
+}
+.markdown-content p code {
+    font-family: var(--fm);
+    font-size: 0.85em;
+    background: rgba(255,255,255,0.07);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+}
+</style>
+
+
 <!-- ══════════════════════════════════════════
      CONCLUSION
 ══════════════════════════════════════════ -->

@@ -2,37 +2,28 @@
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <script>
-    if (sessionStorage.getItem('garage_auth') !== 'romain') {
-      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
-      if (pwd === 'romain') {
-        sessionStorage.setItem('garage_auth', 'romain');
-      } else {
-        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
-        throw new Error('Unauthorized');
-      }
-    }
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nous Trouver — Le Garage Alpin | Séez, Tarentaise</title>
   <meta name="description" content="Retrouvez le Garage Alpin à Séez (73700), zone artisanale de Tarentaise. Horaires, itinéraire et contact." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://www.legaragealpin.fr/location.html" />
-  <meta name="theme-color" content="#07070a" />
+  <meta name="theme-color" content="#f8fafc" />
   <link rel="icon" type="image/png" href="images/logo_preloader.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body class="loading">
+  <!-- Interactive Organic Network -->
+  <canvas id="hero-canvas" aria-hidden="true" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;"></canvas>
 
   <div id="grain" aria-hidden="true"></div>
   <div id="cursor-dot"  aria-hidden="true"></div>
   <div id="cursor-ring" aria-hidden="true"></div>
 
   <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
-    <div class="pre-logo">Garage<span>.</span>Alpin</div>
+    <div class="pre-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></div>
     <div class="pre-bar-wrap" aria-hidden="true"><div class="pre-bar"></div></div>
     <span class="pre-counter" aria-hidden="true">0%</span>
   </div>
@@ -40,13 +31,14 @@
   <header role="banner">
     <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
-        <a href="index.html" class="nav-logo">Garage<span>.</span>Alpin</a>
+        <a href="./" class="nav-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></a>
         <ul class="nav-links" role="list">
-          <li><a href="index.html#services">Services</a></li>
-          <li><a href="index.html#about">À propos</a></li>
-          <li><a href="equipe.html">Notre équipe</a></li>
-          <li><a href="location.html" style="color:var(--white);">Nous trouver</a></li>
-        </ul>
+            <li><a href="./#services">Services</a></li>
+            <li><a href="./#about">À propos</a></li>
+            <li><a href="equipe">Notre équipe</a></li>
+            <li><a href="vehicules">Véhicules & Location</a></li>
+            <li><a href="location">Nous trouver</a></li>
+          </ul>
         <div class="nav-right">
           <div class="nav-status"><span class="nav-dot"></span><span>Ouvert</span></div>
           <button class="nav-burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -60,11 +52,12 @@
   <div id="mobile-menu" class="mob-menu" role="dialog" aria-label="Menu de navigation" aria-modal="true" hidden>
     <nav aria-label="Navigation mobile">
       <ul class="mob-nav-links" role="list">
-        <li><a href="index.html#services" class="mob-link"><span class="link-num">01</span>Services</a></li>
-        <li><a href="index.html#about"    class="mob-link"><span class="link-num">02</span>À propos</a></li>
-        <li><a href="equipe.html"         class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
-        <li><a href="location.html"       class="mob-link"><span class="link-num">04</span>Localisation</a></li>
-        <li><a href="contact.html"        class="mob-link"><span class="link-num">05</span>Contact</a></li>
+        <li><a href="./#services" class="mob-link"><span class="link-num">01</span>Services</a></li>
+        <li><a href="./#about"    class="mob-link"><span class="link-num">02</span>À propos</a></li>
+        <li><a href="equipe"         class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
+        <li><a href="vehicules"      class="mob-link"><span class="link-num">04</span>Véhicules & Location</a></li>
+        <li><a href="location"       class="mob-link"><span class="link-num">05</span>Localisation</a></li>
+        <li><a href="contact"        class="mob-link"><span class="link-num">06</span>Contact</a></li>
       </ul>
     </nav>
     <div class="mob-footer">
@@ -78,7 +71,7 @@
     <!-- PAGE HERO -->
     <section class="page-hero" aria-labelledby="page-title-loc">
       <div class="page-hero-ambient" aria-hidden="true"></div>
-      <div class="hero-grid" style="opacity:0.5;" aria-hidden="true"></div>
+
       <div class="wrap page-hero-inner">
         <p class="page-tag">Localisation</p>
         <h1 class="page-title split-text" id="page-title-loc">
@@ -111,7 +104,7 @@
                 </span>
                 <div>
                   <span class="info-label">Adresse</span>
-                  <span class="info-value">Zone artisanale, 73700 Séez<br>Tarentaise, Savoie</span>
+                  <span class="info-value">10 Rue des Glières, 73700<br>Tarentaise, Savoie</span>
                 </div>
               </div>
               <div class="info-row">
@@ -144,7 +137,7 @@
                 </span>
                 <div>
                   <span class="info-label">Statut actuel</span>
-                  <span class="info-value" style="color:#22c55e;font-weight:600;">Ouvert ●</span>
+                  <span id="location-current-status" class="info-value" style="color:#22c55e;font-weight:600;">Ouvert ●</span>
                 </div>
               </div>
             </div>
@@ -152,14 +145,8 @@
             <!-- Horaires -->
             <div class="location-info reveal reveal-d1" style="margin-top:2px;">
               <h3>Horaires d'ouverture</h3>
-              <div class="horaires-table" role="table" aria-label="Horaires d'ouverture">
-                <div class="horaire-row"><span class="horaire-day">Lundi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Mardi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Mercredi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Jeudi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 18h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Vendredi</span><span class="horaire-time">08h00 – 12h00 / 14h00 – 17h00</span></div>
-                <div class="horaire-row"><span class="horaire-day">Samedi</span><span class="horaire-closed">Sur rendez-vous</span></div>
-                <div class="horaire-row"><span class="horaire-day">Dimanche</span><span class="horaire-closed">Fermé</span></div>
+              <div id="horaires-dynamic-table" class="horaires-table" role="table" aria-label="Horaires d'ouverture">
+                <!-- Les horaires seront injectés ici par JavaScript -->
               </div>
             </div>
           </div>
@@ -168,11 +155,15 @@
           <div class="map-wrap reveal reveal-d2">
             <iframe
               title="Carte du Garage Alpin à Séez"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2758.123!2d6.769!3d45.617!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47899f6aef8ab935%3A0x0!2sSéez%2C%2073700!5e0!3m2!1sfr!2sfr!4v1716000000000"
+              src="https://maps.google.com/maps?q=Le+Garage+Alpin,+10+Rue+des+Gli%C3%A8res,+73700+S%C3%A9ez&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              width="600"
+              height="450"
+              style="border:0;"
+              allowfullscreen=""
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
-              aria-label="Carte Google Maps — Garage Alpin, Séez"
-            ></iframe>
+              aria-label="Carte Google Maps — Garage Alpin, Séez">
+            </iframe>
           </div>
 
         </div>
@@ -180,7 +171,7 @@
         <!-- CTA Get Directions -->
         <div class="reveal" style="margin-top:48px;text-align:center;">
           <a
-            href="https://www.google.com/maps/dir/?api=1&destination=Zone+artisanale+73700+Séez"
+            href="https://www.google.com/maps/dir/?api=1&destination=10+Rue+des+Glères,+73700+Séez"
             target="_blank"
             rel="noopener noreferrer"
             class="btn-magnetic"
@@ -211,7 +202,7 @@
         <p class="cta-over reveal">Prendre rendez-vous</p>
         <h2 class="cta-title split-text" id="cta-location">On vous<br>attend.</h2>
         <div class="cta-actions reveal reveal-d1">
-          <a href="contact.html" class="btn-magnetic" id="loc-cta-contact">
+          <a href="contact" class="btn-magnetic" id="loc-cta-contact">
             Nous contacter
             <span class="btn-icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -230,16 +221,17 @@
     <div class="wrap">
       <div class="footer-grid reveal">
         <div>
-          <div class="footer-logo">Garage<span>.</span>Alpin</div>
+          <div class="footer-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="54" /></div>
           <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
         </div>
         <div class="footer-col">
           <h4>Navigation</h4>
           <ul>
-            <li><a href="index.html">Accueil</a></li>
-            <li><a href="equipe.html">L'Équipe</a></li>
-            <li><a href="location.html">Nous trouver</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="./">Accueil</a></li>
+            <li><a href="equipe">L'Équipe</a></li>
+            <li><a href="vehicules">Véhicules & Location</a></li>
+            <li><a href="location">Nous trouver</a></li>
+            <li><a href="contact">Contact</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -252,15 +244,18 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a> | v1.0.5</span>
         <div style="display:flex;gap:24px;">
-          <a href="#">Mentions légales</a>
-          <a href="#">Confidentialité</a>
+          <a href="mentions-legales">Mentions légales</a>
+          <a href="confidentialite">Confidentialité</a>
+          <a href="cgv">CGV</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js?v=9"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>

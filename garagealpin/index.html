@@ -2,17 +2,6 @@
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <script>
-    if (sessionStorage.getItem('garage_auth') !== 'romain') {
-      let pwd = prompt('Site en cours de développement. Veuillez entrer le mot de passe :');
-      if (pwd === 'romain') {
-        sessionStorage.setItem('garage_auth', 'romain');
-      } else {
-        document.documentElement.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050505;color:#fff;font-family:sans-serif;"><h1>Accès refusé. Veuillez rafraîchir la page.</h1></div>';
-        throw new Error('Unauthorized');
-      }
-    }
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
@@ -25,29 +14,57 @@
   <meta property="og:description" content="Entretien, réparation et diagnostic à Séez, Savoie. Garage indépendant depuis 2018." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://www.legaragealpin.fr/" />
-  <meta name="theme-color"        content="#07070a" />
+  <meta name="theme-color"        content="#f8fafc" />
+  <!-- Critical CSS inline — élimine le render-blocking pour le FCP -->
+  <style>
+    :root{--bg:#f4f6f8;--bg-2:#ffffff;--red:#e3000f;--text:#09090b;--text-muted:#64748b;--surface:linear-gradient(135deg,rgba(255,255,255,0.8) 0%,rgba(255,255,255,0.2) 100%);--border:rgba(255,255,255,0.9);--nav-h:72px;--ease:cubic-bezier(0.16,1,0.3,1);--font-display:'Syne',sans-serif;--font-body:'Inter',system-ui,sans-serif;--pad:clamp(24px,5vw,64px)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;font-size:16px}
+    body{font-family:var(--font-body);background-color:var(--bg);background-image:radial-gradient(circle at 20% 30%,rgba(0,0,0,0.04) 0%,transparent 40%),radial-gradient(circle at 80% 20%,rgba(227,0,15,0.02) 0%,transparent 35%),radial-gradient(circle at 40% 80%,rgba(0,0,0,0.03) 0%,transparent 45%),radial-gradient(circle at 90% 90%,rgba(227,0,15,0.015) 0%,transparent 50%);background-size:1200px 1000px;background-attachment:fixed;color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;cursor:none}
+    body.loading{overflow:hidden}
+    h1,h2,h3,h4{font-family:var(--font-display);line-height:1.05;letter-spacing:-.03em}
+    a{text-decoration:none;color:inherit}ul{list-style:none}img{display:block;max-width:100%}
+    button{font-family:inherit;cursor:none;border:none;background:none}
+    #preloader{position:fixed;inset:0;background:var(--bg);z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity .8s var(--ease),visibility .8s}
+    #preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+    .pre-bar-wrap{width:min(300px,60vw);height:2px;background:rgba(0,0,0,.04);border-radius:2px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.05)}
+    .pre-bar{height:100%;background:var(--red);width:0;border-radius:2px;transition:width .05s linear}
+    .pre-counter{font-family:var(--font-display);font-size:.85rem;font-weight:500;color:var(--text-muted);letter-spacing:.08em}
+    header{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:500;transition:background-color .4s var(--ease)}
+    header.scrolled{background:rgba(255,255,255,.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.9);box-shadow:0 10px 40px rgba(0,0,0,0.03)}
+    .wrap{max-width:1200px;margin:0 auto;padding:0 var(--pad)}
+    .nav-row{display:flex;align-items:center;justify-content:space-between;height:var(--nav-h)}
+    .site-logo-img{height:54px;width:auto;display:block;filter:brightness(0.1);}
+    .nav-burger{display:none;flex-direction:column;gap:5px;padding:8px}
+    @media(max-width:768px){.nav-links{display:none!important}.nav-burger{display:flex!important}.nav-status{display:none!important}body,button{cursor:auto}}
+  </style>
 
+  <!-- Main CSS: non-blocking via media trick -->
+  <!-- Main CSS: bloquant mais préchargé — évite le CLS causé par le FOUC -->
+  <link rel="preload" as="style" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=9" />
+
+  <!-- Fonts: non-blocking (pas de CLS car du texte) -->
   <link rel="icon" type="image/png" href="images/logo_preloader.png" />
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
-
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@400;500;600&display=swap" /></noscript>
 </head>
 <body class="loading">
+  <!-- Interactive Organic Network -->
+  <canvas id="hero-canvas" aria-hidden="true" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;"></canvas>
 
   <!-- ══ GRAIN ══ -->
   <div id="grain" aria-hidden="true"></div>
 
   <!-- ══ CUSTOM CURSOR ══ -->
-  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-dot" aria-hidden="true"></div>
   <div id="cursor-ring" aria-hidden="true"></div>
 
   <!-- ══ PRELOADER ══ -->
   <div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
-    <div class="pre-logo">Garage<span>.</span>Alpin</div>
+    <div class="pre-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" /></div>
     <div class="pre-bar-wrap" aria-hidden="true">
       <div class="pre-bar"></div>
     </div>
@@ -59,15 +76,16 @@
     <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
 
-        <a href="index.html" class="nav-logo" aria-label="Le Garage Alpin — Accueil">
-          Garage<span>.</span>Alpin
+        <a href="./" class="nav-logo" aria-label="Le Garage Alpin — Accueil">
+          <img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" width="140" height="40" fetchpriority="high" />
         </a>
 
         <ul class="nav-links" role="list">
           <li><a href="#services"  id="nl-services">Services</a></li>
           <li><a href="#about"     id="nl-about">À propos</a></li>
-          <li><a href="equipe.html" id="nl-equipe">Notre équipe</a></li>
-          <li><a href="location.html" id="nl-location">Nous trouver</a></li>
+          <li><a href="equipe" id="nl-equipe">Notre équipe</a></li>
+          <li><a href="vehicules" id="nl-vehicules">Véhicules & Location</a></li>
+          <li><a href="location" id="nl-location">Nous trouver</a></li>
         </ul>
 
         <div class="nav-right">
@@ -97,9 +115,10 @@
       <ul class="mob-nav-links" role="list">
         <li><a href="#services"   class="mob-link"><span class="link-num">01</span>Services</a></li>
         <li><a href="#about"      class="mob-link"><span class="link-num">02</span>À propos</a></li>
-        <li><a href="equipe.html" class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
-        <li><a href="location.html" class="mob-link"><span class="link-num">04</span>Localisation</a></li>
-        <li><a href="contact.html"  class="mob-link"><span class="link-num">05</span>Contact</a></li>
+        <li><a href="equipe" class="mob-link"><span class="link-num">03</span>L'Équipe</a></li>
+        <li><a href="vehicules" class="mob-link"><span class="link-num">04</span>Véhicules & Location</a></li>
+        <li><a href="location" class="mob-link"><span class="link-num">05</span>Localisation</a></li>
+        <li><a href="contact"  class="mob-link"><span class="link-num">06</span>Contact</a></li>
       </ul>
     </nav>
     <div class="mob-footer" aria-label="Contact rapide">
@@ -122,23 +141,11 @@
         <div class="amb-orb amb-2"></div>
       </div>
 
-      <!-- Grid background -->
-      <div class="hero-grid" aria-hidden="true"></div>
 
-      <!-- Canvas particles -->
-      <canvas id="hero-canvas" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
 
-      <!-- Massive name -->
-      <div class="hero-name-wrap" aria-hidden="true" style="position:relative;z-index:2;">
-        <span class="hero-name-line">
-          <span class="hero-name-inner solid">Garage</span>
-        </span>
-        <span class="hero-name-line">
-          <span class="hero-name-inner outline" style="transition-delay:0.1s;">Alpin</span>
-        </span>
-        <div class="play-bar reveal" style="transition-delay:0.2s;">
-          <div class="play-bar-inner"></div>
-        </div>
+      <!-- Massive logo -->
+      <div class="hero-name-wrap" aria-hidden="true" style="position:relative;z-index:2; text-align:center;">
+        <img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="hero-massive-logo" />
       </div>
 
       <!-- Animated divider line -->
@@ -162,7 +169,7 @@
             nous prenons soin de votre véhicule avec <strong>précision</strong>.
           </p>
           <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;">
-            <a href="contact.html" class="btn-magnetic" id="hero-cta">
+            <a href="contact" class="btn-magnetic" id="hero-cta">
               Prendre RDV
               <span class="btn-icon" aria-hidden="true">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -369,7 +376,7 @@
             </div>
 
             <div style="margin-top:48px;">
-              <a href="equipe.html" class="btn-outline" id="about-cta">
+              <a href="equipe" class="btn-outline" id="about-cta">
                 Découvrir l'équipe
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -393,15 +400,18 @@
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:48px;" class="reveal">
         <div style="overflow:hidden;height:clamp(200px,28vw,360px);">
-          <img src="images/atelier2.avif" alt="Atelier 2" loading="lazy"
+          <img src="images/atelier2.avif" alt="Atelier du Garage Alpin" loading="lazy" decoding="async"
+               width="400" height="360"
                style="width:100%;height:100%;object-fit:cover;display:block;" />
         </div>
         <div style="overflow:hidden;height:clamp(200px,28vw,360px);">
-          <img src="images/atelier3.avif" alt="Atelier 3" loading="lazy"
+          <img src="images/atelier3.avif" alt="Atelier du Garage Alpin" loading="lazy" decoding="async"
+               width="400" height="360"
                style="width:100%;height:100%;object-fit:cover;display:block;" />
         </div>
         <div style="overflow:hidden;height:clamp(200px,28vw,360px);">
-          <img src="images/atelier4.avif" alt="Atelier 4" loading="lazy"
+          <img src="images/atelier4.avif" alt="Atelier du Garage Alpin" loading="lazy" decoding="async"
+               width="400" height="360"
                style="width:100%;height:100%;object-fit:cover;display:block;" />
         </div>
       </div>
@@ -421,7 +431,7 @@
           <a href="tel:+33479417373" class="cta-tel" id="cta-tel">04 79 41 73 73</a>
         </div>
         <div class="cta-actions reveal reveal-d2" style="margin-top:32px;">
-          <a href="contact.html" class="btn-magnetic" id="cta-btn-contact">
+          <a href="contact" class="btn-magnetic" id="cta-btn-contact">
             Formulaire de contact
             <span class="btn-icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -429,7 +439,7 @@
               </svg>
             </span>
           </a>
-          <a href="location.html" class="btn-outline" id="cta-btn-location">Nous trouver</a>
+          <a href="location" class="btn-outline" id="cta-btn-location">Nous trouver</a>
         </div>
       </div>
     </section>
@@ -441,16 +451,18 @@
     <div class="wrap">
       <div class="footer-grid reveal">
         <div>
-          <div class="footer-logo">Garage<span>.</span>Alpin</div>
+          <div class="footer-logo"><img src="images/logo.svg?v=2" alt="Le Garage Alpin" class="site-logo-img" /></div>
           <p class="footer-desc">L'excellence mécanique au cœur de la Tarentaise. Garage indépendant depuis 2018.</p>
         </div>
         <div class="footer-col">
           <h4>Navigation</h4>
           <ul>
-            <li><a href="index.html">Accueil</a></li>
-            <li><a href="equipe.html">L'Équipe</a></li>
-            <li><a href="location.html">Nous trouver</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">À propos</a></li>
+            <li><a href="equipe">Notre équipe</a></li>
+            <li><a href="vehicules">Véhicules & Location</a></li>
+            <li><a href="location">Nous trouver</a></li>
+            <li><a href="contact">Contact</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -463,15 +475,16 @@
         </div>
       </div>
       <div class="footer-bottom reveal">
-        <span>© 2026 Le Garage Alpin. Tous droits réservés.</span>
+        <span>© 2026 Le Garage Alpin. Tous droits réservés. | Made with 🫶 by <a href="https://mahebrizion.fr" target="_blank" rel="noopener noreferrer" style="color:var(--red); font-weight:600;">Mahe BRIZION</a> | v1.0.5</span>
         <div style="display:flex;gap:24px;">
-          <a href="#">Mentions légales</a>
-          <a href="#">Confidentialité</a>
+          <a href="mentions-legales">Mentions légales</a>
+          <a href="confidentialite">Confidentialité</a>
+          <a href="cgv">CGV</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=5" defer></script>
 </body>
 </html>

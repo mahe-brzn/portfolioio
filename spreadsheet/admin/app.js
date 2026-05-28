@@ -103,15 +103,6 @@ async function handleLogin(user) {
 // ----------------------------------------------------
 // AUTHENTICATION
 // ----------------------------------------------------
-document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.addEventListener('click', (e) => {
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-    
-    e.target.classList.add('active');
-    document.getElementById(`form-${e.target.dataset.tab}`).classList.add('active');
-  });
-});
 
 document.getElementById('form-login').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -130,21 +121,25 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
   else handleLogin(data.user);
 });
 
-document.getElementById('form-register').addEventListener('submit', async (e) => {
+// Request Access Flow
+document.getElementById('btn-show-request-access')?.addEventListener('click', (e) => {
   e.preventDefault();
-  const email = document.getElementById('register-email').value;
-  const password = document.getElementById('register-password').value;
-  const btn = e.target.querySelector('button');
-  const err = document.getElementById('register-error');
-  
-  btn.textContent = 'Chargement...';
-  err.textContent = '';
+  document.getElementById('modal-req-access').classList.add('active');
+});
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  btn.textContent = 'Créer un compte';
+document.getElementById('btn-close-req')?.addEventListener('click', () => {
+  document.getElementById('modal-req-access').classList.remove('active');
+});
+
+document.getElementById('form-req-access')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const email = encodeURIComponent(document.getElementById('req-email').value);
+  const msg = encodeURIComponent(document.getElementById('req-msg').value);
+  const subject = encodeURIComponent("Demande d'accès Admin Spreadsheets");
+  const body = `Email demandeur: ${email}%0D%0A%0D%0AMessage:%0D%0A${msg}`;
   
-  if (error) err.textContent = "Erreur: " + error.message;
-  else if (data.user) handleLogin(data.user);
+  window.location.href = `mailto:spreadsheet@mahebrizion.fr?subject=${subject}&body=${body}`;
+  document.getElementById('modal-req-access').classList.remove('active');
 });
 
 document.getElementById('btn-logout').addEventListener('click', async () => {

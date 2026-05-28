@@ -51,24 +51,14 @@
       <div class="auth-box reveal active">
         <h2 class="admin-title">Accès <span class="accent">Sécurisé</span></h2>
         
-        <div class="auth-tabs">
-          <button class="auth-tab active" data-tab="login">Connexion</button>
-          <button class="auth-tab" data-tab="register">S'inscrire</button>
-        </div>
-
         <form id="form-login" class="auth-form active">
           <input type="email" id="login-email" placeholder="Email" required />
           <input type="password" id="login-password" placeholder="Mot de passe" required />
           <button type="submit" class="btn-magnetic">Se connecter</button>
           <p class="auth-error" id="login-error"></p>
-        </form>
-
-        <form id="form-register" class="auth-form">
-          <input type="email" id="register-email" placeholder="Email" required />
-          <input type="password" id="register-password" placeholder="Mot de passe" required />
-          <button type="submit" class="btn-magnetic">Créer un compte</button>
-          <p class="auth-error" id="register-error"></p>
-          <p class="auth-notice">Votre compte devra être autorisé par un administrateur.</p>
+          <div style="text-align: center; margin-top: 15px;">
+            <a href="#" id="btn-show-request-access" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: underline;">Demander un accès (S'inscrire)</a>
+          </div>
         </form>
       </div>
     </section>
@@ -123,6 +113,19 @@
         </div>
       </div>
     </section>
+
+    <!-- REQUEST ACCESS MODAL -->
+    <div id="modal-req-access" class="modal">
+      <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <button class="modal-close" id="btn-close-req">&times;</button>
+        <h2 class="admin-title" style="font-size: 1.8rem; margin-bottom: 20px;">Demande <span class="accent">d'accès</span></h2>
+        <form id="form-req-access" class="auth-form active">
+          <input type="email" id="req-email" placeholder="Votre email" required />
+          <textarea id="req-msg" placeholder="Pourquoi souhaitez-vous un accès ?" required style="padding: 14px 16px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; outline: none; font-family: var(--font-body); min-height: 100px; resize: vertical;"></textarea>
+          <button type="submit" class="btn-magnetic" style="margin-top: 10px;">Envoyer la demande</button>
+        </form>
+      </div>
+    </div>
 
     <!-- PENDING VIEW -->
     <section id="view-pending" class="admin-section">

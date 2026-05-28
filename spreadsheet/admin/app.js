@@ -5,10 +5,14 @@ let currentUser = null;
 let currentProfile = null;
 let editingSpreadsheetId = null;
 let editingItems = [];
+let pendingFactorId = null;
+let pendingChallengeId = null;
 
 // DOM Elements
 const views = {
   auth: document.getElementById('view-auth'),
+  '2fa-challenge': document.getElementById('view-2fa-challenge'),
+  '2fa-setup': document.getElementById('view-2fa-setup'),
   pending: document.getElementById('view-pending'),
   admin: document.getElementById('view-admin'),
   user: document.getElementById('view-user'),
@@ -19,8 +23,10 @@ const userEmailDisplay = document.getElementById('user-email');
 
 // UI Functions
 function showView(viewId) {
-  Object.values(views).forEach(v => v.classList.remove('active'));
-  views[viewId].classList.add('active');
+  Object.values(views).forEach(v => {
+    if (v) v.classList.remove('active');
+  });
+  if(views[viewId]) views[viewId].classList.add('active');
 }
 
 function updateNav() {
@@ -54,6 +60,18 @@ async function init() {
 
 async function handleLogin(user) {
   currentUser = user;
+  
+  // Check 2FA Assurance Level
+  const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aalError) {
+    console.error("AAL Error:", aalError);
+  } else if (aal.nextLevel === 'aal2' && aal.currentLevel === 'aal1') {
+    // Requires 2FA Challenge
+    updateNav(); // show nav so user can see they are partially logged in
+    start2FAChallenge();
+    return;
+  }
+
   updateNav();
   
   // Fetch profile
@@ -134,6 +152,144 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 });
 
 // ----------------------------------------------------
+// 2FA LOGIC (MFA)
+// ----------------------------------------------------
+document.getElementById('btn-security')?.addEventListener('click', () => {
+  document.getElementById('2fa-setup-step1').style.display = 'block';
+  document.getElementById('2fa-setup-step2').style.display = 'none';
+  document.getElementById('2fa-setup-success').style.display = 'none';
+  showView('2fa-setup');
+});
+
+document.getElementById('btn-back-from-2fa')?.addEventListener('click', () => {
+  handleLogin(currentUser);
+});
+
+// Start Enrollment
+document.getElementById('btn-start-2fa')?.addEventListener('click', async () => {
+  const btn = document.getElementById('btn-start-2fa');
+  btn.textContent = 'Génération du QR Code...';
+  
+  const { data, error } = await supabase.auth.mfa.enroll({
+    factorType: 'totp'
+  });
+  
+  btn.textContent = 'Activer la 2FA maintenant';
+
+  if (error) {
+    alert("Erreur: " + error.message);
+    return;
+  }
+
+  pendingFactorId = data.id;
+  
+  // Display SVG QR Code
+  const qrContainer = document.getElementById('2fa-qr-code-container');
+  qrContainer.innerHTML = data.totp.qr_code;
+  qrContainer.querySelector('svg').style.width = '200px';
+  qrContainer.querySelector('svg').style.height = '200px';
+
+  document.getElementById('2fa-setup-step1').style.display = 'none';
+  document.getElementById('2fa-setup-step2').style.display = 'block';
+});
+
+// Verify Enrollment
+document.getElementById('form-2fa-verify')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code = document.getElementById('2fa-verify-code').value;
+  const err = document.getElementById('2fa-verify-error');
+  const btn = e.target.querySelector('button');
+  
+  btn.textContent = 'Vérification...';
+  err.textContent = '';
+
+  const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+    factorId: pendingFactorId
+  });
+
+  if (challengeError) {
+    err.textContent = "Erreur challenge: " + challengeError.message;
+    btn.textContent = 'Vérifier et Activer';
+    return;
+  }
+
+  const { data, error } = await supabase.auth.mfa.verify({
+    factorId: pendingFactorId,
+    challengeId: challengeData.id,
+    code: code
+  });
+
+  btn.textContent = 'Vérifier et Activer';
+
+  if (error) {
+    err.textContent = "Code invalide. Essayez encore.";
+  } else {
+    document.getElementById('2fa-setup-step2').style.display = 'none';
+    document.getElementById('2fa-setup-success').style.display = 'block';
+    setTimeout(() => {
+      handleLogin(currentUser); // re-trigger login flow to show correct dashboard
+    }, 2000);
+  }
+});
+
+// Start Challenge (Login)
+async function start2FAChallenge() {
+  showView('2fa-challenge');
+  const { data: { factors }, error } = await supabase.auth.mfa.listFactors();
+  
+  if (error) {
+    console.error("Error listing factors", error);
+    return;
+  }
+
+  const totpFactor = factors.find(f => f.factor_type === 'totp' && f.status === 'verified');
+  if (!totpFactor) {
+    console.error("No verified TOTP factor found");
+    return;
+  }
+
+  pendingFactorId = totpFactor.id;
+
+  const { data, error: challengeError } = await supabase.auth.mfa.challenge({
+    factorId: pendingFactorId
+  });
+
+  if (challengeError) {
+    console.error("Challenge error", challengeError);
+    return;
+  }
+
+  pendingChallengeId = data.id;
+}
+
+// Verify Challenge (Login)
+document.getElementById('form-2fa-challenge')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code = document.getElementById('2fa-challenge-code').value;
+  const err = document.getElementById('2fa-challenge-error');
+  const btn = e.target.querySelector('button');
+  
+  btn.textContent = 'Vérification...';
+  err.textContent = '';
+
+  const { data, error } = await supabase.auth.mfa.verify({
+    factorId: pendingFactorId,
+    challengeId: pendingChallengeId,
+    code: code
+  });
+
+  btn.textContent = 'Valider';
+
+  if (error) {
+    err.textContent = "Code invalide.";
+  } else {
+    // 2FA successful! proceed to dashboard
+    handleLogin(currentUser);
+  }
+});
+
+
+// ----------------------------------------------------
 // ADMIN DASHBOARD
 // ----------------------------------------------------
 async function loadAdminData() {
@@ -144,11 +300,11 @@ async function loadAdminData() {
   const approvedList = document.getElementById('approved-users-list');
   const spreadsheetsList = document.getElementById('all-spreadsheets-list');
   
-  pendingList.innerHTML = '';
-  approvedList.innerHTML = '';
-  spreadsheetsList.innerHTML = '';
+  if(pendingList) pendingList.innerHTML = '';
+  if(approvedList) approvedList.innerHTML = '';
+  if(spreadsheetsList) spreadsheetsList.innerHTML = '';
 
-  if (profiles) {
+  if (profiles && pendingList && approvedList) {
     profiles.forEach(p => {
       const el = document.createElement('div');
       el.className = 'list-item';
@@ -168,7 +324,7 @@ async function loadAdminData() {
     });
   }
 
-  if (spreadsheets) {
+  if (spreadsheets && spreadsheetsList) {
     spreadsheets.forEach(s => {
       const el = document.createElement('div');
       el.className = 'list-item';
@@ -202,6 +358,7 @@ window.revokeUser = async (userId) => {
 async function loadUserData() {
   const { data: spreadsheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', currentUser.id);
   const list = document.getElementById('my-spreadsheets-list');
+  if(!list) return;
   list.innerHTML = '';
 
   if (spreadsheets && spreadsheets.length > 0) {
@@ -211,7 +368,7 @@ async function loadUserData() {
       el.innerHTML = `
         <div>
           <div class="list-item-title">${s.title}</div>
-          <div class="list-item-sub">/spreadsheet/${s.slug} — ${s.items.length || 0} articles</div>
+          <div class="list-item-sub">/spreadsheet/${s.slug} — ${s.items?.length || 0} articles</div>
         </div>
         <div style="display:flex; gap:8px;">
           <a href="/spreadsheet/${s.slug}" target="_blank" class="btn-outline" style="padding:4px 10px; font-size:0.75rem;">Voir</a>
@@ -228,14 +385,14 @@ async function loadUserData() {
 // ----------------------------------------------------
 // CREATE SPREADSHEET
 // ----------------------------------------------------
-document.getElementById('btn-show-create').addEventListener('click', () => {
+document.getElementById('btn-show-create')?.addEventListener('click', () => {
   document.getElementById('modal-create').classList.add('active');
 });
-document.getElementById('btn-close-create').addEventListener('click', () => {
+document.getElementById('btn-close-create')?.addEventListener('click', () => {
   document.getElementById('modal-create').classList.remove('active');
 });
 
-document.getElementById('form-create-spreadsheet').addEventListener('submit', async (e) => {
+document.getElementById('form-create-spreadsheet')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const slug = document.getElementById('create-slug').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
   const title = document.getElementById('create-title').value;
@@ -276,18 +433,19 @@ window.openEditSpreadsheet = async (id) => {
   }
 };
 
-document.getElementById('btn-back-to-list').addEventListener('click', () => {
+document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
   if (currentProfile.role === 'admin') showView('admin');
   else showView('user');
 });
 
-document.getElementById('btn-add-item').addEventListener('click', () => {
+document.getElementById('btn-add-item')?.addEventListener('click', () => {
   editingItems.push({ title: '', price: '', url: '' });
   renderEditItems();
 });
 
 function renderEditItems() {
   const container = document.getElementById('items-container');
+  if(!container) return;
   container.innerHTML = '';
 
   if (editingItems.length === 0) {
@@ -329,7 +487,7 @@ window.deleteItem = (index) => {
   renderEditItems();
 };
 
-document.getElementById('btn-save-spreadsheet').addEventListener('click', async (e) => {
+document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async (e) => {
   const btn = e.target;
   const originalText = btn.textContent;
   btn.textContent = 'Enregistrement...';

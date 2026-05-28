@@ -37,6 +37,7 @@
         <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB<span>.</span> Admin</a>
         <div class="nav-right" id="auth-nav-controls" style="display: none;">
           <span id="user-email" style="font-size: 0.8rem; color: var(--text-muted); margin-right: 15px;"></span>
+          <button id="btn-security" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-color: var(--sneaker-accent); color: var(--sneaker-accent); margin-right: 10px;">Sécurité (2FA)</button>
           <button id="btn-logout" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">Déconnexion</button>
         </div>
       </div>
@@ -69,6 +70,57 @@
           <p class="auth-error" id="register-error"></p>
           <p class="auth-notice">Votre compte devra être autorisé par un administrateur.</p>
         </form>
+      </div>
+    </section>
+
+    <!-- 2FA CHALLENGE VIEW (LOGIN) -->
+    <section id="view-2fa-challenge" class="admin-section">
+      <div class="auth-box reveal active" style="text-align: center;">
+        <h2 class="admin-title">Validation <span class="accent">2FA</span></h2>
+        <p style="color: var(--text-muted); margin-top: 20px; margin-bottom: 20px;">Ouvrez votre application d'authentification et entrez le code à 6 chiffres.</p>
+        <form id="form-2fa-challenge" class="auth-form active">
+          <input type="text" id="2fa-challenge-code" placeholder="000000" pattern="[0-9]{6}" maxlength="6" required style="text-align: center; letter-spacing: 0.5em; font-size: 1.5rem;" />
+          <button type="submit" class="btn-magnetic" style="margin-top: 10px; width: 100%; justify-content: center;">Valider</button>
+          <p class="auth-error" id="2fa-challenge-error"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2FA SETUP VIEW (ENROLL) -->
+    <section id="view-2fa-setup" class="admin-section wrap">
+      <div class="admin-header">
+        <div>
+          <button id="btn-back-from-2fa" class="btn-outline" style="margin-bottom: 20px;">&larr; Retour</button>
+          <h1 class="admin-title">Sécurité <span class="accent">2FA</span></h1>
+          <p style="color: var(--text-muted);">Protégez votre compte avec la double authentification.</p>
+        </div>
+      </div>
+      
+      <div class="admin-card" style="max-width: 600px; margin: 40px auto 0; text-align: center;">
+        <div id="2fa-setup-step1">
+          <button id="btn-start-2fa" class="btn-magnetic" style="margin-bottom: 20px;">Activer la 2FA maintenant</button>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">(Nécessite Google Authenticator, Authy, ou Apple Passwords)</p>
+        </div>
+
+        <div id="2fa-setup-step2" style="display: none;">
+          <p style="margin-bottom: 20px;">1. Scannez ce QR Code avec votre application :</p>
+          <div id="2fa-qr-code-container" style="background: white; padding: 20px; border-radius: 12px; display: inline-block; margin-bottom: 20px;">
+            <!-- SVG QR Code will be injected here -->
+          </div>
+          
+          <form id="form-2fa-verify">
+            <p style="margin-bottom: 10px;">2. Entrez le code généré pour confirmer :</p>
+            <input type="text" id="2fa-verify-code" placeholder="000000" pattern="[0-9]{6}" maxlength="6" required style="text-align: center; letter-spacing: 0.5em; font-size: 1.5rem; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; width: 100%; max-width: 250px; margin-bottom: 15px;" />
+            <br>
+            <button type="submit" class="btn-magnetic">Vérifier et Activer</button>
+            <p class="auth-error" id="2fa-verify-error" style="margin-top: 10px;"></p>
+          </form>
+        </div>
+
+        <div id="2fa-setup-success" style="display: none;">
+          <h2 style="color: #4caf50; margin-bottom: 10px;">2FA Activée ! 🎉</h2>
+          <p style="color: var(--text-muted);">Votre compte est désormais hautement sécurisé.</p>
+        </div>
       </div>
     </section>
 

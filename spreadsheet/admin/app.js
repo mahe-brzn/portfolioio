@@ -327,7 +327,7 @@ async function loadAdminData() {
   if(spreadsheetsList) spreadsheetsList.innerHTML = '';
 
   if (profiles && pendingList && approvedList) {
-    profiles.forEach(p => {
+    profiles.forEach((p, i) => {
       const el = document.createElement('div');
       el.className = 'list-item stagger-item';
       el.style.animationDelay = `${i * 0.05}s`;

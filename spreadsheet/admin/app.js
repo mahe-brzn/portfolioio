@@ -109,7 +109,7 @@ document.querySelectorAll('.auth-tab').forEach(tab => {
     document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
     
     e.target.classList.add('active');
-    document.getElementById(`form-${e.target.dataset.target}`).classList.add('active');
+    document.getElementById(`form-${e.target.dataset.tab}`).classList.add('active');
   });
 });
 

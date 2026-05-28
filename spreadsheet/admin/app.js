@@ -537,3 +537,40 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
 
 // Start the app
 document.addEventListener('DOMContentLoaded', init);
+
+// ----------------------------------------------------
+// ADMIN EXTRA HANDLERS
+// ----------------------------------------------------
+document.getElementById('btn-show-create-admin')?.addEventListener('click', () => {
+  document.getElementById('modal-create').classList.add('active');
+});
+
+document.getElementById('btn-show-create-user')?.addEventListener('click', () => {
+  document.getElementById('modal-create-user').classList.add('active');
+});
+
+document.getElementById('btn-close-create-user')?.addEventListener('click', () => {
+  document.getElementById('modal-create-user').classList.remove('active');
+});
+
+document.getElementById('form-create-user')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.innerHTML = 'Création...';
+  
+  const email = document.getElementById('new-user-email').value;
+  const password = document.getElementById('new-user-password').value;
+  
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+  });
+  
+  if (error) {
+    alert("Erreur: " + error.message);
+    btn.innerHTML = 'Créer le compte';
+  } else {
+    alert("Utilisateur créé ! Vous avez été déconnecté (sécurité Supabase). Veuillez vous reconnecter.");
+    window.location.reload();
+  }
+});

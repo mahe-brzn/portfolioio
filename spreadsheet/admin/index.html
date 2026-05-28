@@ -139,6 +139,10 @@
     <section id="view-admin" class="admin-section wrap">
       <div class="admin-header">
         <h1 class="admin-title">Panneau <span class="accent">Admin</span></h1>
+        <div style="display:flex; gap:12px;">
+          <button id="btn-show-create-user" class="btn-outline">Créer un utilisateur</button>
+          <button id="btn-show-create-admin" class="btn-magnetic">Nouvelle Spreadsheet</button>
+        </div>
       </div>
 
       <div class="admin-grid">
@@ -168,6 +172,21 @@
 
       <div id="my-spreadsheets-list" class="list-container" style="margin-top: 40px;"></div>
     </section>
+
+    
+    <!-- CREATE USER MODAL -->
+    <div id="modal-create-user" class="modal">
+      <div class="modal-content glass-panel" style="max-width: 400px; text-align: center;">
+        <button class="modal-close" id="btn-close-create-user">&times;</button>
+        <h2 class="admin-title" style="font-size: 1.8rem; margin-bottom: 20px;">Créer <span class="accent">Utilisateur</span></h2>
+        <form id="form-create-user" class="auth-form active">
+          <input type="email" id="new-user-email" placeholder="Email de l'utilisateur" required class="glass-input" />
+          <input type="text" id="new-user-password" placeholder="Mot de passe temporaire" required class="glass-input" />
+          <button type="submit" class="btn-magnetic" style="margin-top: 10px;">Créer le compte</button>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;">Note : La création va vous déconnecter temporairement pour des raisons de sécurité Supabase.</p>
+        </form>
+      </div>
+    </div>
 
     <!-- CREATE SPREADSHEET MODAL -->
     <div id="modal-create" class="modal">
@@ -218,6 +237,6 @@
 
   <!-- IMPORTANT: Place your Supabase configuration in app.js -->
   <script src="/garagealpin/script.js" defer></script>
-  <script src="app.js?v=7" defer></script>
+  <script src="app.js?v=9" defer></script>
 </body>
 </html>

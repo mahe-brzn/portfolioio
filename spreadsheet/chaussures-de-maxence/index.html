@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="icon" href="/assets/img/favicon.png" type="image/png" />
   <title>Chaussures de Maxence | La Sélection du Chef</title>
   <meta name="description" content="La sélection exclusive de chaussures de Maxence." />
   <meta name="robots" content="noindex, nofollow" />
@@ -13,15 +12,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/assets/css/main.css" />
+  <!-- Link to garagealpin styles for buttons and texture -->
+  <link rel="stylesheet" href="/garagealpin/style.css" />
   
   <style>
+    /* Specific spreadsheet overrides */
+    body {
+      overflow-y: auto !important;
+    }
     .spreadsheet-hero {
       position: relative;
-      padding: clamp(100px, 15vw, 180px) clamp(24px, 5vw, 80px) clamp(60px, 8vw, 100px);
+      padding: clamp(100px, 15vw, 160px) clamp(24px, 5vw, 80px) clamp(60px, 8vw, 80px);
       text-align: center;
-      overflow: hidden;
-      min-height: 50vh;
+      min-height: 40vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -30,7 +33,7 @@
     }
 
     .spreadsheet-title {
-      font-family: var(--font-d);
+      font-family: var(--font-display);
       font-size: clamp(3rem, 8vw, 6rem);
       font-weight: 800;
       line-height: 1.05;
@@ -40,12 +43,12 @@
     }
     
     .spreadsheet-title .accent {
-      color: var(--accent);
+      color: var(--red);
     }
 
     .spreadsheet-subtitle {
       font-size: clamp(1rem, 2vw, 1.25rem);
-      color: var(--grey-4);
+      color: var(--text-muted);
       max-width: 600px;
       margin: 0 auto 40px;
       line-height: 1.8;
@@ -56,571 +59,462 @@
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 24px;
       padding: 0 clamp(24px, 5vw, 80px) clamp(100px, 10vw, 160px);
-      max-width: 1360px;
+      max-width: 1400px;
       margin: 0 auto;
       position: relative;
       z-index: 2;
     }
-
+    
     .shoe-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 32px 24px;
-      transition: all 0.4s var(--ease-out);
-      position: relative;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 240px;
-      backdrop-filter: blur(10px);
+      min-height: 260px;
+      padding: 40px 32px;
     }
-
-    .shoe-card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at top right, rgba(200, 255, 87, 0.1), transparent 50%);
-      opacity: 0;
-      transition: opacity 0.5s var(--ease-out);
-      pointer-events: none;
-    }
-
-    .shoe-card:hover {
-      transform: translateY(-8px);
-      border-color: rgba(200, 255, 87, 0.3);
-      background: rgba(255, 255, 255, 0.04);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(200, 255, 87, 0.05);
-    }
-
-    .shoe-card:hover::before {
-      opacity: 1;
-    }
-
+    
     .shoe-card-index {
-      font-family: var(--font-d);
-      font-size: 0.8rem;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.15);
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      transition: color 0.3s;
+      color: var(--red);
+      margin-bottom: 16px;
     }
-
-    .shoe-card:hover .shoe-card-index {
-      color: var(--accent);
-    }
-
+    
     .shoe-card-title {
-      font-family: var(--font-d);
-      font-size: 1.5rem;
+      font-family: var(--font-display);
+      font-size: 1.6rem;
       font-weight: 700;
       color: var(--white);
       margin-bottom: 12px;
       line-height: 1.2;
-      padding-right: 30px;
     }
-
+    
     .shoe-card-price {
-      display: inline-block;
-      font-family: var(--font-b);
-      font-size: 1.25rem;
+      font-family: var(--font-body);
+      font-size: 1.3rem;
       font-weight: 600;
-      color: var(--accent);
+      color: var(--white);
       margin-bottom: 30px;
+      display: inline-block;
     }
-
-    .shoe-card-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--font-d);
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--black);
-      background: var(--white);
-      padding: 16px 24px;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: all 0.3s var(--ease-out);
+    
+    .btn-buy {
       align-self: flex-start;
       margin-top: auto;
     }
-
-    .shoe-card-link:hover {
-      background: var(--accent);
-      transform: translateX(4px);
-      box-shadow: 0 0 20px rgba(200, 255, 87, 0.3);
-    }
-    
-    .shoe-card-link svg {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.3s var(--ease-out);
-    }
-
-    .shoe-card-link:hover svg {
-      transform: translateX(4px) rotate(-45deg);
-    }
-
-    .spread-ambient {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-    .spread-orb-1 {
-      position: absolute;
-      width: 60vw;
-      height: 60vw;
-      top: -20%;
-      left: -10%;
-      background: radial-gradient(circle, rgba(200, 255, 87, 0.05) 0, transparent 60%);
-      filter: blur(80px);
-      border-radius: 50%;
-    }
-    .spread-orb-2 {
-      position: absolute;
-      width: 50vw;
-      height: 50vw;
-      bottom: -10%;
-      right: -10%;
-      background: radial-gradient(circle, rgba(200, 255, 87, 0.03) 0, transparent 60%);
-      filter: blur(80px);
-      border-radius: 50%;
-    }
-    
-    .reveal-item {
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeUpItem 0.8s var(--ease-out) forwards;
-    }
-    @keyframes fadeUpItem {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
   </style>
 </head>
-<body class="loading">
+<body>
+  <!-- GRAIN & CURSOR (Garage Alpin style) -->
   <div id="grain" aria-hidden="true"></div>
   <div id="cursor-dot" aria-hidden="true"></div>
   <div id="cursor-ring" aria-hidden="true"></div>
 
-  <div class="spread-ambient" aria-hidden="true">
-    <div class="spread-orb-1"></div>
-    <div class="spread-orb-2"></div>
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- Ambient orbs -->
+  <div class="hero-ambient" aria-hidden="true">
+    <div class="amb-orb amb-1"></div>
+    <div class="amb-orb amb-2"></div>
   </div>
+  <div class="hero-grid" aria-hidden="true"></div>
 
-  <header role="banner">
-    <nav id="nav" aria-label="Navigation principale" class="visible">
+  <!-- HEADER -->
+  <header role="banner" class="scrolled">
+    <nav id="nav" aria-label="Navigation principale">
       <div class="wrap nav-row">
-        <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB</a>
+        <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB<span>.</span></a>
         <ul class="nav-links" role="list">
-          <li role="listitem"><a href="/">Accueil</a></li>
-          <li role="listitem"><a href="/spreadsheet">Spreadsheets</a></li>
+          <li><a href="/">Accueil</a></li>
+          <li><a href="/spreadsheet">Spreadsheets</a></li>
         </ul>
-        <div class="nav-right">
-          <div class="nav-status" role="status">
-            <span class="nav-dot" aria-hidden="true"></span>
-            <span>Disponible</span>
-          </div>
-        </div>
       </div>
     </nav>
   </header>
 
   <main id="main-content">
     <section class="spreadsheet-hero">
-      <p class="s-label reveal on" data-num="01" aria-hidden="true">La sélection du chef</p>
-      <h1 class="spreadsheet-title reveal on reveal-d1">Chaussures de<br><span class="accent">Maxence</span></h1>
-      <p class="spreadsheet-subtitle reveal on reveal-d2">Une sélection exclusive de sneakers, claquettes et sacs à dos. Découvrez les meilleures pièces au meilleur prix.</p>
+      <p class="s-label reveal active" data-num="01" aria-hidden="true">La sélection du chef</p>
+      <h1 class="spreadsheet-title reveal active reveal-d1">Chaussures de<br><span class="accent">Maxence</span></h1>
+      <p class="spreadsheet-subtitle reveal active reveal-d2">Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.</p>
     </section>
 
     <div class="shoes-grid">
 
-      <article class="shoe-card reveal-item" style="animation-delay: 0.1s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">01</span>
-        <div>
-          <h2 class="shoe-card-title">Balenciaga Track</h2>
-          <span class="shoe-card-price">50€</span>
-        </div>
-        <a href="https://hipobuy.cn/3zXiVbJs" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Balenciaga Track</h2>
+        <span class="shoe-card-price">50€</span>
+        <a href="https://hipobuy.cn/3zXiVbJs" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.15000000000000002s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">02</span>
-        <div>
-          <h2 class="shoe-card-title">Nike Mind 001</h2>
-          <span class="shoe-card-price">25€</span>
-        </div>
-        <a href="https://hipobuy.cn/RQ5OvWgQ" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Nike Mind 001</h2>
+        <span class="shoe-card-price">25€</span>
+        <a href="https://hipobuy.cn/RQ5OvWgQ" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.2s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">03</span>
-        <div>
-          <h2 class="shoe-card-title">Asics gel NYC</h2>
-          <span class="shoe-card-price">20€</span>
-        </div>
-        <a href="https://hipobuy.cn/3Oh6IHb5" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Asics gel NYC</h2>
+        <span class="shoe-card-price">20€</span>
+        <a href="https://hipobuy.cn/3Oh6IHb5" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.25s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">04</span>
-        <div>
-          <h2 class="shoe-card-title">New Balance 530</h2>
-          <span class="shoe-card-price">25€</span>
-        </div>
-        <a href="https://hipobuy.cn/1sTyWMQw" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">New Balance 530</h2>
+        <span class="shoe-card-price">25€</span>
+        <a href="https://hipobuy.cn/1sTyWMQw" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.30000000000000004s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">05</span>
-        <div>
-          <h2 class="shoe-card-title">Louis Vuitton Trainer</h2>
-          <span class="shoe-card-price">66€</span>
-        </div>
-        <a href="https://hipobuy.cn/y2YEN3MP" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Louis Vuitton Trainer</h2>
+        <span class="shoe-card-price">66€</span>
+        <a href="https://hipobuy.cn/y2YEN3MP" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.35s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">06</span>
-        <div>
-          <h2 class="shoe-card-title">Nike dunk StrangeLove</h2>
-          <span class="shoe-card-price">53€</span>
-        </div>
-        <a href="https://hipobuy.cn/M6xSH9fj" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Nike dunk StrangeLove</h2>
+        <span class="shoe-card-price">53€</span>
+        <a href="https://hipobuy.cn/M6xSH9fj" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.4s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">07</span>
-        <div>
-          <h2 class="shoe-card-title">Air force one Nocta/suprême</h2>
-          <span class="shoe-card-price">32€</span>
-        </div>
-        <a href="https://hipobuy.cn/7D2qDxzs" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Air force one Nocta/suprême</h2>
+        <span class="shoe-card-price">32€</span>
+        <a href="https://hipobuy.cn/7D2qDxzs" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.45000000000000007s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">08</span>
-        <div>
-          <h2 class="shoe-card-title">Balenciaga Track LED</h2>
-          <span class="shoe-card-price">64€</span>
-        </div>
-        <a href="https://hipobuy.cn/GdFMNFc1" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Balenciaga Track LED</h2>
+        <span class="shoe-card-price">64€</span>
+        <a href="https://hipobuy.cn/GdFMNFc1" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.5s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">09</span>
-        <div>
-          <h2 class="shoe-card-title">Louis Vuitton Skate</h2>
-          <span class="shoe-card-price">66€</span>
-        </div>
-        <a href="https://hipobuy.cn/3ggFuMfm" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Louis Vuitton Skate</h2>
+        <span class="shoe-card-price">66€</span>
+        <a href="https://hipobuy.cn/3ggFuMfm" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.55s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">10</span>
-        <div>
-          <h2 class="shoe-card-title">Dunk Travis Scott</h2>
-          <span class="shoe-card-price">48€</span>
-        </div>
-        <a href="https://hipobuy.cn/eA0zhaqg" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Dunk Travis Scott</h2>
+        <span class="shoe-card-price">48€</span>
+        <a href="https://hipobuy.cn/eA0zhaqg" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.6s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">11</span>
-        <div>
-          <h2 class="shoe-card-title">Adidas Samba</h2>
-          <span class="shoe-card-price">15€</span>
-        </div>
-        <a href="https://hipobuy.cn/jkMJwCVC" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Adidas Samba</h2>
+        <span class="shoe-card-price">15€</span>
+        <a href="https://hipobuy.cn/jkMJwCVC" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.65s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">12</span>
-        <div>
-          <h2 class="shoe-card-title">AF1</h2>
-          <span class="shoe-card-price">20€</span>
-        </div>
-        <a href="https://hipobuy.cn/I5ObS87A" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">AF1</h2>
+        <span class="shoe-card-price">20€</span>
+        <a href="https://hipobuy.cn/I5ObS87A" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.7000000000000001s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">13</span>
-        <div>
-          <h2 class="shoe-card-title">Jordan 4</h2>
-          <span class="shoe-card-price">66€</span>
-        </div>
-        <a href="https://hipobuy.cn/RroTNS3P" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Jordan 4</h2>
+        <span class="shoe-card-price">66€</span>
+        <a href="https://hipobuy.cn/RroTNS3P" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.75s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">14</span>
-        <div>
-          <h2 class="shoe-card-title">New Balance 2002</h2>
-          <span class="shoe-card-price">32€</span>
-        </div>
-        <a href="https://hipobuy.cn/0qTVuyjg" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">New Balance 2002</h2>
+        <span class="shoe-card-price">32€</span>
+        <a href="https://hipobuy.cn/0qTVuyjg" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.8s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">15</span>
-        <div>
-          <h2 class="shoe-card-title">Dior B30</h2>
-          <span class="shoe-card-price">80€</span>
-        </div>
-        <a href="https://hipobuy.cn/nPXgPOeS" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Dior B30</h2>
+        <span class="shoe-card-price">80€</span>
+        <a href="https://hipobuy.cn/nPXgPOeS" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.85s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">16</span>
-        <div>
-          <h2 class="shoe-card-title">Dior B25</h2>
-          <span class="shoe-card-price">80€</span>
-        </div>
-        <a href="https://hipobuy.cn/iJRoloKQ" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Dior B25</h2>
+        <span class="shoe-card-price">80€</span>
+        <a href="https://hipobuy.cn/iJRoloKQ" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.9s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">17</span>
-        <div>
-          <h2 class="shoe-card-title">Nike Mind 001</h2>
-          <span class="shoe-card-price">22€</span>
-        </div>
-        <a href="https://hipobuy.cn/8fWulQbS" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Nike Mind 001</h2>
+        <span class="shoe-card-price">22€</span>
+        <a href="https://hipobuy.cn/8fWulQbS" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 0.9500000000000001s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">18</span>
-        <div>
-          <h2 class="shoe-card-title">Claquette Burberry</h2>
-          <span class="shoe-card-price">28€</span>
-        </div>
-        <a href="https://hipobuy.cn/ok8cfD9x" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Claquette Burberry</h2>
+        <span class="shoe-card-price">28€</span>
+        <a href="https://hipobuy.cn/ok8cfD9x" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.0s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">19</span>
-        <div>
-          <h2 class="shoe-card-title">Yeezy Slide</h2>
-          <span class="shoe-card-price">13€</span>
-        </div>
-        <a href="https://hipobuy.cn/mSHCyU7I" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Yeezy Slide</h2>
+        <span class="shoe-card-price">13€</span>
+        <a href="https://hipobuy.cn/mSHCyU7I" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.05s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">20</span>
-        <div>
-          <h2 class="shoe-card-title">Air Max 95 1:1</h2>
-          <span class="shoe-card-price">145€</span>
-        </div>
-        <a href="https://hipobuy.cn/8szSjRRT" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Air Max 95 1:1</h2>
+        <span class="shoe-card-price">145€</span>
+        <a href="https://hipobuy.cn/8szSjRRT" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.1s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">21</span>
-        <div>
-          <h2 class="shoe-card-title">Sac a dos Nike élite</h2>
-          <span class="shoe-card-price">19€</span>
-        </div>
-        <a href="https://hipobuy.cn/ksv9RBAW" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Sac a dos Nike élite</h2>
+        <span class="shoe-card-price">19€</span>
+        <a href="https://hipobuy.cn/ksv9RBAW" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.1500000000000001s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">22</span>
-        <div>
-          <h2 class="shoe-card-title">Prada CUP</h2>
-          <span class="shoe-card-price">51€</span>
-        </div>
-        <a href="https://hipobuy.cn/UbiNLUay" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Prada CUP</h2>
+        <span class="shoe-card-price">51€</span>
+        <a href="https://hipobuy.cn/UbiNLUay" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.2000000000000002s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">23</span>
-        <div>
-          <h2 class="shoe-card-title">Air Max 95 Cortez</h2>
-          <span class="shoe-card-price">35€</span>
-        </div>
-        <a href="https://hipobuy.cn/m5foFaMg" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Air Max 95 Cortez</h2>
+        <span class="shoe-card-price">35€</span>
+        <a href="https://hipobuy.cn/m5foFaMg" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.2500000000000002s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">24</span>
-        <div>
-          <h2 class="shoe-card-title">Gucci Shoes</h2>
-          <span class="shoe-card-price">61€</span>
-        </div>
-        <a href="https://hipobuy.cn/BKprIo8Z" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Gucci Shoes</h2>
+        <span class="shoe-card-price">61€</span>
+        <a href="https://hipobuy.cn/BKprIo8Z" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.3000000000000003s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">25</span>
-        <div>
-          <h2 class="shoe-card-title">Hermes Shoes</h2>
-          <span class="shoe-card-price">56€</span>
-        </div>
-        <a href="https://hipobuy.cn/uHTL6Aar" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Hermes Shoes</h2>
+        <span class="shoe-card-price">56€</span>
+        <a href="https://hipobuy.cn/uHTL6Aar" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.35s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">26</span>
-        <div>
-          <h2 class="shoe-card-title">Jordan 1 Low Dior</h2>
-          <span class="shoe-card-price">41€</span>
-        </div>
-        <a href="https://hipobuy.cn/PHcP7Wjl" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Jordan 1 Low Dior</h2>
+        <span class="shoe-card-price">41€</span>
+        <a href="https://hipobuy.cn/PHcP7Wjl" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.4000000000000001s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">27</span>
-        <div>
-          <h2 class="shoe-card-title">Dior B27</h2>
-          <span class="shoe-card-price">30€</span>
-        </div>
-        <a href="https://hipobuy.cn/Mce1WavA" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Dior B27</h2>
+        <span class="shoe-card-price">30€</span>
+        <a href="https://hipobuy.cn/Mce1WavA" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
-      <article class="shoe-card reveal-item" style="animation-delay: 1.4500000000000002s;">
+      <article class="service-card tilt-card reveal active">
         <span class="shoe-card-index">28</span>
-        <div>
-          <h2 class="shoe-card-title">Jordan B9S</h2>
-          <span class="shoe-card-price">62€</span>
-        </div>
-        <a href="https://hipobuy.cn/6KGN6CRo" target="_blank" rel="noopener noreferrer" class="shoe-card-link">
+        <h2 class="shoe-card-title">Jordan B9S</h2>
+        <span class="shoe-card-price">62€</span>
+        <a href="https://hipobuy.cn/6KGN6CRo" target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-buy">
           Acheter
-          <svg viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <span class="btn-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </article>
     </div>
   </main>
 
-  <footer role="contentinfo" style="position: relative; z-index: 2;">
-    <div class="wrap footer-row" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 28px;">
-      <p class="footer-copy">
-        &copy; 2026 <span>Mahé Brizion</span> — La Sélection du Chef
-      </p>
+  <footer style="position: relative; z-index: 2;">
+    <div class="wrap">
+      <div class="footer-bottom reveal active">
+        <span>© 2026 Mahé Brizion — La Sélection du Chef</span>
+      </div>
     </div>
   </footer>
 
-  <script src="/assets/js/main.js" defer></script>
+  <script src="/garagealpin/script.js" defer></script>
 </body>
 </html>

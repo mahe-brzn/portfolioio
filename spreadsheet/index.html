@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" href="/assets/img/favicon.png" type="image/png" />
+  <title>Spreadsheets | Mahé Brizion</title>
+  <meta name="description" content="Liste des spreadsheets et sélections." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  
+  <style>
+    .spreadsheet-hero {
+      position: relative;
+      padding: clamp(100px, 15vw, 180px) clamp(24px, 5vw, 80px) clamp(60px, 8vw, 100px);
+      text-align: center;
+      overflow: hidden;
+      min-height: 40vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .spreadsheet-title {
+      font-family: var(--font-d);
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      color: var(--white);
+    }
+    
+    .spreadsheet-title .accent {
+      color: var(--accent);
+    }
+
+    .shoes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+      padding: 0 clamp(24px, 5vw, 80px) clamp(100px, 10vw, 160px);
+      max-width: 1360px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .spread-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 40px 32px;
+      transition: all 0.4s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .spread-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at top right, rgba(200, 255, 87, 0.1), transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s var(--ease-out);
+      pointer-events: none;
+    }
+
+    .spread-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(200, 255, 87, 0.3);
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(200, 255, 87, 0.05);
+    }
+
+    .spread-card:hover::before {
+      opacity: 1;
+    }
+
+    .spread-card-title {
+      font-family: var(--font-d);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 16px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .spread-card-desc {
+      font-size: 1rem;
+      color: var(--grey-4);
+      line-height: 1.7;
+      margin-bottom: 30px;
+    }
+
+    .spread-card-arrow {
+      margin-top: auto;
+      align-self: flex-start;
+      color: var(--accent);
+      background: rgba(200, 255, 87, 0.1);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      transition: all 0.3s var(--ease-out);
+    }
+
+    .spread-card:hover .spread-card-arrow {
+      background: var(--accent);
+      color: var(--black);
+      transform: rotate(-45deg);
+    }
+
+    .spread-card-arrow svg {
+      width: 20px; height: 20px;
+    }
+
+    /* ambient background for spreadsheet */
+    .spread-ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .spread-orb-1 {
+      position: absolute;
+      width: 60vw;
+      height: 60vw;
+      top: -20%;
+      left: -10%;
+      background: radial-gradient(circle, rgba(200, 255, 87, 0.05) 0, transparent 60%);
+      filter: blur(80px);
+      border-radius: 50%;
+    }
+    .spread-orb-2 {
+      position: absolute;
+      width: 50vw;
+      height: 50vw;
+      bottom: -10%;
+      right: -10%;
+      background: radial-gradient(circle, rgba(200, 255, 87, 0.03) 0, transparent 60%);
+      filter: blur(80px);
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body class="loading">
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <div class="spread-ambient" aria-hidden="true">
+    <div class="spread-orb-1"></div>
+    <div class="spread-orb-2"></div>
+    <div class="hero-grid" aria-hidden="true"></div>
+  </div>
+
+  <header role="banner">
+    <nav id="nav" aria-label="Navigation principale" class="visible">
+      <div class="wrap nav-row">
+        <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB</a>
+        <ul class="nav-links" role="list">
+          <li role="listitem"><a href="/">Accueil</a></li>
+          <li role="listitem"><a href="/spreadsheet" class="on">Spreadsheets</a></li>
+        </ul>
+        <div class="nav-right">
+          <div class="nav-status" role="status">
+            <span class="nav-dot" aria-hidden="true"></span>
+            <span>Disponible</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="spreadsheet-hero">
+      <p class="s-label reveal on" data-num="01" aria-hidden="true">Index</p>
+      <h1 class="spreadsheet-title reveal on reveal-d1">Mes <span class="accent">Spreadsheets</span></h1>
+    </section>
+
+    <div class="shoes-grid reveal on reveal-d2">
+      <a href="/spreadsheet/chaussures-de-maxence" class="spread-card">
+        <h2 class="spread-card-title">Chaussures de Maxence</h2>
+        <p class="spread-card-desc">La sélection du chef exclusive de sneakers, claquettes et sacs à dos au meilleur prix.</p>
+        <div class="spread-card-arrow">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <footer role="contentinfo" style="position: relative; z-index: 2;">
+    <div class="wrap footer-row" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 28px;">
+      <p class="footer-copy">
+        &copy; 2026 <span>Mahé Brizion</span> — Développeur iOS &amp; Sysadmin en Savoie
+      </p>
+    </div>
+  </footer>
+
+  <script src="/assets/js/main.js" defer></script>
+</body>
+</html>

@@ -201,8 +201,8 @@ if (btnStart2fa) {
     // Display SVG QR Code
     const qrContainer = document.getElementById('2fa-qr-code-container');
     qrContainer.innerHTML = data.totp.qr_code;
-    qrContainer.querySelector('svg').style.width = '200px';
-    qrContainer.querySelector('svg').style.height = '200px';
+    qrContainer.querySelector('svg').style.width = '100%'; qrContainer.querySelector('svg').style.maxWidth = '180px';
+    qrContainer.querySelector('svg').style.height = 'auto';
 
     document.getElementById('2fa-setup-step1').style.display = 'none';
     document.getElementById('2fa-setup-step2').style.display = 'block';

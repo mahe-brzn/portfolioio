@@ -1,4 +1,4 @@
-const supabase = window.supabaseClient;
+const supabaseClient = window.supabaseClient;
 
 // State
 let currentUser = null;
@@ -40,7 +40,7 @@ function updateNav() {
 
 // Initialization
 async function init() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
     await handleLogin(session.user);
   } else {
@@ -48,7 +48,7 @@ async function init() {
   }
 
   // Setup auth state listener
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_OUT') {
       currentUser = null;
       currentProfile = null;
@@ -62,7 +62,7 @@ async function handleLogin(user) {
   currentUser = user;
   
   // Check 2FA Assurance Level
-  const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const { data: aal, error: aalError } = await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aalError) {
     console.error("AAL Error:", aalError);
   } else if (aal.nextLevel === 'aal2' && aal.currentLevel === 'aal1') {
@@ -75,7 +75,7 @@ async function handleLogin(user) {
   updateNav();
   
   // Fetch profile
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await supabaseClient
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -114,7 +114,7 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
   btn.textContent = 'Chargement...';
   err.textContent = '';
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
   btn.textContent = 'Se connecter';
   
   if (error) {
@@ -155,7 +155,7 @@ if (formReq) {
 }
 
 document.getElementById('btn-logout').addEventListener('click', async () => {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
 });
 
 // ----------------------------------------------------
@@ -185,7 +185,7 @@ if (btnStart2fa) {
     const btn = document.getElementById('btn-start-2fa');
     btn.textContent = 'Génération du QR Code...';
     
-    const { data, error } = await supabase.auth.mfa.enroll({
+    const { data, error } = await supabaseClient.auth.mfa.enroll({
       factorType: 'totp'
     });
     
@@ -221,7 +221,7 @@ if (form2faVerify) {
     btn.textContent = 'Vérification...';
     err.textContent = '';
 
-    const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+    const { data: challengeData, error: challengeError } = await supabaseClient.auth.mfa.challenge({
       factorId: pendingFactorId
     });
 
@@ -231,7 +231,7 @@ if (form2faVerify) {
       return;
     }
 
-    const { data, error } = await supabase.auth.mfa.verify({
+    const { data, error } = await supabaseClient.auth.mfa.verify({
       factorId: pendingFactorId,
       challengeId: challengeData.id,
       code: code
@@ -254,7 +254,7 @@ if (form2faVerify) {
 // Start Challenge (Login)
 async function start2FAChallenge() {
   showView('2fa-challenge');
-  const { data: { factors }, error } = await supabase.auth.mfa.listFactors();
+  const { data: { factors }, error } = await supabaseClient.auth.mfa.listFactors();
   
   if (error) {
     console.error("Error listing factors", error);
@@ -269,7 +269,7 @@ async function start2FAChallenge() {
 
   pendingFactorId = totpFactor.id;
 
-  const { data, error: challengeError } = await supabase.auth.mfa.challenge({
+  const { data, error: challengeError } = await supabaseClient.auth.mfa.challenge({
     factorId: pendingFactorId
   });
 
@@ -293,7 +293,7 @@ if (form2faChallenge) {
     btn.textContent = 'Vérification...';
     err.textContent = '';
 
-    const { data, error } = await supabase.auth.mfa.verify({
+    const { data, error } = await supabaseClient.auth.mfa.verify({
       factorId: pendingFactorId,
       challengeId: pendingChallengeId,
       code: code
@@ -315,8 +315,8 @@ if (form2faChallenge) {
 // ADMIN DASHBOARD
 // ----------------------------------------------------
 async function loadAdminData() {
-  const { data: profiles } = await supabase.from('profiles').select('*');
-  const { data: spreadsheets } = await supabase.from('spreadsheets').select('*, profiles(email)');
+  const { data: profiles } = await supabaseClient.from('profiles').select('*');
+  const { data: spreadsheets } = await supabaseClient.from('spreadsheets').select('*, profiles(email)');
   
   const pendingList = document.getElementById('pending-users-list');
   const approvedList = document.getElementById('approved-users-list');
@@ -366,11 +366,11 @@ async function loadAdminData() {
 }
 
 window.approveUser = async (userId) => {
-  await supabase.from('profiles').update({ role: 'user' }).eq('id', userId);
+  await supabaseClient.from('profiles').update({ role: 'user' }).eq('id', userId);
   loadAdminData();
 };
 window.revokeUser = async (userId) => {
-  await supabase.from('profiles').update({ role: 'pending' }).eq('id', userId);
+  await supabaseClient.from('profiles').update({ role: 'pending' }).eq('id', userId);
   loadAdminData();
 };
 
@@ -378,7 +378,7 @@ window.revokeUser = async (userId) => {
 // USER DASHBOARD
 // ----------------------------------------------------
 async function loadUserData() {
-  const { data: spreadsheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', currentUser.id);
+  const { data: spreadsheets } = await supabaseClient.from('spreadsheets').select('*').eq('owner_id', currentUser.id);
   const list = document.getElementById('my-spreadsheets-list');
   if(!list) return;
   list.innerHTML = '';
@@ -421,7 +421,7 @@ document.getElementById('form-create-spreadsheet')?.addEventListener('submit', a
   const err = document.getElementById('create-error');
   err.textContent = '';
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('spreadsheets')
     .insert([{ owner_id: currentUser.id, slug, title, items: [] }])
     .select();
@@ -442,7 +442,7 @@ document.getElementById('form-create-spreadsheet')?.addEventListener('submit', a
 // ----------------------------------------------------
 window.openEditSpreadsheet = async (id) => {
   editingSpreadsheetId = id;
-  const { data: spreadsheet, error } = await supabase.from('spreadsheets').select('*').eq('id', id).single();
+  const { data: spreadsheet, error } = await supabaseClient.from('spreadsheets').select('*').eq('id', id).single();
   
   if (spreadsheet) {
     editingItems = spreadsheet.items || [];
@@ -514,7 +514,7 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
   const originalText = btn.textContent;
   btn.textContent = 'Enregistrement...';
 
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .from('spreadsheets')
     .update({ items: editingItems })
     .eq('id', editingSpreadsheetId);

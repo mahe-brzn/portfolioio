@@ -1,12 +1,12 @@
 (async function() {
-  const supabase = window.supabaseClient;
-  if (!supabase) return;
+  const supabaseClient = window.supabaseClient;
+  if (!supabaseClient) return;
 
   const pathParts = window.location.pathname.split('/').filter(Boolean);
   const slug = pathParts[pathParts.length - 1]; // e.g. "mon-lien"
 
   try {
-    const { data: spreadsheet, error } = await supabase
+    const { data: spreadsheet, error } = await supabaseClient
       .from('spreadsheets')
       .select('*')
       .eq('slug', slug)

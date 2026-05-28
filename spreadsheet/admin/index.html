@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Admin Panel | Spreadsheets</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/garagealpin/style.css" />
+  <link rel="stylesheet" href="admin.css" />
+  
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/spreadsheet/supabase-config.js"></script>
+</head>
+<body>
+  <!-- GRAIN & CURSOR (Garage Alpin style) -->
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Ambient orbs Cyan Theme -->
+  <div class="hero-ambient" aria-hidden="true">
+    <div class="cyan-orb cyan-orb-1"></div>
+    <div class="cyan-orb cyan-orb-2"></div>
+  </div>
+  <div class="hero-grid" aria-hidden="true"></div>
+
+  <header role="banner" class="scrolled">
+    <nav id="nav" aria-label="Navigation principale">
+      <div class="wrap nav-row">
+        <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB<span>.</span> Admin</a>
+        <div class="nav-right" id="auth-nav-controls" style="display: none;">
+          <span id="user-email" style="font-size: 0.8rem; color: var(--text-muted); margin-right: 15px;"></span>
+          <button id="btn-logout" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">Déconnexion</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    
+    <!-- AUTH VIEW -->
+    <section id="view-auth" class="admin-section active">
+      <div class="auth-box reveal active">
+        <h2 class="admin-title">Accès <span class="accent">Sécurisé</span></h2>
+        
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-target="login">Connexion</button>
+          <button class="auth-tab" data-target="register">S'inscrire</button>
+        </div>
+
+        <form id="form-login" class="auth-form active">
+          <input type="email" id="login-email" placeholder="Email" required />
+          <input type="password" id="login-password" placeholder="Mot de passe" required />
+          <button type="submit" class="btn-magnetic">Se connecter</button>
+          <p class="auth-error" id="login-error"></p>
+        </form>
+
+        <form id="form-register" class="auth-form">
+          <input type="email" id="register-email" placeholder="Email" required />
+          <input type="password" id="register-password" placeholder="Mot de passe" required />
+          <button type="submit" class="btn-magnetic">Créer un compte</button>
+          <p class="auth-error" id="register-error"></p>
+          <p class="auth-notice">Votre compte devra être autorisé par un administrateur.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- PENDING VIEW -->
+    <section id="view-pending" class="admin-section">
+      <div class="auth-box reveal active" style="text-align: center;">
+        <h2 class="admin-title">Compte en <span class="accent">attente</span></h2>
+        <p style="color: var(--text-muted); margin-top: 20px;">Votre compte a bien été créé, mais il doit être autorisé par Mahé avant de pouvoir créer des spreadsheets.</p>
+      </div>
+    </section>
+
+    <!-- ADMIN VIEW -->
+    <section id="view-admin" class="admin-section wrap">
+      <div class="admin-header">
+        <h1 class="admin-title">Panneau <span class="accent">Admin</span></h1>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Utilisateurs en attente</h3>
+          <div id="pending-users-list" class="list-container"></div>
+        </div>
+        
+        <div class="admin-card">
+          <h3>Utilisateurs autorisés</h3>
+          <div id="approved-users-list" class="list-container"></div>
+        </div>
+      </div>
+      
+      <div class="admin-card" style="margin-top: 40px;">
+        <h3>Toutes les Spreadsheets</h3>
+        <div id="all-spreadsheets-list" class="list-container"></div>
+      </div>
+    </section>
+
+    <!-- USER VIEW -->
+    <section id="view-user" class="admin-section wrap">
+      <div class="admin-header">
+        <h1 class="admin-title">Mes <span class="accent">Spreadsheets</span></h1>
+        <button id="btn-show-create" class="btn-magnetic">Nouvelle Spreadsheet</button>
+      </div>
+
+      <div id="my-spreadsheets-list" class="list-container" style="margin-top: 40px;"></div>
+    </section>
+
+    <!-- CREATE SPREADSHEET MODAL -->
+    <div id="modal-create" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" id="btn-close-create">&times;</button>
+        <h2 class="admin-title" style="font-size: 2rem;">Créer une <span class="accent">Spreadsheet</span></h2>
+        <form id="form-create-spreadsheet" style="margin-top: 20px;">
+          <label>URL Personnalisée (slug)</label>
+          <div class="input-group">
+            <span class="input-prefix">mahebrizion.fr/spreadsheet/</span>
+            <input type="text" id="create-slug" placeholder="mon-lien-perso" required pattern="[a-z0-9-]+" title="Uniquement des lettres minuscules, chiffres et tirets" />
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px;">Exemple: ma-selection-nike</p>
+
+          <label>Titre de la page</label>
+          <input type="text" id="create-title" placeholder="Ma Sélection de Sneakers" required style="width:100%; margin-bottom: 30px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;" />
+
+          <button type="submit" class="btn-magnetic" style="width: 100%; justify-content: center;">Créer et Éditer</button>
+          <p class="auth-error" id="create-error"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- EDIT SPREADSHEET VIEW -->
+    <section id="view-edit" class="admin-section wrap">
+      <div class="admin-header">
+        <div>
+          <button id="btn-back-to-list" class="btn-outline" style="margin-bottom: 20px;">&larr; Retour</button>
+          <h1 class="admin-title" id="edit-title-display">Édition</h1>
+          <p style="color: var(--text-muted);">URL : <a href="#" target="_blank" id="edit-url-display" style="color: var(--sneaker-accent);"></a></p>
+        </div>
+        <button id="btn-save-spreadsheet" class="btn-magnetic">Enregistrer les modifs</button>
+      </div>
+
+      <div class="admin-card" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3>Liste des chaussures</h3>
+          <button id="btn-add-item" class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem;">+ Ajouter un article</button>
+        </div>
+        
+        <div id="items-container">
+          <!-- JS will populate items here -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- IMPORTANT: Place your Supabase configuration in app.js -->
+  <script src="/garagealpin/script.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

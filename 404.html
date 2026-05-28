@@ -91,10 +91,22 @@
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/spreadsheet/supabase-config.js"></script>
   <script>
-    // Custom cursor logic for the 404 page so we don't need to load the huge GSAP bundle
-    const dot = document.getElementById('cursor-dot');
-    const ring = document.getElementById('cursor-ring');
+    // Intercept /spreadsheet/* to render dynamic pages
+    if (window.location.pathname.startsWith('/spreadsheet/') && window.location.pathname !== '/spreadsheet/' && window.location.pathname !== '/spreadsheet/admin' && window.location.pathname !== '/spreadsheet/admin/') {
+      // Hide 404 content
+      document.getElementById('main-content').style.display = 'none';
+      
+      // Load dynamic viewer
+      const script = document.createElement('script');
+      script.src = '/spreadsheet/view.js';
+      document.head.appendChild(script);
+    } else {
+      // Custom cursor logic for the 404 page so we don't need to load the huge GSAP bundle
+      const dot = document.getElementById('cursor-dot');
+      const ring = document.getElementById('cursor-ring');
     
     // Check if it's a touch device
     const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -135,6 +147,7 @@
       document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
       document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
     }
+  }
   </script>
 </body>
 </html>

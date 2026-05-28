@@ -125,25 +125,34 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
 });
 
 // Request Access Flow
-document.getElementById('btn-show-request-access')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  document.getElementById('modal-req-access').classList.add('active');
-});
+const btnShowReq = document.getElementById('btn-show-request-access');
+if (btnShowReq) {
+  btnShowReq.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('modal-req-access').classList.add('active');
+  });
+}
 
-document.getElementById('btn-close-req')?.addEventListener('click', () => {
-  document.getElementById('modal-req-access').classList.remove('active');
-});
+const btnCloseReq = document.getElementById('btn-close-req');
+if (btnCloseReq) {
+  btnCloseReq.addEventListener('click', () => {
+    document.getElementById('modal-req-access').classList.remove('active');
+  });
+}
 
-document.getElementById('form-req-access')?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const email = encodeURIComponent(document.getElementById('req-email').value);
-  const msg = encodeURIComponent(document.getElementById('req-msg').value);
-  const subject = encodeURIComponent("Demande d'accès Admin Spreadsheets");
-  const body = `Email demandeur: ${email}%0D%0A%0D%0AMessage:%0D%0A${msg}`;
-  
-  window.location.href = `mailto:spreadsheet@mahebrizion.fr?subject=${subject}&body=${body}`;
-  document.getElementById('modal-req-access').classList.remove('active');
-});
+const formReq = document.getElementById('form-req-access');
+if (formReq) {
+  formReq.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = encodeURIComponent(document.getElementById('req-email').value);
+    const msg = encodeURIComponent(document.getElementById('req-msg').value);
+    const subject = encodeURIComponent("Demande d'accès Admin Spreadsheets");
+    const body = `Email demandeur: ${email}%0D%0A%0D%0AMessage:%0D%0A${msg}`;
+    
+    window.location.href = `mailto:spreadsheet@mahebrizion.fr?subject=${subject}&body=${body}`;
+    document.getElementById('modal-req-access').classList.remove('active');
+  });
+}
 
 document.getElementById('btn-logout').addEventListener('click', async () => {
   await supabase.auth.signOut();
@@ -152,83 +161,95 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 // ----------------------------------------------------
 // 2FA LOGIC (MFA)
 // ----------------------------------------------------
-document.getElementById('btn-security')?.addEventListener('click', () => {
-  document.getElementById('2fa-setup-step1').style.display = 'block';
-  document.getElementById('2fa-setup-step2').style.display = 'none';
-  document.getElementById('2fa-setup-success').style.display = 'none';
-  showView('2fa-setup');
-});
+const btnSecurity = document.getElementById('btn-security');
+if (btnSecurity) {
+  btnSecurity.addEventListener('click', () => {
+    document.getElementById('2fa-setup-step1').style.display = 'block';
+    document.getElementById('2fa-setup-step2').style.display = 'none';
+    document.getElementById('2fa-setup-success').style.display = 'none';
+    showView('2fa-setup');
+  });
+}
 
-document.getElementById('btn-back-from-2fa')?.addEventListener('click', () => {
-  handleLogin(currentUser);
-});
+const btnBack2fa = document.getElementById('btn-back-from-2fa');
+if (btnBack2fa) {
+  btnBack2fa.addEventListener('click', () => {
+    handleLogin(currentUser);
+  });
+}
 
 // Start Enrollment
-document.getElementById('btn-start-2fa')?.addEventListener('click', async () => {
-  const btn = document.getElementById('btn-start-2fa');
-  btn.textContent = 'Génération du QR Code...';
-  
-  const { data, error } = await supabase.auth.mfa.enroll({
-    factorType: 'totp'
+const btnStart2fa = document.getElementById('btn-start-2fa');
+if (btnStart2fa) {
+  btnStart2fa.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-start-2fa');
+    btn.textContent = 'Génération du QR Code...';
+    
+    const { data, error } = await supabase.auth.mfa.enroll({
+      factorType: 'totp'
+    });
+    
+    btn.textContent = 'Activer la 2FA maintenant';
+
+    if (error) {
+      alert("Erreur: " + error.message);
+      return;
+    }
+
+    pendingFactorId = data.id;
+    
+    // Display SVG QR Code
+    const qrContainer = document.getElementById('2fa-qr-code-container');
+    qrContainer.innerHTML = data.totp.qr_code;
+    qrContainer.querySelector('svg').style.width = '200px';
+    qrContainer.querySelector('svg').style.height = '200px';
+
+    document.getElementById('2fa-setup-step1').style.display = 'none';
+    document.getElementById('2fa-setup-step2').style.display = 'block';
   });
-  
-  btn.textContent = 'Activer la 2FA maintenant';
-
-  if (error) {
-    alert("Erreur: " + error.message);
-    return;
-  }
-
-  pendingFactorId = data.id;
-  
-  // Display SVG QR Code
-  const qrContainer = document.getElementById('2fa-qr-code-container');
-  qrContainer.innerHTML = data.totp.qr_code;
-  qrContainer.querySelector('svg').style.width = '200px';
-  qrContainer.querySelector('svg').style.height = '200px';
-
-  document.getElementById('2fa-setup-step1').style.display = 'none';
-  document.getElementById('2fa-setup-step2').style.display = 'block';
-});
+}
 
 // Verify Enrollment
-document.getElementById('form-2fa-verify')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const code = document.getElementById('2fa-verify-code').value;
-  const err = document.getElementById('2fa-verify-error');
-  const btn = e.target.querySelector('button');
-  
-  btn.textContent = 'Vérification...';
-  err.textContent = '';
+const form2faVerify = document.getElementById('form-2fa-verify');
+if (form2faVerify) {
+  form2faVerify.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = document.getElementById('2fa-verify-code').value;
+    const err = document.getElementById('2fa-verify-error');
+    const btn = e.target.querySelector('button');
+    
+    btn.textContent = 'Vérification...';
+    err.textContent = '';
 
-  const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
-    factorId: pendingFactorId
-  });
+    const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+      factorId: pendingFactorId
+    });
 
-  if (challengeError) {
-    err.textContent = "Erreur challenge: " + challengeError.message;
+    if (challengeError) {
+      err.textContent = "Erreur challenge: " + challengeError.message;
+      btn.textContent = 'Vérifier et Activer';
+      return;
+    }
+
+    const { data, error } = await supabase.auth.mfa.verify({
+      factorId: pendingFactorId,
+      challengeId: challengeData.id,
+      code: code
+    });
+
     btn.textContent = 'Vérifier et Activer';
-    return;
-  }
 
-  const { data, error } = await supabase.auth.mfa.verify({
-    factorId: pendingFactorId,
-    challengeId: challengeData.id,
-    code: code
+    if (error) {
+      err.textContent = "Code invalide. Essayez encore.";
+    } else {
+      document.getElementById('2fa-setup-step2').style.display = 'none';
+      document.getElementById('2fa-setup-success').style.display = 'block';
+      setTimeout(() => {
+        handleLogin(currentUser); // re-trigger login flow to show correct dashboard
+      }, 2000);
+    }
   });
-
-  btn.textContent = 'Vérifier et Activer';
-
-  if (error) {
-    err.textContent = "Code invalide. Essayez encore.";
-  } else {
-    document.getElementById('2fa-setup-step2').style.display = 'none';
-    document.getElementById('2fa-setup-success').style.display = 'block';
-    setTimeout(() => {
-      handleLogin(currentUser); // re-trigger login flow to show correct dashboard
-    }, 2000);
-  }
-});
+}
 
 // Start Challenge (Login)
 async function start2FAChallenge() {
@@ -261,30 +282,33 @@ async function start2FAChallenge() {
 }
 
 // Verify Challenge (Login)
-document.getElementById('form-2fa-challenge')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const code = document.getElementById('2fa-challenge-code').value;
-  const err = document.getElementById('2fa-challenge-error');
-  const btn = e.target.querySelector('button');
-  
-  btn.textContent = 'Vérification...';
-  err.textContent = '';
+const form2faChallenge = document.getElementById('form-2fa-challenge');
+if (form2faChallenge) {
+  form2faChallenge.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = document.getElementById('2fa-challenge-code').value;
+    const err = document.getElementById('2fa-challenge-error');
+    const btn = e.target.querySelector('button');
+    
+    btn.textContent = 'Vérification...';
+    err.textContent = '';
 
-  const { data, error } = await supabase.auth.mfa.verify({
-    factorId: pendingFactorId,
-    challengeId: pendingChallengeId,
-    code: code
+    const { data, error } = await supabase.auth.mfa.verify({
+      factorId: pendingFactorId,
+      challengeId: pendingChallengeId,
+      code: code
+    });
+
+    btn.textContent = 'Valider';
+
+    if (error) {
+      err.textContent = "Code invalide.";
+    } else {
+      // 2FA successful! proceed to dashboard
+      handleLogin(currentUser);
+    }
   });
-
-  btn.textContent = 'Valider';
-
-  if (error) {
-    err.textContent = "Code invalide.";
-  } else {
-    // 2FA successful! proceed to dashboard
-    handleLogin(currentUser);
-  }
-});
+}
 
 
 // ----------------------------------------------------

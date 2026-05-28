@@ -329,17 +329,18 @@ async function loadAdminData() {
   if (profiles && pendingList && approvedList) {
     profiles.forEach(p => {
       const el = document.createElement('div');
-      el.className = 'list-item';
+      el.className = 'list-item stagger-item';
+      el.style.animationDelay = `${i * 0.05}s`;
       if (p.role === 'pending') {
         el.innerHTML = `
           <div><div class="list-item-title">${p.email}</div><div class="badge pending">En attente</div></div>
-          <button class="btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="approveUser('${p.id}')">Approuver</button>
+          <button class="btn-icon" onclick="approveUser('${p.id}')" title="Approuver"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
         `;
         pendingList.appendChild(el);
       } else {
         el.innerHTML = `
           <div><div class="list-item-title">${p.email}</div><div class="badge ${p.role}">${p.role}</div></div>
-          ${p.role !== 'admin' ? `<button class="btn-outline" style="padding:4px 10px; font-size:0.75rem; border-color:#ff4b4b; color:#ff4b4b;" onclick="revokeUser('${p.id}')">Révoquer</button>` : ''}
+          ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
         `;
         approvedList.appendChild(el);
       }
@@ -347,17 +348,18 @@ async function loadAdminData() {
   }
 
   if (spreadsheets && spreadsheetsList) {
-    spreadsheets.forEach(s => {
+    spreadsheets.forEach((s, i) => {
       const el = document.createElement('div');
-      el.className = 'list-item';
+      el.className = 'list-item stagger-item';
+      el.style.animationDelay = `${i * 0.05}s`;
       el.innerHTML = `
         <div>
           <div class="list-item-title">${s.title}</div>
           <div class="list-item-sub">/spreadsheet/${s.slug} — par ${s.profiles?.email}</div>
         </div>
         <div style="display:flex; gap:8px;">
-          <a href="/spreadsheet/${s.slug}" target="_blank" class="btn-outline" style="padding:4px 10px; font-size:0.75rem;">Voir</a>
-          <button class="btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="openEditSpreadsheet('${s.id}')">Éditer</button>
+          <a href="/spreadsheet/${s.slug}" target="_blank" class="btn-icon" title="Voir"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+          <button class="btn-icon" onclick="openEditSpreadsheet('${s.id}')" title="Éditer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
         </div>
       `;
       spreadsheetsList.appendChild(el);
@@ -384,17 +386,18 @@ async function loadUserData() {
   list.innerHTML = '';
 
   if (spreadsheets && spreadsheets.length > 0) {
-    spreadsheets.forEach(s => {
+    spreadsheets.forEach((s, i) => {
       const el = document.createElement('div');
-      el.className = 'list-item';
+      el.className = 'list-item stagger-item';
+      el.style.animationDelay = `${i * 0.05}s`;
       el.innerHTML = `
         <div>
           <div class="list-item-title">${s.title}</div>
           <div class="list-item-sub">/spreadsheet/${s.slug} — ${s.items?.length || 0} articles</div>
         </div>
         <div style="display:flex; gap:8px;">
-          <a href="/spreadsheet/${s.slug}" target="_blank" class="btn-outline" style="padding:4px 10px; font-size:0.75rem;">Voir</a>
-          <button class="btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="openEditSpreadsheet('${s.id}')">Éditer</button>
+          <a href="/spreadsheet/${s.slug}" target="_blank" class="btn-icon" title="Voir"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+          <button class="btn-icon" onclick="openEditSpreadsheet('${s.id}')" title="Éditer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
         </div>
       `;
       list.appendChild(el);
@@ -477,7 +480,8 @@ function renderEditItems() {
 
   editingItems.forEach((item, index) => {
     const el = document.createElement('div');
-    el.className = 'edit-item';
+    el.className = 'edit-item stagger-item';
+    el.style.animationDelay = `${index * 0.05}s`;
     el.innerHTML = `
       <div>
         <label style="font-size:0.7rem;color:var(--text-muted);">Titre</label>
@@ -488,7 +492,7 @@ function renderEditItems() {
         <input type="text" value="${item.price.replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'price', this.value)" placeholder="ex: 50€" />
       </div>
       <div style="display:flex; align-items:flex-end;">
-        <button class="btn-outline" style="border-color:#ff4b4b; color:#ff4b4b; padding:8px;" onclick="deleteItem(${index})">&times;</button>
+        <button class="btn-icon danger" onclick="deleteItem(${index})" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
       </div>
       <div class="edit-item-row2">
         <div style="flex:1;">

@@ -48,7 +48,7 @@
     
     <!-- AUTH VIEW -->
     <section id="view-auth" class="admin-section active">
-      <div class="auth-box reveal active">
+      <div class="auth-box glass-panel reveal active">
         <h2 class="admin-title">Accès <span class="accent">Sécurisé</span></h2>
         
         <form id="form-login" class="auth-form active">
@@ -65,7 +65,7 @@
 
     <!-- 2FA CHALLENGE VIEW (LOGIN) -->
     <section id="view-2fa-challenge" class="admin-section">
-      <div class="auth-box reveal active" style="text-align: center;">
+      <div class="auth-box glass-panel reveal active" style="text-align: center;">
         <h2 class="admin-title">Validation <span class="accent">2FA</span></h2>
         <p style="color: var(--text-muted); margin-top: 20px; margin-bottom: 20px;">Ouvrez votre application d'authentification et entrez le code à 6 chiffres.</p>
         <form id="form-2fa-challenge" class="auth-form active">
@@ -86,7 +86,7 @@
         </div>
       </div>
       
-      <div class="admin-card" style="max-width: 600px; margin: 40px auto 0; text-align: center;">
+      <div class="admin-card glass-panel" style="max-width: 600px; margin: 40px auto 0; text-align: center;">
         <div id="2fa-setup-step1">
           <button id="btn-start-2fa" class="btn-magnetic" style="margin-bottom: 20px;">Activer la 2FA maintenant</button>
           <p style="color: var(--text-muted); font-size: 0.9rem;">(Nécessite Google Authenticator, Authy, ou Apple Passwords)</p>
@@ -116,7 +116,7 @@
 
     <!-- REQUEST ACCESS MODAL -->
     <div id="modal-req-access" class="modal">
-      <div class="modal-content" style="max-width: 400px; text-align: center;">
+      <div class="modal-content glass-panel" style="max-width: 400px; text-align: center;">
         <button class="modal-close" id="btn-close-req">&times;</button>
         <h2 class="admin-title" style="font-size: 1.8rem; margin-bottom: 20px;">Demande <span class="accent">d'accès</span></h2>
         <form id="form-req-access" class="auth-form active">
@@ -129,7 +129,7 @@
 
     <!-- PENDING VIEW -->
     <section id="view-pending" class="admin-section">
-      <div class="auth-box reveal active" style="text-align: center;">
+      <div class="auth-box glass-panel reveal active" style="text-align: center;">
         <h2 class="admin-title">Compte en <span class="accent">attente</span></h2>
         <p style="color: var(--text-muted); margin-top: 20px;">Votre compte a bien été créé, mais il doit être autorisé par Mahé avant de pouvoir créer des spreadsheets.</p>
       </div>
@@ -142,18 +142,18 @@
       </div>
 
       <div class="admin-grid">
-        <div class="admin-card">
+        <div class="admin-card glass-panel">
           <h3>Utilisateurs en attente</h3>
           <div id="pending-users-list" class="list-container"></div>
         </div>
         
-        <div class="admin-card">
+        <div class="admin-card glass-panel">
           <h3>Utilisateurs autorisés</h3>
           <div id="approved-users-list" class="list-container"></div>
         </div>
       </div>
       
-      <div class="admin-card" style="margin-top: 40px;">
+      <div class="admin-card glass-panel" style="margin-top: 40px;">
         <h3>Toutes les Spreadsheets</h3>
         <div id="all-spreadsheets-list" class="list-container"></div>
       </div>
@@ -171,7 +171,7 @@
 
     <!-- CREATE SPREADSHEET MODAL -->
     <div id="modal-create" class="modal">
-      <div class="modal-content">
+      <div class="modal-content glass-panel">
         <button class="modal-close" id="btn-close-create">&times;</button>
         <h2 class="admin-title" style="font-size: 2rem;">Créer une <span class="accent">Spreadsheet</span></h2>
         <form id="form-create-spreadsheet" style="margin-top: 20px;">
@@ -202,11 +202,11 @@
         <button id="btn-save-spreadsheet" class="btn-magnetic">Enregistrer les modifs</button>
       </div>
 
-      <div class="admin-card" style="margin-top: 40px;">
+      <div class="admin-card glass-panel" style="margin-top: 40px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h3>Liste des chaussures</h3>
-          <button id="btn-add-item" class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem;">+ Ajouter un article</button>
         </div>
+        <button id="btn-add-item" class="btn-add-ghost"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Ajouter un article</button>
         
         <div id="items-container">
           <!-- JS will populate items here -->

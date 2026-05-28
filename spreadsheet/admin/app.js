@@ -117,7 +117,10 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   btn.textContent = 'Se connecter';
   
-  if (error) err.textContent = "Erreur: " + error.message;
+  if (error) {
+    err.textContent = "Erreur: " + error.message;
+    alert("Erreur de connexion : " + error.message);
+  }
   else handleLogin(data.user);
 });
 

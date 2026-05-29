@@ -385,13 +385,19 @@ async function loadAdminData() {
       if (p.role === 'pending') {
         el.innerHTML = `
           <div><div class="list-item-title">${p.email}</div><div class="badge pending">En attente</div></div>
-          <button class="btn-icon" onclick="approveUser('${p.id}')" title="Approuver"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-icon" onclick="approveUser('${p.id}')" title="Approuver"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+            <button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+          </div>
         `;
         pendingList.appendChild(el);
       } else {
         el.innerHTML = `
           <div><div class="list-item-title">${p.email}</div><div class="badge ${p.role}">${p.role}</div></div>
-          ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+          <div style="display:flex; gap:8px;">
+            ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+            ${p.id !== currentUser.id ? `<button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
+          </div>
         `;
         approvedList.appendChild(el);
       }
@@ -425,6 +431,16 @@ window.approveUser = async (userId) => {
 window.revokeUser = async (userId) => {
   await supabaseClient.from('profiles').update({ role: 'pending' }).eq('id', userId);
   loadAdminData();
+};
+window.deleteUser = async (userId) => {
+  if (confirm("⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ?\n\nToutes ses spreadsheets seront également supprimées de façon irréversible.")) {
+    const { error } = await supabaseClient.rpc('delete_user_admin', { target_user_id: userId });
+    if (error) {
+      alert("Erreur lors de la suppression : " + error.message);
+    } else {
+      loadAdminData();
+    }
+  }
 };
 
 // ----------------------------------------------------
@@ -516,6 +532,44 @@ window.openEditSpreadsheet = async (id) => {
     const colorInput = document.getElementById('edit-color');
     if (colorInput) colorInput.value = spreadsheet.accent_color || '#c8ff57';
     
+    // Permissions logic
+    const permPanel = document.getElementById('edit-owner')?.closest('.admin-card');
+    if (currentProfile.role === 'admin') {
+      if (permPanel) permPanel.style.display = 'block';
+      const { data: profiles } = await supabaseClient.from('profiles').select('*').in('role', ['user', 'admin']);
+      const ownerSelect = document.getElementById('edit-owner');
+      const editorsList = document.getElementById('edit-editors-list');
+      
+      if (ownerSelect && editorsList && profiles) {
+        ownerSelect.innerHTML = '';
+        editorsList.innerHTML = '';
+        
+        profiles.forEach(p => {
+          // Owner option
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.email;
+          if (p.id === spreadsheet.owner_id) opt.selected = true;
+          ownerSelect.appendChild(opt);
+          
+          // Editor checkbox
+          if (p.id !== spreadsheet.owner_id) {
+            const isEditor = (spreadsheet.editors || []).includes(p.id);
+            const div = document.createElement('div');
+            div.innerHTML = `
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" value="${p.id}" class="editor-checkbox" ${isEditor ? 'checked' : ''} />
+                <span style="color:var(--white); font-size:0.9rem;">${p.email}</span>
+              </label>
+            `;
+            editorsList.appendChild(div);
+          }
+        });
+      }
+    } else {
+      if (permPanel) permPanel.style.display = 'none';
+    }
+
     renderEditItems();
     showView('edit');
   }
@@ -677,10 +731,27 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
   const btn = e.target;
   const originalText = btn.textContent;
   btn.textContent = 'Enregistrement...';
+  const updateData = { 
+    items: editingItems, 
+    accent_color: document.getElementById('edit-color') ? document.getElementById('edit-color').value : undefined, 
+    badge_text: document.getElementById('edit-badge') ? document.getElementById('edit-badge').value : undefined, 
+    description: document.getElementById('edit-desc') ? document.getElementById('edit-desc').value : undefined 
+  };
+
+  if (currentProfile.role === 'admin') {
+    const ownerSelect = document.getElementById('edit-owner');
+    if (ownerSelect && ownerSelect.value) {
+      updateData.owner_id = ownerSelect.value;
+    }
+    
+    const editorCheckboxes = document.querySelectorAll('.editor-checkbox:checked');
+    const editors = Array.from(editorCheckboxes).map(cb => cb.value);
+    updateData.editors = editors;
+  }
 
   const { error } = await supabaseClient
     .from('spreadsheets')
-    .update({ items: editingItems, accent_color: document.getElementById('edit-color') ? document.getElementById('edit-color').value : undefined, badge_text: document.getElementById('edit-badge') ? document.getElementById('edit-badge').value : undefined, description: document.getElementById('edit-desc') ? document.getElementById('edit-desc').value : undefined })
+    .update(updateData)
     .eq('id', editingSpreadsheetId);
 
   if (error) {

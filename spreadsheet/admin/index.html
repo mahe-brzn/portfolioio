@@ -249,6 +249,25 @@
         <button id="btn-save-spreadsheet" class="btn-magnetic">Enregistrer les modifs</button>
       </div>
 
+      <div class="admin-card glass-panel" style="margin-top: 40px; border-color: rgba(200, 255, 87, 0.3);">
+        <h3 style="color: var(--accent); margin-bottom: 15px;">Permissions et Accès</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Gérez qui peut modifier cette spreadsheet.</p>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Propriétaire (Owner) :</label>
+          <select id="edit-owner" class="glass-input" style="padding: 10px; width: 100%; appearance: auto;">
+            <!-- Rempli par le JS -->
+          </select>
+        </div>
+        
+        <div>
+          <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Éditeurs (peuvent modifier les articles) :</label>
+          <div id="edit-editors-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); max-height: 150px; overflow-y: auto;">
+            <!-- Rempli par le JS -->
+          </div>
+        </div>
+      </div>
+
       <div class="admin-card glass-panel" style="margin-top: 40px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h3>Liste des chaussures</h3>
@@ -294,6 +313,6 @@
 
   <!-- IMPORTANT: Place your Supabase configuration in app.js -->
   <script src="/garagealpin/script.js" defer></script>
-  <script src="app.js?v=31" defer></script>
+  <script src="app.js?v=32" defer></script>
 </body>
 </html>

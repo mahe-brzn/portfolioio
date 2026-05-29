@@ -185,8 +185,19 @@ if (btnStart2fa) {
     const btn = document.getElementById('btn-start-2fa');
     btn.textContent = 'Génération du QR Code...';
     
+    // Unenroll any existing unverified factors to prevent "already exists" error
+    const { data: factors } = await supabaseClient.auth.mfa.listFactors();
+    if (factors && factors.all) {
+      for (const factor of factors.all) {
+        if (factor.status === 'unverified') {
+          await supabaseClient.auth.mfa.unenroll({ factorId: factor.id });
+        }
+      }
+    }
+
     const { data, error } = await supabaseClient.auth.mfa.enroll({
-      factorType: 'totp'
+      factorType: 'totp',
+      friendlyName: 'Portfolio Auth'
     });
     
     btn.textContent = 'Activer la 2FA maintenant';
@@ -198,11 +209,20 @@ if (btnStart2fa) {
 
     pendingFactorId = data.id;
     
-    // Display SVG QR Code
+    // Display SVG QR Code safely
     const qrContainer = document.getElementById('2fa-qr-code-container');
     qrContainer.innerHTML = data.totp.qr_code;
-    qrContainer.querySelector('svg').style.width = '100%'; qrContainer.querySelector('svg').style.maxWidth = '180px';
-    qrContainer.querySelector('svg').style.height = 'auto';
+    
+    const svg = qrContainer.querySelector('svg');
+    if (svg) {
+      svg.removeAttribute('width');
+      svg.removeAttribute('height');
+      svg.style.width = '100%';
+      svg.style.height = 'auto';
+      svg.style.maxWidth = '250px';
+      svg.style.display = 'block';
+      svg.style.margin = '0 auto';
+    }
 
     document.getElementById('2fa-setup-step1').style.display = 'none';
     document.getElementById('2fa-setup-step2').style.display = 'block';

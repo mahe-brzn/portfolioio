@@ -231,23 +231,14 @@ function renderSpreadsheet(spreadsheet) {
     <div class="hero-grid" aria-hidden="true"></div>
 
     <!-- HEADER -->
-    <header role="banner" class="scrolled">
-      <nav id="nav" aria-label="Navigation principale">
-        <div class="wrap nav-row">
-          <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB<span>.</span></a>
-          <ul class="nav-links" role="list">
-            <li><a href="/">Accueil</a></li>
-            <li><a href="/spreadsheet">Spreadsheets</a></li>
-          </ul>
-        </div>
-      </nav>
-    </header>
+    
 
     <main id="main-content-dynamic">
       <section class="spreadsheet-hero">
-        <p class="s-label reveal active" data-num="01" aria-hidden="true">La sélection du chef</p>
+        <p class="s-label reveal active" data-num="01" aria-hidden="true">${spreadsheet.badge_text || 'La sélection du chef'}</p>
         <h1 class="spreadsheet-title reveal active reveal-d1">${spreadsheet.title.replace(' ', '<br><span class="accent">')}</span></h1>
-        <p class="spreadsheet-subtitle reveal active reveal-d2">Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.</p>
+        <p class="spreadsheet-subtitle reveal active reveal-d2">${spreadsheet.description || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.'}</p>
+        <p class="spreadsheet-subtitle reveal active reveal-d2" style="font-size:0.85rem; opacity:0.6; margin-top:10px;">Par ${spreadsheet.profiles?.email || 'Admin'} • Mis à jour le ${new Date(spreadsheet.created_at).toLocaleDateString('fr-FR')}</p>
       </section>
 
       <div class="shoes-grid">
@@ -258,7 +249,7 @@ function renderSpreadsheet(spreadsheet) {
     <footer style="position: relative; z-index: 2;">
       <div class="wrap">
         <div class="footer-bottom reveal active">
-          <span>© 2026 Mahé Brizion — La Sélection du Chef</span>
+          <span>© 2026 Mahé Brizion — ${spreadsheet.title}</span>
         </div>
       </div>
     </footer>

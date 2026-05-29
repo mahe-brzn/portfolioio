@@ -421,13 +421,15 @@ document.getElementById('form-create-spreadsheet')?.addEventListener('submit', a
   e.preventDefault();
   const slug = document.getElementById('create-slug').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
   const title = document.getElementById('create-title').value;
+  const badge_text = document.getElementById('create-badge').value || 'La sélection du chef';
+  const description = document.getElementById('create-desc').value || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.';
   const accent_color = document.getElementById('create-color').value;
   const err = document.getElementById('create-error');
   err.textContent = '';
 
   const { data, error } = await supabaseClient
     .from('spreadsheets')
-    .insert([{ owner_id: currentUser.id, slug, title, items: [], accent_color }])
+    .insert([{ owner_id: currentUser.id, slug, title, items: [], accent_color, badge_text, description }])
     .select();
 
   if (error) {
@@ -521,7 +523,7 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
 
   const { error } = await supabaseClient
     .from('spreadsheets')
-    .update({ items: editingItems, accent_color: document.getElementById('edit-color') ? document.getElementById('edit-color').value : undefined })
+    .update({ items: editingItems, accent_color: document.getElementById('edit-color') ? document.getElementById('edit-color').value : undefined, badge_text: document.getElementById('edit-badge') ? document.getElementById('edit-badge').value : undefined, description: document.getElementById('edit-desc') ? document.getElementById('edit-desc').value : undefined })
     .eq('id', editingSpreadsheetId);
 
   if (error) {

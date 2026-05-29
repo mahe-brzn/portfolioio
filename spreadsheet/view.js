@@ -190,6 +190,22 @@ function renderSpreadsheet(spreadsheet) {
       bottom: -200px; left: -200px;
       background: radial-gradient(circle, var(--sneaker-dim) 0%, transparent 70%);
     }
+
+    /* Extreme Mobile Optimization */
+    @media (max-width: 600px) {
+      .spreadsheet-hero { padding: 60px 20px 40px; min-height: 25vh; }
+      .spreadsheet-title { font-size: clamp(2rem, 9vw, 2.8rem) !important; }
+      .spreadsheet-subtitle { font-size: 1rem; }
+      .shoes-grid { grid-template-columns: 1fr; gap: 20px; padding: 0 16px 60px; }
+      .sneaker-card { padding: 20px 16px; min-height: auto; }
+      .sneaker-title { font-size: 1.3rem !important; }
+      .sneaker-price { font-size: 1rem !important; margin-bottom: 20px !important; }
+      .sneaker-btn { width: 100%; justify-content: center; }
+      .cyan-orb-1 { top: -200px; right: -300px; }
+      #grain { display: none !important; }
+    }
+
+    #sneaker-search:focus { border-color: var(--sneaker-accent); box-shadow: 0 0 15px var(--sneaker-dim); }
   `;
   document.head.appendChild(style);
 
@@ -239,6 +255,13 @@ function renderSpreadsheet(spreadsheet) {
   });
   // -----------------------------
 
+  // Custom Cursor color adaptation
+  if (spreadsheet.accent_color) {
+    document.documentElement.style.setProperty('--sneaker-accent', spreadsheet.accent_color);
+    document.documentElement.style.setProperty('--accent', spreadsheet.accent_color);
+  } else {
+    document.documentElement.style.setProperty('--accent', '#c8ff57');
+  }
 
   // Build the DOM
   const mainWrapper = document.createElement('div');

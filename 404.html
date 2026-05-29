@@ -103,6 +103,12 @@
       const script = document.createElement('script');
       script.src = '/spreadsheet/view.js?v=9';
       document.head.appendChild(script);
+
+      // Load cursor logic
+      const cursorScript = document.createElement('script');
+      cursorScript.src = '/garagealpin/script.js';
+      cursorScript.defer = true;
+      document.head.appendChild(cursorScript);
     } else {
       // Custom cursor logic for the 404 page so we don't need to load the huge GSAP bundle
       const dot = document.getElementById('cursor-dot');

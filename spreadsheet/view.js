@@ -242,7 +242,12 @@ function renderSpreadsheet(spreadsheet) {
         <p class="spreadsheet-subtitle reveal active reveal-d2" style="font-size:0.85rem; opacity:0.6; margin-top:10px;">Par ${spreadsheet.profiles?.email || 'Admin'} • Mis à jour le ${new Date(spreadsheet.created_at).toLocaleDateString('fr-FR')}</p>
       </section>
 
+      
+      <div class="search-container" style="max-width: 600px; margin: -20px auto 40px auto; padding: 0 clamp(24px, 5vw, 80px); position: relative; z-index: 5;">
+        <input type="text" id="sneaker-search" placeholder="Rechercher (ex: Jordan, Nike...)" style="width: 100%; padding: 16px 24px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: white; font-family: var(--font-body); font-size: 1rem; outline: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s;" />
+      </div>
       <div class="shoes-grid">
+
         ${itemsHtml}
       </div>
     </main>
@@ -261,4 +266,21 @@ function renderSpreadsheet(spreadsheet) {
   // Remove the old main-content
   const oldMain = document.getElementById('main-content');
   if (oldMain) oldMain.remove();
+
+  // Search logic
+  const searchInput = document.getElementById('sneaker-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const cards = document.querySelectorAll('.sneaker-card');
+      cards.forEach(card => {
+        const title = card.querySelector('.sneaker-title').textContent.toLowerCase();
+        if (title.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  }
 }

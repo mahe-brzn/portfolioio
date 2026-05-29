@@ -366,9 +366,10 @@ if (form2faChallenge) {
 // ADMIN DASHBOARD
 // ----------------------------------------------------
 async function loadAdminData() {
-  const { data: profiles } = await supabaseClient.from('profiles').select('*');
-  const { data: spreadsheets } = await supabaseClient.from('spreadsheets').select('*, profiles(email)');
-  
+  const { data: profiles, error: errProfiles } = await supabaseClient.from('profiles').select('*');
+  if (errProfiles) alert("Erreur profils : " + errProfiles.message);
+  const { data: spreadsheets, error: errSpreadsheets } = await supabaseClient.from('spreadsheets').select('*, profiles(email)');
+  if (errSpreadsheets) alert("Erreur spreadsheets : " + errSpreadsheets.message);
   const pendingList = document.getElementById('pending-users-list');
   const approvedList = document.getElementById('approved-users-list');
   const spreadsheetsList = document.getElementById('all-spreadsheets-list');

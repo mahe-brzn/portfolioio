@@ -595,7 +595,7 @@ window.generateKeywords = async (index) => {
   const prompt = `Tu es un expert en sneakers et en streetwear. Génère une liste de mots-clés de recherche (abréviations, marque, surnoms, catégories, fautes de frappe courantes) pour la chaussure suivante : "${item.title}". Règles: Ne renvoie STRICTEMENT rien d'autre que la liste des mots-clés séparés par des virgules. Maximum 30 mots-clés. Tout en minuscules.`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',

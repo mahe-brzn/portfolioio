@@ -208,6 +208,21 @@ function renderSpreadsheet(spreadsheet) {
     }
 
     #sneaker-search:focus { border-color: var(--sneaker-accent); box-shadow: 0 0 15px var(--sneaker-dim); }
+    
+    .social-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+    .action-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 20px; border-radius: 100px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-weight: 500; transition: all 0.3s; font-size: 0.9rem; }
+    .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+    .action-btn.active-like { background: rgba(255, 82, 82, 0.2); border-color: rgba(255, 82, 82, 0.5); color: #ff5252; }
+    .action-btn.active-fav { background: rgba(255, 215, 0, 0.2); border-color: rgba(255, 215, 0, 0.5); color: #ffd700; }
+    
+    .comments-section { max-width: 800px; margin: 0 auto; padding: 0 20px 100px 20px; position: relative; z-index: 2; }
+    .comments-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 20px; }
+    .comment-item { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+    .comment-author { font-weight: bold; color: var(--sneaker-accent); margin-bottom: 5px; font-size: 0.9rem; }
+    .comment-text { font-size: 1rem; color: rgba(255,255,255,0.8); }
+    .comment-form { display: flex; gap: 10px; margin-top: 30px; }
+    .comment-input { flex: 1; padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; outline: none; }
+    .comment-submit { background: var(--sneaker-accent); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
   `;
   document.head.appendChild(style);
 
@@ -309,6 +324,25 @@ function renderSpreadsheet(spreadsheet) {
         <h1 class="spreadsheet-title reveal active reveal-d1">${spreadsheet.title.includes(' ') ? spreadsheet.title.replace(' ', '<br><span class="accent">') + '</span>' : spreadsheet.title}</h1>
         <p class="spreadsheet-subtitle reveal active reveal-d2">${spreadsheet.description || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.'}</p>
         <p class="spreadsheet-subtitle reveal active reveal-d2" style="font-size:0.85rem; opacity:0.6; margin-top:10px;">Par ${spreadsheet.profiles?.email || 'Admin'} • Mis à jour le ${new Date(spreadsheet.created_at).toLocaleDateString('fr-FR')}</p>
+        
+        <div class="social-actions reveal active" style="transition-delay: 0.3s;">
+          <button class="action-btn" id="btn-like">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            <span id="like-count">${spreadsheet.likes_count || 0}</span>
+          </button>
+          <button class="action-btn" id="btn-fav">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Favoris
+          </button>
+          <button class="action-btn" id="btn-suggest">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            Suggérer
+          </button>
+          <button class="action-btn" id="btn-duplicate">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Dupliquer
+          </button>
+        </div>
       </section>
 
       
@@ -319,6 +353,17 @@ function renderSpreadsheet(spreadsheet) {
 
         ${itemsHtml}
       </div>
+
+      <section class="comments-section">
+        <h3 class="comments-title">Commentaires</h3>
+        <div id="comments-list">
+          <p style="color:var(--text-muted);">Chargement des commentaires...</p>
+        </div>
+        <form class="comment-form" id="comment-form">
+          <input type="text" id="comment-input" class="comment-input" placeholder="Ajouter un commentaire..." required />
+          <button type="submit" class="comment-submit">Envoyer</button>
+        </form>
+      </section>
     </main>
 
     <footer style="position: relative; z-index: 2;">
@@ -353,4 +398,170 @@ function renderSpreadsheet(spreadsheet) {
       });
     });
   }
+
+  // --- SOCIAL LOGIC ---
+  const btnLike = document.getElementById('btn-like');
+  const btnFav = document.getElementById('btn-fav');
+  const btnSuggest = document.getElementById('btn-suggest');
+  const btnDuplicate = document.getElementById('btn-duplicate');
+  const likeCountSpan = document.getElementById('like-count');
+
+  // Load initial states (if logged in)
+  const checkInteractions = async () => {
+    if (!window.currentUser) return;
+    
+    // Check like
+    const { data: like } = await supabaseClient.from('likes').select('*').eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id).single();
+    if (like) btnLike.classList.add('active-like');
+    
+    // Check fav
+    const { data: fav } = await supabaseClient.from('favorites').select('*').eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id).single();
+    if (fav) btnFav.classList.add('active-fav');
+  };
+  // We need to wait for auth-modal to init
+  setTimeout(checkInteractions, 1000);
+
+  // Like Action
+  btnLike.addEventListener('click', async () => {
+    if (!window.currentUser) return window.openAuthModal();
+    
+    if (btnLike.classList.contains('active-like')) {
+      await supabaseClient.from('likes').delete().eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id);
+      btnLike.classList.remove('active-like');
+      likeCountSpan.textContent = parseInt(likeCountSpan.textContent) - 1;
+    } else {
+      await supabaseClient.from('likes').insert({ user_id: window.currentUser.id, spreadsheet_id: spreadsheet.id });
+      btnLike.classList.add('active-like');
+      likeCountSpan.textContent = parseInt(likeCountSpan.textContent) + 1;
+    }
+  });
+
+  // Fav Action
+  btnFav.addEventListener('click', async () => {
+    if (!window.currentUser) return window.openAuthModal();
+    
+    if (btnFav.classList.contains('active-fav')) {
+      await supabaseClient.from('favorites').delete().eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id);
+      btnFav.classList.remove('active-fav');
+    } else {
+      await supabaseClient.from('favorites').insert({ user_id: window.currentUser.id, spreadsheet_id: spreadsheet.id });
+      btnFav.classList.add('active-fav');
+    }
+  });
+
+  // Suggest Action
+  btnSuggest.addEventListener('click', () => {
+    if (!window.currentUser) return window.openAuthModal();
+    
+    const title = prompt("Titre de l'article suggéré :");
+    if (!title) return;
+    const url = prompt("Lien URL de l'article :");
+    if (!url) return;
+    const price = prompt("Prix (ex: 50€) :");
+    const note = prompt("Pourquoi le suggérez-vous ? (optionnel)");
+    
+    supabaseClient.from('suggestions').insert({
+      spreadsheet_id: spreadsheet.id,
+      user_id: window.currentUser.id,
+      title, url, price, note
+    }).then(({error}) => {
+      if (error) alert("Erreur: " + error.message);
+      else alert("Suggestion envoyée ! Le créateur devra l'approuver.");
+    });
+  });
+
+  // Duplicate Action
+  btnDuplicate.addEventListener('click', async () => {
+    if (!window.currentUser) return window.openAuthModal();
+    if (!confirm("Voulez-vous dupliquer cette spreadsheet dans votre espace personnel ?")) return;
+    
+    const randomSlug = Math.random().toString(36).substring(2, 10);
+    const { data, error } = await supabaseClient.from('spreadsheets').insert({
+      owner_id: window.currentUser.id,
+      title: "Copie de " + spreadsheet.title,
+      slug: randomSlug,
+      description: spreadsheet.description,
+      badge_text: spreadsheet.badge_text,
+      accent_color: spreadsheet.accent_color,
+      items: spreadsheet.items,
+      visibility: 'private' // Duplication is always private initially
+    }).select();
+    
+    if (error) {
+      alert("Erreur: " + error.message);
+    } else {
+      alert("Dupliquée avec succès ! Redirection vers votre copie.");
+      window.location.href = "/spreadsheet/" + randomSlug;
+    }
+  });
+
+  // --- COMMENTS LOGIC ---
+  const commentsList = document.getElementById('comments-list');
+  const commentForm = document.getElementById('comment-form');
+  const commentInput = document.getElementById('comment-input');
+
+  const loadComments = async () => {
+    const { data, error } = await supabaseClient.from('comments').select('*, profiles(email)').eq('spreadsheet_id', spreadsheet.id).order('created_at', { ascending: true });
+    
+    if (error) {
+      commentsList.innerHTML = '<p style="color:red;">Erreur de chargement des commentaires.</p>';
+      return;
+    }
+    
+    commentsList.innerHTML = '';
+    if (data.length === 0) {
+      commentsList.innerHTML = '<p style="color:var(--text-muted);">Aucun commentaire. Soyez le premier !</p>';
+    } else {
+      data.forEach(c => {
+        const author = c.profiles?.email ? c.profiles.email.split('@')[0] : 'Utilisateur';
+        const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+        
+        let deleteBtn = '';
+        if (window.currentUser && (window.currentUser.id === c.user_id || window.currentUser.id === spreadsheet.owner_id || window.currentProfile?.role === 'admin')) {
+          deleteBtn = `<button onclick="deleteComment('${c.id}')" style="background:none; border:none; color:#ff5252; cursor:pointer; font-size:0.8rem; float:right;">Supprimer</button>`;
+        }
+
+        commentsList.innerHTML += `
+          <div class="comment-item" id="comment-${c.id}">
+            ${deleteBtn}
+            <div class="comment-author">${author} <span style="color:var(--text-muted); font-size:0.8rem; font-weight:normal;">• ${date}</span></div>
+            <div class="comment-text">${c.content.replace(/</g, "&lt;")}</div>
+          </div>
+        `;
+      });
+    }
+  };
+
+  window.deleteComment = async (id) => {
+    if (!confirm("Supprimer ce commentaire ?")) return;
+    await supabaseClient.from('comments').delete().eq('id', id);
+    loadComments();
+  };
+
+  commentForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!window.currentUser) return window.openAuthModal();
+    
+    const content = commentInput.value;
+    const btn = commentForm.querySelector('button');
+    btn.disabled = true; btn.textContent = '...';
+    
+    const { error } = await supabaseClient.from('comments').insert({
+      spreadsheet_id: spreadsheet.id,
+      user_id: window.currentUser.id,
+      content
+    });
+    
+    btn.disabled = false; btn.textContent = 'Envoyer';
+    if (error) {
+      alert("Erreur: " + error.message);
+    } else {
+      commentInput.value = '';
+      loadComments();
+    }
+  });
+
+  // Load comments (wait a bit for auth)
+  setTimeout(loadComments, 500);
+
 }

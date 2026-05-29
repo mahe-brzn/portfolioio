@@ -214,16 +214,9 @@
       <h1 class="spreadsheet-title reveal on reveal-d1">Les <span class="accent">Spreadsheets</span></h1>
     </section>
 
-    <div class="shoes-grid reveal on reveal-d2">
-      <a href="/spreadsheet/chaussures-de-maxence" class="spread-card">
-        <h2 class="spread-card-title">Chaussures de Maxence</h2>
-        <p class="spread-card-desc">La sélection du chef exclusive de sneakers, claquettes et sacs à dos au meilleur prix.</p>
-        <div class="spread-card-arrow">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </a>
+    <div class="shoes-grid reveal on reveal-d2" id="public-spreadsheets-list">
+      <!-- Rempli dynamiquement par JS -->
+      <p style="color:var(--text-muted); text-align:center;">Chargement des spreadsheets...</p>
     </div>
   </main>
 
@@ -236,5 +229,60 @@
   </footer>
 
   <script src="/assets/js/main.js" defer></script>
+  
+  <!-- Supabase & Auth -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/spreadsheet/supabase-config.js"></script>
+  <script src="/spreadsheet/auth-modal.js" defer></script>
+
+  <!-- Load Public Spreadsheets -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Si on est sur une page spreadsheet individuelle (le slug n'est pas vide et pas 'spreadsheet' ni 'index.html'), 
+      // view.js s'occupera du rendu. Ici on ne charge la liste que si on est sur l'index.
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const isIndex = pathParts.length === 1 && pathParts[0] === 'spreadsheet' || window.location.pathname.endsWith('index.html');
+      
+      if (!isIndex) return;
+
+      const container = document.getElementById('public-spreadsheets-list');
+      if (!window.supabaseClient) {
+        container.innerHTML = '<p style="color:red; text-align:center;">Erreur: Supabase non initialisé.</p>';
+        return;
+      }
+
+      const { data, error } = await window.supabaseClient
+        .from('spreadsheets')
+        .select('*, profiles(email)')
+        .eq('visibility', 'public')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        container.innerHTML = '<p style="color:red; text-align:center;">Erreur de chargement : ' + error.message + '</p>';
+      } else if (data && data.length > 0) {
+        container.innerHTML = '';
+        data.forEach(s => {
+          const author = s.profiles?.email ? s.profiles.email.split('@')[0] : 'Communauté';
+          container.innerHTML += `
+            <a href="/spreadsheet/${s.slug}" class="spread-card">
+              <h2 class="spread-card-title">${s.title}</h2>
+              <p class="spread-card-desc">${s.description || 'Une sélection au meilleur prix.'}</p>
+              <p style="font-size:0.8rem; opacity:0.5; margin-top:10px;">Par ${author} • ${s.likes_count || 0} ❤️</p>
+              <div class="spread-card-arrow">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </a>
+          `;
+        });
+      } else {
+        container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucune spreadsheet publique pour le moment.</p>';
+      }
+    });
+  </script>
+  
+  <!-- View Logic (s'exécute si on est sur un /slug) -->
+  <script src="/spreadsheet/view.js" defer></script>
 </body>
 </html>

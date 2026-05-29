@@ -250,9 +250,17 @@
       </div>
 
       <div class="admin-card glass-panel" style="margin-top: 40px; border-color: rgba(200, 255, 87, 0.3);">
-        <h3 style="color: var(--accent); margin-bottom: 15px;">Permissions et Accès</h3>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Gérez qui peut modifier cette spreadsheet.</p>
+        <h3 style="color: var(--accent); margin-bottom: 15px;">Permissions, Accès et Visibilité</h3>
         
+        <div style="margin-bottom: 15px;">
+          <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Visibilité de la Spreadsheet :</label>
+          <select id="edit-visibility" class="glass-input" style="padding: 10px; width: 100%; appearance: auto;">
+            <option value="public">Publique (Visible dans l'index)</option>
+            <option value="unlisted">Non-répertoriée (Cachée, mais accessible via le lien)</option>
+            <option value="private">Privée (Seulement le propriétaire et les éditeurs)</option>
+          </select>
+        </div>
+
         <div style="margin-bottom: 15px;">
           <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Propriétaire (Owner) :</label>
           <select id="edit-owner" class="glass-input" style="padding: 10px; width: 100%; appearance: auto;">
@@ -265,6 +273,14 @@
           <div id="edit-editors-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); max-height: 150px; overflow-y: auto;">
             <!-- Rempli par le JS -->
           </div>
+        </div>
+      </div>
+      <div class="admin-card glass-panel" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3>Suggestions en attente</h3>
+        </div>
+        <div id="suggestions-list" style="display: flex; flex-direction: column; gap: 10px;">
+          <p style="color: var(--text-muted);">Aucune suggestion.</p>
         </div>
       </div>
 

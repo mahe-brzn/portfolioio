@@ -532,6 +532,9 @@ window.openEditSpreadsheet = async (id) => {
     const colorInput = document.getElementById('edit-color');
     if (colorInput) colorInput.value = spreadsheet.accent_color || '#c8ff57';
     
+    const visibilitySelect = document.getElementById('edit-visibility');
+    if (visibilitySelect) visibilitySelect.value = spreadsheet.visibility || 'public';
+    
     // Permissions logic
     const permPanel = document.getElementById('edit-owner')?.closest('.admin-card');
     if (currentProfile.role === 'admin') {
@@ -569,10 +572,61 @@ window.openEditSpreadsheet = async (id) => {
     } else {
       if (permPanel) permPanel.style.display = 'none';
     }
-
     renderEditItems();
+    loadSuggestions(id);
     showView('edit');
   }
+};
+
+async function loadSuggestions(spreadsheetId) {
+  const container = document.getElementById('suggestions-list');
+  if (!container) return;
+  
+  const { data: suggestions, error } = await supabaseClient.from('suggestions').select('*, profiles(email)').eq('spreadsheet_id', spreadsheetId).eq('status', 'pending');
+  
+  if (error) {
+    container.innerHTML = '<p style="color:red;">Erreur lors du chargement des suggestions.</p>';
+    return;
+  }
+  
+  if (!suggestions || suggestions.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);">Aucune suggestion en attente.</p>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  suggestions.forEach(s => {
+    const author = s.profiles?.email ? s.profiles.email.split('@')[0] : 'Inconnu';
+    container.innerHTML += `
+      <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h4 style="margin:0 0 5px 0;">${s.title} <span style="font-size:0.8rem; color:var(--text-muted); font-weight:normal;">par ${author}</span></h4>
+          <p style="margin:0; font-size:0.85rem; color:rgba(255,255,255,0.7);"><a href="${s.url}" target="_blank" style="color:var(--sneaker-accent);">${s.url}</a> — ${s.price || 'Pas de prix'}</p>
+          ${s.note ? `<p style="margin:5px 0 0 0; font-size:0.85rem; font-style:italic;">"${s.note}"</p>` : ''}
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-icon" onclick="approveSuggestion('${s.id}', \`${s.title}\`, \`${s.url}\`, \`${s.price}\`)" style="color:#c8ff57; border-color:#c8ff57;" title="Accepter et ajouter"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
+          <button class="btn-icon danger" onclick="rejectSuggestion('${s.id}')" title="Rejeter"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+window.approveSuggestion = async (id, title, url, price) => {
+  // Append to items
+  editingItems.push({ title: title, price: price || '', url: url, keywords: '' });
+  renderEditItems();
+  
+  // Mark as approved in DB
+  await supabaseClient.from('suggestions').update({ status: 'approved' }).eq('id', id);
+  loadSuggestions(editingSpreadsheetId);
+};
+
+window.rejectSuggestion = async (id) => {
+  if (!confirm("Voulez-vous rejeter cette suggestion ?")) return;
+  await supabaseClient.from('suggestions').update({ status: 'rejected' }).eq('id', id);
+  loadSuggestions(editingSpreadsheetId);
 };
 
 document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
@@ -735,7 +789,8 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
     items: editingItems, 
     accent_color: document.getElementById('edit-color') ? document.getElementById('edit-color').value : undefined, 
     badge_text: document.getElementById('edit-badge') ? document.getElementById('edit-badge').value : undefined, 
-    description: document.getElementById('edit-desc') ? document.getElementById('edit-desc').value : undefined 
+    description: document.getElementById('edit-desc') ? document.getElementById('edit-desc').value : undefined,
+    visibility: document.getElementById('edit-visibility') ? document.getElementById('edit-visibility').value : 'public'
   };
 
   if (currentProfile.role === 'admin') {

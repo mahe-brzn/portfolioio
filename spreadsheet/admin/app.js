@@ -421,12 +421,13 @@ document.getElementById('form-create-spreadsheet')?.addEventListener('submit', a
   e.preventDefault();
   const slug = document.getElementById('create-slug').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
   const title = document.getElementById('create-title').value;
+  const accent_color = document.getElementById('create-color').value;
   const err = document.getElementById('create-error');
   err.textContent = '';
 
   const { data, error } = await supabaseClient
     .from('spreadsheets')
-    .insert([{ owner_id: currentUser.id, slug, title, items: [] }])
+    .insert([{ owner_id: currentUser.id, slug, title, items: [], accent_color }])
     .select();
 
   if (error) {
@@ -520,7 +521,7 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
 
   const { error } = await supabaseClient
     .from('spreadsheets')
-    .update({ items: editingItems })
+    .update({ items: editingItems, accent_color: document.getElementById('edit-color') ? document.getElementById('edit-color').value : undefined })
     .eq('id', editingSpreadsheetId);
 
   if (error) {

@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="/garagealpin/style.css" />
-  <link rel="stylesheet" href="admin.css?v=13" />
+  <link rel="stylesheet" href="admin.css?v=14" />
   
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -205,6 +205,13 @@
           <label>Titre de la page</label>
           <input type="text" id="create-title" placeholder="Ma Sélection de Sneakers" required style="width:100%; margin-bottom: 30px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;" />
 
+          
+          <label>Couleur d'accentuation</label>
+          <div style="display: flex; gap: 15px; margin-bottom: 30px; align-items: center;">
+            <input type="color" id="create-color" value="#c8ff57" style="width: 50px; height: 50px; border: none; border-radius: 8px; cursor: pointer; background: transparent; padding: 0;" />
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Couleur principale de la spreadsheet</span>
+          </div>
+
           <button type="submit" class="btn-magnetic" style="width: 100%; justify-content: center;">Créer et Éditer</button>
           <p class="auth-error" id="create-error"></p>
         </form>
@@ -218,6 +225,11 @@
           <button id="btn-back-to-list" class="btn-outline" style="margin-bottom: 20px;">&larr; Retour</button>
           <h1 class="admin-title" id="edit-title-display">Édition</h1>
           <p style="color: var(--text-muted);">URL : <a href="#" target="_blank" id="edit-url-display" style="color: var(--sneaker-accent);"></a></p>
+        <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+          <label style="font-size: 0.85rem; color: var(--text-muted);">Couleur d'accentuation :</label>
+          <input type="color" id="edit-color" value="#c8ff57" style="width: 30px; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent; padding: 0;" />
+        </div>
+
         </div>
         <button id="btn-save-spreadsheet" class="btn-magnetic">Enregistrer les modifs</button>
       </div>
@@ -238,6 +250,6 @@
 
   <!-- IMPORTANT: Place your Supabase configuration in app.js -->
   <script src="/garagealpin/script.js" defer></script>
-  <script src="app.js?v=13" defer></script>
+  <script src="app.js?v=14" defer></script>
 </body>
 </html>

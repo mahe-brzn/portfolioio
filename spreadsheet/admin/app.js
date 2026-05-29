@@ -406,7 +406,10 @@ async function loadAdminData() {
   }
 
   if (spreadsheets && spreadsheetsList) {
-    spreadsheets.forEach((s, i) => {
+    if (spreadsheets.length === 0) {
+      spreadsheetsList.innerHTML = '<p style="color:var(--text-muted); padding: 10px;">Aucune spreadsheet trouvée.</p>';
+    } else {
+      spreadsheets.forEach((s, i) => {
       const el = document.createElement('div');
       el.className = 'list-item stagger-item';
       el.style.animationDelay = `${i * 0.05}s`;
@@ -422,6 +425,7 @@ async function loadAdminData() {
       `;
       spreadsheetsList.appendChild(el);
     });
+    }
   }
 }
 

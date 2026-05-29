@@ -211,20 +211,25 @@ function renderSpreadsheet(spreadsheet) {
 
     #sneaker-search:focus { border-color: var(--sneaker-accent); box-shadow: 0 0 15px var(--sneaker-dim); }
     
-    .social-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-    .action-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 20px; border-radius: 100px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-weight: 500; transition: all 0.3s; font-size: 0.9rem; }
+    .social-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; position: relative; z-index: 20; pointer-events: auto; }
+    .action-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 20px; border-radius: 100px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-weight: 500; transition: all 0.3s; font-size: 0.9rem; position: relative; z-index: 20; }
     .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
     .action-btn.active-like { background: rgba(255, 82, 82, 0.2); border-color: rgba(255, 82, 82, 0.5); color: #ff5252; }
     .action-btn.active-fav { background: rgba(255, 215, 0, 0.2); border-color: rgba(255, 215, 0, 0.5); color: #ffd700; }
     
-    .comments-section { max-width: 800px; margin: 0 auto; padding: 0 20px 100px 20px; position: relative; z-index: 2; }
+    .comments-section { max-width: 800px; margin: 0 auto; padding: 0 20px 100px 20px; position: relative; z-index: 10; }
     .comments-title { font-family: var(--font-display); font-size: 2rem; margin-bottom: 20px; }
     .comment-item { background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
     .comment-author { font-weight: bold; color: var(--sneaker-accent); margin-bottom: 5px; font-size: 0.9rem; }
     .comment-text { font-size: 1rem; color: rgba(255,255,255,0.8); }
     .comment-form { display: flex; gap: 10px; margin-top: 30px; }
-    .comment-input { flex: 1; padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; outline: none; }
-    .comment-submit { background: var(--sneaker-accent); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .comment-input { flex: 1; padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; outline: none; position: relative; z-index: 10; }
+    .comment-submit { background: var(--sneaker-accent); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; position: relative; z-index: 10; }
+
+    /* Force background elements to ignore pointers */
+    .hero-ambient, .hero-grid, .cyan-orb { pointer-events: none !important; }
+    .spreadsheet-hero { position: relative; z-index: 5; pointer-events: none; }
+    .spreadsheet-hero > * { pointer-events: auto; }
   `;
   document.head.appendChild(style);
 

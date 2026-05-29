@@ -368,7 +368,7 @@ if (form2faChallenge) {
 async function loadAdminData() {
   const { data: profiles, error: errProfiles } = await supabaseClient.from('profiles').select('*');
   if (errProfiles) alert("Erreur profils : " + errProfiles.message);
-  const { data: spreadsheets, error: errSpreadsheets } = await supabaseClient.from('spreadsheets').select('*, profiles!spreadsheets_owner_id_fkey(email)');
+  const { data: spreadsheets, error: errSpreadsheets } = await supabaseClient.from('spreadsheets').select('*, profiles!owner_id(email)');
   if (errSpreadsheets) alert("Erreur spreadsheets : " + errSpreadsheets.message);
   const pendingList = document.getElementById('pending-users-list');
   const approvedList = document.getElementById('approved-users-list');

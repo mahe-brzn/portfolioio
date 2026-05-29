@@ -211,17 +211,33 @@ if (btnStart2fa) {
     
     // Display SVG QR Code safely
     const qrContainer = document.getElementById('2fa-qr-code-container');
-    qrContainer.innerHTML = data.totp.qr_code;
+    qrContainer.innerHTML = ''; // clear previous
+
+    let qrData = data.totp.qr_code;
     
-    const svg = qrContainer.querySelector('svg');
-    if (svg) {
-      svg.removeAttribute('width');
-      svg.removeAttribute('height');
-      svg.style.width = '100%';
-      svg.style.height = 'auto';
-      svg.style.maxWidth = '250px';
-      svg.style.display = 'block';
-      svg.style.margin = '0 auto';
+    // Some versions of Supabase return a data URI
+    if (qrData.startsWith('data:image')) {
+      const img = document.createElement('img');
+      img.src = qrData;
+      img.style.width = '100%';
+      img.style.maxWidth = '250px';
+      img.style.height = 'auto';
+      img.style.display = 'block';
+      img.style.margin = '0 auto';
+      qrContainer.appendChild(img);
+    } else {
+      // Raw SVG string
+      qrContainer.innerHTML = qrData;
+      const svg = qrContainer.querySelector('svg');
+      if (svg) {
+        svg.removeAttribute('width');
+        svg.removeAttribute('height');
+        svg.style.width = '100%';
+        svg.style.height = 'auto';
+        svg.style.maxWidth = '250px';
+        svg.style.display = 'block';
+        svg.style.margin = '0 auto';
+      }
     }
 
     document.getElementById('2fa-setup-step1').style.display = 'none';

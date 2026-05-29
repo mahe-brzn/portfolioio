@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Mon Espace | Spreadsheets</title>
+  <title>Mon Compte | Spreadsheets</title>
   <meta name="robots" content="noindex, nofollow" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,58 +15,122 @@
   <style>
     :root {
       --sneaker-accent: #c8ff57;
-      --red: #c8ff57;
-      --red-dim: rgba(200, 255, 87, 0.15);
-      --red-glow: rgba(200, 255, 87, 0.3);
+      --accent-glow: rgba(200, 255, 87, 0.2);
     }
     ::selection { background: var(--sneaker-accent); color: black; }
     
-    body { background: var(--bg); color: var(--white); font-family: var(--font-body); }
-    .hero { padding: 120px 20px 40px; text-align: center; }
-    .hero-title { font-family: var(--font-title); font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 20px; }
-    .accent { color: var(--sneaker-accent); }
+    body { background: var(--bg); color: var(--white); font-family: var(--font-body); margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
     
-    .profile-nav { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; }
-    .profile-tab { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 20px; border-radius: 100px; cursor: pointer; transition: 0.3s; }
-    .profile-tab.active { background: var(--sneaker-accent); color: #000; font-weight: bold; }
+    /* Ambient Background */
+    .account-ambient {
+      position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    }
+    .orb-1 {
+      position: absolute; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(200,255,87,0.05) 0%, transparent 70%);
+      top: -20%; left: -10%; border-radius: 50%; filter: blur(60px);
+    }
+    .orb-2 {
+      position: absolute; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
+      bottom: -10%; right: -10%; border-radius: 50%; filter: blur(60px);
+    }
+
+    /* Layout */
+    .account-layout {
+      display: flex; gap: 40px; max-width: 1200px; margin: 120px auto 80px; padding: 0 20px; width: 100%; flex: 1; align-items: flex-start;
+    }
     
-    .profile-section { display: none; max-width: 1000px; margin: 0 auto; padding: 0 20px 80px; }
+    /* Sidebar */
+    .account-sidebar {
+      width: 280px; flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px;
+      padding: 30px 20px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      position: sticky; top: 120px;
+    }
+    .user-avatar {
+      width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(200,255,87,0.2), rgba(255,255,255,0.05));
+      display: flex; justify-content: center; align-items: center; font-family: var(--font-display); font-size: 2rem; color: var(--sneaker-accent);
+      margin: 0 auto 20px; border: 1px solid rgba(200,255,87,0.3); box-shadow: 0 10px 30px var(--accent-glow);
+    }
+    .user-info { text-align: center; margin-bottom: 30px; }
+    .user-email { font-weight: 600; font-size: 1.1rem; word-break: break-all; margin-bottom: 5px; }
+    .user-role { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    .profile-nav { display: flex; flex-direction: column; gap: 8px; }
+    .profile-tab {
+      padding: 14px 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.6);
+      display: flex; align-items: center; gap: 12px; font-weight: 500;
+    }
+    .profile-tab:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .profile-tab.active { background: var(--sneaker-accent); color: #000; box-shadow: 0 8px 20px var(--accent-glow); }
+    
+    /* Main Content */
+    .account-content { flex: 1; min-width: 0; }
+    .profile-section { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
     .profile-section.active { display: block; }
     
-    .shoes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
+    .section-header { margin-bottom: 30px; }
+    .section-title { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 10px; }
+    .section-desc { color: var(--text-muted); font-size: 1rem; }
+
+    /* Cards Grid */
+    .shoes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+    
     .spread-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 30px;
-      text-decoration: none;
-      color: var(--white);
-      transition: transform 0.4s var(--ease), border-color 0.4s;
+      background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px;
+      padding: 30px; text-decoration: none; color: var(--white); display: flex; flex-direction: column;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden;
     }
-    .spread-card:hover { transform: translateY(-8px); border-color: rgba(200,255,87,0.3); }
+    .spread-card::before {
+      content: ''; position: absolute; inset: 0; background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(255,255,255,0.06), transparent 40%); opacity: 0; transition: opacity 0.4s; pointer-events: none;
+    }
+    .spread-card:hover::before { opacity: 1; }
+    .spread-card:hover { transform: translateY(-8px); border-color: rgba(200,255,87,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    
+    .badge-visibility { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(10px); }
 
-    .suggestion-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
-    .badge { padding: 5px 10px; border-radius: 100px; font-size: 0.8rem; font-weight: bold; }
-    .badge.pending { background: rgba(255,255,255,0.1); color: #fff; }
-    .badge.approved { background: rgba(200,255,87,0.2); color: #c8ff57; }
-    .badge.rejected { background: rgba(255,82,82,0.2); color: #ff5252; }
+    /* List Items */
+    .list-item {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
+      padding: 24px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+    }
+    .list-item:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); }
+    .status-badge { padding: 6px 14px; border-radius: 100px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-pending { background: rgba(255,255,255,0.1); color: #fff; }
+    .status-approved { background: rgba(200,255,87,0.15); color: #c8ff57; border: 1px solid rgba(200,255,87,0.3); }
+    .status-rejected { background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
+
+    /* Settings Form */
+    .settings-panel { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 40px; }
+    .input-group { margin-bottom: 20px; }
+    .input-label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+    .form-input { width: 100%; padding: 16px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; font-family: inherit; font-size: 1rem; transition: 0.3s; }
+    .form-input:focus { outline: none; border-color: var(--sneaker-accent); background: rgba(255,255,255,0.02); }
+    .btn-submit { width: 100%; padding: 16px; background: var(--sneaker-accent); color: #000; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--accent-glow); background: #fff; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .account-layout { flex-direction: column; margin-top: 100px; gap: 20px; }
+      .account-sidebar { width: 100%; position: static; display: flex; flex-direction: column; }
+      .profile-nav { flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
+      .profile-tab { white-space: nowrap; }
+    }
 
     /* Fix interactions */
-    #cursor-dot, #cursor-ring, #grain, .spread-ambient, .hero-grid {
-      pointer-events: none !important;
-    }
+    #cursor-dot, #cursor-ring, #grain, .account-ambient { pointer-events: none !important; }
   </style>
 </head>
 <body>
-  <!-- GRAIN & CURSOR (Garage Alpin style) -->
   <div id="grain" aria-hidden="true"></div>
   <div id="cursor-dot" aria-hidden="true"></div>
   <div id="cursor-ring" aria-hidden="true"></div>
+
+  <div class="account-ambient">
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+  </div>
 
   <header role="banner">
     <nav id="nav" class="visible">
@@ -83,54 +147,98 @@
     </nav>
   </header>
 
-  <div class="hero">
-    <h1 class="hero-title">Mon <span class="accent">Espace</span></h1>
+  <div class="account-layout">
+    <!-- SIDEBAR -->
+    <aside class="account-sidebar">
+      <div class="user-avatar" id="avatar-initial">?</div>
+      <div class="user-info">
+        <div class="user-email" id="sidebar-email">Chargement...</div>
+        <div class="user-role" id="sidebar-role">...</div>
+      </div>
+      
+      <div class="profile-nav">
+        <!-- Remplacement de data-target par data-tab pour éviter le bug NaN de script.js -->
+        <div class="profile-tab active" data-tab="sec-spreadsheets">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Mes Spreadsheets
+        </div>
+        <div class="profile-tab" data-tab="sec-favorites">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          Mes Favoris
+        </div>
+        <div class="profile-tab" data-tab="sec-suggestions">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          Mes Suggestions
+        </div>
+        <div class="profile-tab" data-tab="sec-settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Sécurité
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="account-content">
+      
+      <!-- SPREADSHEETS -->
+      <section class="profile-section active" id="sec-spreadsheets">
+        <div class="section-header">
+          <h1 class="section-title">Mes Créations</h1>
+          <p class="section-desc">Retrouvez ici toutes les spreadsheets que vous avez créées ou dupliquées.</p>
+        </div>
+        <div class="shoes-grid" id="my-spreadsheets-list">
+          <p style="color:var(--text-muted);">Chargement en cours...</p>
+        </div>
+      </section>
+
+      <!-- FAVORITES -->
+      <section class="profile-section" id="sec-favorites">
+        <div class="section-header">
+          <h1 class="section-title">Mes Favoris</h1>
+          <p class="section-desc">Vos bases de données sauvegardées pour un accès rapide.</p>
+        </div>
+        <div class="shoes-grid" id="my-favorites-list">
+          <p style="color:var(--text-muted);">Chargement en cours...</p>
+        </div>
+      </section>
+
+      <!-- SUGGESTIONS -->
+      <section class="profile-section" id="sec-suggestions">
+        <div class="section-header">
+          <h1 class="section-title">Historique des Suggestions</h1>
+          <p class="section-desc">Suivez l'état d'approbation de vos ajouts de données communautaires.</p>
+        </div>
+        <div id="my-suggestions-list">
+          <p style="color:var(--text-muted);">Chargement en cours...</p>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="profile-section" id="sec-settings">
+        <div class="section-header">
+          <h1 class="section-title">Sécurité</h1>
+          <p class="section-desc">Gérez les paramètres de sécurité de votre compte.</p>
+        </div>
+        
+        <div class="settings-panel">
+          <h3 style="margin-bottom: 25px; font-size: 1.4rem;">Modifier mon mot de passe</h3>
+          <form id="form-change-password">
+            <div class="input-group">
+              <label class="input-label">Nouveau mot de passe</label>
+              <input type="password" id="new-password" class="form-input" placeholder="••••••••" required minlength="6" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Confirmer le mot de passe</label>
+              <input type="password" id="confirm-password" class="form-input" placeholder="••••••••" required minlength="6" />
+            </div>
+            <button type="submit" class="btn-submit">Mettre à jour la sécurité</button>
+            <p id="password-status" style="margin-top: 15px; font-size: 0.95rem; text-align: center;"></p>
+          </form>
+        </div>
+      </section>
+
+    </div>
   </div>
-
-  <div class="profile-nav">
-    <div class="profile-tab active" data-target="sec-spreadsheets">Mes Spreadsheets</div>
-    <div class="profile-tab" data-target="sec-favorites">Mes Favoris</div>
-    <div class="profile-tab" data-target="sec-suggestions">Mes Suggestions</div>
-    <div class="profile-tab" data-target="sec-settings">Paramètres</div>
-  </div>
-
-  <!-- MES SPREADSHEETS -->
-  <section class="profile-section active" id="sec-spreadsheets">
-    <h2 style="margin-bottom:20px; font-family:var(--font-display);">Mes Créations / Copies</h2>
-    <div class="shoes-grid" id="my-spreadsheets-list">
-      <p style="color:var(--text-muted);">Chargement...</p>
-    </div>
-  </section>
-
-  <!-- MES FAVORIS -->
-  <section class="profile-section" id="sec-favorites">
-    <h2 style="margin-bottom:20px; font-family:var(--font-display);">Mes Spreadsheets Favorites</h2>
-    <div class="shoes-grid" id="my-favorites-list">
-      <p style="color:var(--text-muted);">Chargement...</p>
-    </div>
-  </section>
-
-  <!-- MES SUGGESTIONS -->
-  <section class="profile-section" id="sec-suggestions">
-    <h2 style="margin-bottom:20px; font-family:var(--font-display);">Mes Suggestions (Modération)</h2>
-    <div class="shoes-grid" id="my-suggestions-list" style="grid-template-columns: 1fr;">
-      <p style="color:var(--text-muted);">Chargement...</p>
-    </div>
-  </section>
-
-  <!-- PARAMÈTRES -->
-  <section class="profile-section" id="sec-settings">
-    <h2 style="margin-bottom:20px; font-family:var(--font-display);">Paramètres du compte</h2>
-    <div class="spread-card" style="max-width: 500px; margin: 0 auto;">
-      <h3 style="margin-bottom: 20px;">Modifier mon mot de passe</h3>
-      <form id="form-change-password">
-        <input type="password" id="new-password" placeholder="Nouveau mot de passe" required style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;" />
-        <input type="password" id="confirm-password" placeholder="Confirmer le nouveau mot de passe" required style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;" />
-        <button type="submit" style="width: 100%; padding: 12px; background: var(--sneaker-accent); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s;">Mettre à jour</button>
-        <p id="password-status" style="margin-top: 15px; font-size: 0.9rem; text-align: center;"></p>
-      </form>
-    </div>
-  </section>
 
   <script src="/garagealpin/script.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -139,7 +247,7 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Tab Navigation
+      // Tab Navigation with new data-tab attribute
       const tabs = document.querySelectorAll('.profile-tab');
       const sections = document.querySelectorAll('.profile-section');
       
@@ -148,9 +256,22 @@
           tabs.forEach(t => t.classList.remove('active'));
           sections.forEach(s => s.classList.remove('active'));
           tab.classList.add('active');
-          document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+          document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
         });
       });
+
+      // Mouse effect on cards
+      function bindCardHover() {
+        document.querySelectorAll('.spread-card').forEach(card => {
+          card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', x + 'px');
+            card.style.setProperty('--mouse-y', y + 'px');
+          });
+        });
+      }
 
       // Handle Password Change
       const formPwd = document.getElementById('form-change-password');
@@ -162,28 +283,16 @@
           const status = document.getElementById('password-status');
           
           if (pwd1 !== pwd2) {
-            status.style.color = '#ff5252';
-            status.textContent = 'Les mots de passe ne correspondent pas.';
-            return;
-          }
-          if (pwd1.length < 6) {
-            status.style.color = '#ff5252';
-            status.textContent = 'Le mot de passe doit faire au moins 6 caractères.';
-            return;
+            status.style.color = '#ff5252'; status.textContent = 'Les mots de passe ne correspondent pas.'; return;
           }
           
-          status.style.color = '#fff';
-          status.textContent = 'Mise à jour en cours...';
-          
-          const { error } = await supabase.auth.updateUser({ password: pwd1 });
+          status.style.color = '#fff'; status.textContent = 'Mise à jour en cours...';
+          const { error } = await window.supabaseClient.auth.updateUser({ password: pwd1 });
           
           if (error) {
-            status.style.color = '#ff5252';
-            status.textContent = 'Erreur : ' + error.message;
+            status.style.color = '#ff5252'; status.textContent = 'Erreur : ' + error.message;
           } else {
-            status.style.color = '#c8ff57';
-            status.textContent = 'Mot de passe mis à jour avec succès !';
-            formPwd.reset();
+            status.style.color = '#c8ff57'; status.textContent = 'Mot de passe mis à jour avec succès !'; formPwd.reset();
           }
         });
       }
@@ -195,65 +304,71 @@
           return;
         }
 
+        // Fill user info
+        document.getElementById('sidebar-email').textContent = window.currentUser.email;
+        document.getElementById('sidebar-role').textContent = window.currentProfile?.role || 'user';
+        document.getElementById('avatar-initial').textContent = window.currentUser.email.charAt(0).toUpperCase();
+
         const supabase = window.supabaseClient;
 
         // 1. My Spreadsheets
         const { data: mySheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', window.currentUser.id);
         const mySheetsList = document.getElementById('my-spreadsheets-list');
         if (mySheets && mySheets.length > 0) {
-          mySheetsList.innerHTML = '';
-          mySheets.forEach(s => {
-            mySheetsList.innerHTML += `
-              <a href="/spreadsheet/${s.slug}" class="spread-card" style="position:relative;">
-                <span class="badge" style="position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.1);">${s.visibility}</span>
-                <h3 style="font-family:var(--font-display); font-size:1.5rem; margin-bottom:10px;">${s.title}</h3>
-                <p style="opacity:0.6; font-size:0.9rem;">${s.description || ''}</p>
-              </a>
-            `;
-          });
+          mySheetsList.innerHTML = mySheets.map(s => `
+            <a href="/spreadsheet/${s.slug}" class="spread-card">
+              <span class="badge-visibility">${s.visibility}</span>
+              <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${s.title}</h3>
+              <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${s.description || 'Aucune description'}</p>
+            </a>
+          `).join('');
+          bindCardHover();
         } else {
-          mySheetsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Aucune spreadsheet créée ou dupliquée.</p>';
+          mySheetsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez pas encore créé ou copié de spreadsheet.</p>';
         }
 
         // 2. My Favorites
         const { data: myFavs } = await supabase.from('favorites').select('*, spreadsheets(*)').eq('user_id', window.currentUser.id);
         const myFavsList = document.getElementById('my-favorites-list');
         if (myFavs && myFavs.length > 0) {
-          myFavsList.innerHTML = '';
-          myFavs.forEach(f => {
-            if(!f.spreadsheets) return;
-            myFavsList.innerHTML += `
+          const validFavs = myFavs.filter(f => f.spreadsheets);
+          if (validFavs.length > 0) {
+            myFavsList.innerHTML = validFavs.map(f => `
               <a href="/spreadsheet/${f.spreadsheets.slug}" class="spread-card">
-                <h3 style="font-family:var(--font-display); font-size:1.5rem; margin-bottom:10px;">${f.spreadsheets.title}</h3>
-                <p style="opacity:0.6; font-size:0.9rem;">${f.spreadsheets.description || ''}</p>
+                <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${f.spreadsheets.title}</h3>
+                <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${f.spreadsheets.description || 'Aucune description'}</p>
               </a>
-            `;
-          });
+            `).join('');
+            bindCardHover();
+          } else {
+            myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Aucun favori valide.</p>';
+          }
         } else {
-          myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Aucun favori pour le moment.</p>';
+          myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez ajouté aucune spreadsheet à vos favoris.</p>';
         }
 
         // 3. My Suggestions
-        const { data: mySuggs } = await supabase.from('suggestions').select('*, spreadsheets(title)').eq('user_id', window.currentUser.id);
+        const { data: mySuggs } = await supabase.from('suggestions').select('*, spreadsheets(title)').eq('user_id', window.currentUser.id).order('created_at', { ascending: false });
         const mySuggsList = document.getElementById('my-suggestions-list');
         if (mySuggs && mySuggs.length > 0) {
-          mySuggsList.innerHTML = '';
-          mySuggs.forEach(s => {
-            mySuggsList.innerHTML += `
-              <div class="suggestion-item">
+          mySuggsList.innerHTML = mySuggs.map(s => {
+            const statusClass = s.status === 'pending' ? 'status-pending' : s.status === 'approved' ? 'status-approved' : 'status-rejected';
+            const statusText = s.status === 'pending' ? 'En attente' : s.status === 'approved' ? 'Approuvé' : 'Rejeté';
+            return `
+              <div class="list-item">
                 <div>
-                  <h4 style="margin-bottom:5px;">${s.title}</h4>
-                  <p style="font-size:0.85rem; color:var(--text-muted);">Proposé pour : ${s.spreadsheets?.title || 'Spreadsheet inconnue'} — ${new Date(s.created_at).toLocaleDateString()}</p>
+                  <h4 style="margin-bottom:8px; font-size:1.1rem;">${s.title}</h4>
+                  <p style="font-size:0.9rem; color:rgba(255,255,255,0.5);">Pour : <strong style="color:#fff;">${s.spreadsheets?.title || 'Base inconnue'}</strong> — le ${new Date(s.created_at).toLocaleDateString()}</p>
                 </div>
-                <span class="badge ${s.status}">${s.status === 'pending' ? 'En attente' : s.status === 'approved' ? 'Approuvé' : 'Rejeté'}</span>
+                <span class="status-badge ${statusClass}">${statusText}</span>
               </div>
             `;
-          });
+          }).join('');
         } else {
-          mySuggsList.innerHTML = '<p style="color:var(--text-muted);">Aucune suggestion envoyée.</p>';
+          mySuggsList.innerHTML = '<p style="color:var(--text-muted);">Vous n\'avez fait aucune suggestion pour le moment.</p>';
         }
 
-      }, 1000);
+      }, 800);
     });
   </script>
 </body>

@@ -193,8 +193,52 @@ function renderSpreadsheet(spreadsheet) {
   `;
   document.head.appendChild(style);
 
+  
   // Update page title
   document.title = `${spreadsheet.title} | Mahé Brizion`;
+
+  // --- Dynamic SEO Injection ---
+  const currentUrl = window.location.href;
+  const seoDesc = spreadsheet.description || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.';
+
+  // Canonical
+  let canonical = document.querySelector("link[rel='canonical']");
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.setAttribute("rel", "canonical");
+    document.head.appendChild(canonical);
+  }
+  canonical.setAttribute("href", currentUrl);
+
+  // Meta Description
+  let metaDesc = document.querySelector("meta[name='description']");
+  if (!metaDesc) {
+    metaDesc = document.createElement("meta");
+    metaDesc.setAttribute("name", "description");
+    document.head.appendChild(metaDesc);
+  }
+  metaDesc.setAttribute("content", seoDesc);
+
+  // Open Graph
+  const ogTags = {
+    "og:title": `${spreadsheet.title} | Mahé Brizion`,
+    "og:description": seoDesc,
+    "og:url": currentUrl,
+    "og:type": "website",
+    "og:site_name": "Mahé Brizion"
+  };
+
+  Object.keys(ogTags).forEach(property => {
+    let metaTag = document.querySelector(`meta[property='${property}']`);
+    if (!metaTag) {
+      metaTag = document.createElement("meta");
+      metaTag.setAttribute("property", property);
+      document.head.appendChild(metaTag);
+    }
+    metaTag.setAttribute("content", ogTags[property]);
+  });
+  // -----------------------------
+
 
   // Build the DOM
   const mainWrapper = document.createElement('div');

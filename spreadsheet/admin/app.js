@@ -507,6 +507,15 @@ window.openEditSpreadsheet = async (id) => {
     document.getElementById('edit-url-display').textContent = `mahebrizion.fr/spreadsheet/${spreadsheet.slug}`;
     document.getElementById('edit-url-display').href = `/spreadsheet/${spreadsheet.slug}`;
     
+    const badgeInput = document.getElementById('edit-badge');
+    if (badgeInput) badgeInput.value = spreadsheet.badge_text || '';
+    
+    const descInput = document.getElementById('edit-desc');
+    if (descInput) descInput.value = spreadsheet.description || '';
+    
+    const colorInput = document.getElementById('edit-color');
+    if (colorInput) colorInput.value = spreadsheet.accent_color || '#c8ff57';
+    
     renderEditItems();
     showView('edit');
   }

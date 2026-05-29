@@ -213,7 +213,11 @@ if (btnStart2fa) {
       return;
     }
 
+    console.log('[2FA Enroll] data:', JSON.stringify(data));
+    console.log('[2FA Enroll] error:', error);
     pendingFactorId = data.id;
+    console.log('[2FA Enroll] pendingFactorId set to:', pendingFactorId);
+    console.log('[2FA Enroll] qr_code type:', typeof data.totp.qr_code, '| starts with:', data.totp.qr_code?.substring(0, 30));
     
     // Display SVG QR Code safely
     const qrContainer = document.getElementById('2fa-qr-code-container');
@@ -263,9 +267,12 @@ if (form2faVerify) {
     btn.textContent = 'Vérification...';
     err.textContent = '';
 
+    console.log('[2FA Verify] pendingFactorId at verify time:', pendingFactorId);
+    console.log('[2FA Verify] code entered:', code);
     const { data: challengeData, error: challengeError } = await supabaseClient.auth.mfa.challenge({
       factorId: pendingFactorId
     });
+    console.log('[2FA Verify] challenge result:', JSON.stringify(challengeData), challengeError);
 
     if (challengeError) {
       err.textContent = "Erreur challenge: " + challengeError.message;

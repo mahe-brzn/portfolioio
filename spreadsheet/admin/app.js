@@ -368,8 +368,17 @@ if (form2faChallenge) {
 async function loadAdminData() {
   const { data: profiles, error: errProfiles } = await supabaseClient.from('profiles').select('*');
   if (errProfiles) alert("Erreur profils : " + errProfiles.message);
-  const { data: spreadsheets, error: errSpreadsheets } = await supabaseClient.from('spreadsheets').select('*, profiles!owner_id(email)');
+  
+  const { data: spreadsheets, error: errSpreadsheets } = await supabaseClient.from('spreadsheets').select('*');
   if (errSpreadsheets) alert("Erreur spreadsheets : " + errSpreadsheets.message);
+  
+  // Manual join to avoid Supabase PostgREST ambiguity
+  if (spreadsheets && profiles) {
+    spreadsheets.forEach(s => {
+      const ownerProfile = profiles.find(p => p.id === s.owner_id);
+      s.profiles = ownerProfile ? { email: ownerProfile.email } : null;
+    });
+  }
   const pendingList = document.getElementById('pending-users-list');
   const approvedList = document.getElementById('approved-users-list');
   const spreadsheetsList = document.getElementById('all-spreadsheets-list');

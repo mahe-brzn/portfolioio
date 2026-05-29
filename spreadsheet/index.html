@@ -253,9 +253,18 @@
 
       const { data, error } = await window.supabaseClient
         .from('spreadsheets')
-        .select('*, profiles!owner_id(email)')
+        .select('*')
         .eq('visibility', 'public')
         .order('created_at', { ascending: false });
+
+      // Manual join to avoid Supabase PostgREST ambiguity
+      const { data: profilesData } = await window.supabaseClient.from('profiles').select('id, email');
+      if (data && profilesData) {
+        data.forEach(s => {
+          const ownerProfile = profilesData.find(p => p.id === s.owner_id);
+          s.profiles = ownerProfile ? { email: ownerProfile.email } : null;
+        });
+      }
 
       if (error) {
         container.innerHTML = '<p style="color:red; text-align:center;">Erreur de chargement : ' + error.message + '</p>';

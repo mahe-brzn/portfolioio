@@ -594,11 +594,11 @@ window.generateKeywords = async (index) => {
       })
     });
 
-    if (!response.ok) {
-      throw new Error("Erreur de l'API Gemini. Clé invalide ou quota dépassé.");
-    }
-
     const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error((data.error && data.error.message) ? data.error.message : "Erreur inconnue de l'API Gemini.");
+    }
     let keywords = data.candidates[0].content.parts[0].text.trim();
     // Remove any trailing period if AI added one
     if (keywords.endsWith('.')) keywords = keywords.slice(0, -1);

@@ -44,6 +44,8 @@ function renderSpreadsheet(spreadsheet) {
     }
     body { overflow-y: auto !important; }
     .nav-logo span, .link-num, .s-label::before { color: var(--sneaker-accent) !important; }
+    ::selection { background: var(--sneaker-accent) !important; color: #000 !important; }
+    ::-moz-selection { background: var(--sneaker-accent) !important; color: #000 !important; }
     
     .spreadsheet-hero {
       position: relative;

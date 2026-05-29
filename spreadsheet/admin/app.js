@@ -467,7 +467,7 @@ document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
 });
 
 document.getElementById('btn-add-item')?.addEventListener('click', () => {
-  editingItems.push({ title: '', price: '', url: '' });
+  editingItems.push({ title: '', price: '', url: '', keywords: '' });
   renderEditItems();
 });
 
@@ -501,6 +501,10 @@ function renderEditItems() {
         <div style="flex:1;">
           <label style="font-size:0.7rem;color:var(--text-muted);">Lien</label>
           <input type="url" value="${item.url.replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'url', this.value)" placeholder="https://..." />
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.7rem;color:var(--text-muted);">Mots-clés (recherche)</label>
+          <input type="text" value="${(item.keywords || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'keywords', this.value)" placeholder="ex: LV, sneaker..." />
         </div>
       </div>
     `;

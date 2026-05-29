@@ -272,7 +272,7 @@ function renderSpreadsheet(spreadsheet) {
   if (spreadsheet.items && spreadsheet.items.length > 0) {
     spreadsheet.items.forEach((item, index) => {
       itemsHtml += `
-        <article class="sneaker-card reveal active">
+        <article class="sneaker-card reveal active" data-keywords="${(item.keywords || '').replace(/"/g, '&quot;').toLowerCase()}">
           <div class="sneaker-watermark">${String(index+1).padStart(2, '0')}</div>
           <div class="sneaker-content">
             <h2 class="sneaker-title">${item.title}</h2>
@@ -344,7 +344,8 @@ function renderSpreadsheet(spreadsheet) {
       const cards = document.querySelectorAll('.sneaker-card');
       cards.forEach(card => {
         const title = card.querySelector('.sneaker-title').textContent.toLowerCase();
-        if (title.includes(query)) {
+        const keywords = card.getAttribute('data-keywords') || '';
+        if (title.includes(query) || keywords.includes(query)) {
           card.style.display = 'flex';
         } else {
           card.style.display = 'none';

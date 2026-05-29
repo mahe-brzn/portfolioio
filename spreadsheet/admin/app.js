@@ -213,11 +213,8 @@ if (btnStart2fa) {
       return;
     }
 
-    console.log('[2FA Enroll] data:', JSON.stringify(data));
-    console.log('[2FA Enroll] error:', error);
+    console.log('[2FA Enroll] pendingFactorId set to:', data.id);
     pendingFactorId = data.id;
-    console.log('[2FA Enroll] pendingFactorId set to:', pendingFactorId);
-    console.log('[2FA Enroll] qr_code type:', typeof data.totp.qr_code, '| starts with:', data.totp.qr_code?.substring(0, 30));
     
     // Display SVG QR Code safely
     const qrContainer = document.getElementById('2fa-qr-code-container');
@@ -272,7 +269,7 @@ if (form2faVerify) {
     const { data: challengeData, error: challengeError } = await supabaseClient.auth.mfa.challenge({
       factorId: pendingFactorId
     });
-    console.log('[2FA Verify] challenge result:', JSON.stringify(challengeData), challengeError);
+    console.log('[2FA Verify] challengeData:', challengeData, challengeError);
 
     if (challengeError) {
       err.textContent = "Erreur challenge: " + challengeError.message;
@@ -303,16 +300,21 @@ if (form2faVerify) {
 // Start Challenge (Login)
 async function start2FAChallenge() {
   showView('2fa-challenge');
-  const { data: { factors }, error } = await supabaseClient.auth.mfa.listFactors();
+  const { data: factorsData, error } = await supabaseClient.auth.mfa.listFactors();
+  console.log('[2FA Challenge] listFactors result:', factorsData, error);
   
   if (error) {
     console.error("Error listing factors", error);
     return;
   }
 
-  const totpFactor = factors.find(f => f.factor_type === 'totp' && f.status === 'verified');
+  // Supabase returns { all: [], totp: [] }
+  const allFactors = factorsData?.all || factorsData?.totp || [];
+  const totpFactor = allFactors.find(f => f.factor_type === 'totp' && f.status === 'verified');
   if (!totpFactor) {
-    console.error("No verified TOTP factor found");
+    console.error("No verified TOTP factor found. All factors:", allFactors);
+    // No 2FA set up yet, go directly to dashboard
+    handleLogin(currentUser);
     return;
   }
 

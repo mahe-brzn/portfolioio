@@ -253,7 +253,7 @@
 
       const { data, error } = await window.supabaseClient
         .from('spreadsheets')
-        .select('*, profiles(email)')
+        .select('*, profiles!spreadsheets_owner_id_fkey(email)')
         .eq('visibility', 'public')
         .order('created_at', { ascending: false });
 

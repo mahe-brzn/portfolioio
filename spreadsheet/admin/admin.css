@@ -381,10 +381,12 @@
   background: rgba(200, 255, 87, 0.05);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .admin-section {
     padding-top: 80px;
     padding-bottom: 40px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
   .admin-grid {
     grid-template-columns: 1fr;
@@ -393,39 +395,61 @@
   .admin-header {
     flex-direction: column;
     align-items: flex-start;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    gap: 15px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    gap: 12px;
   }
   .admin-header h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   .admin-card {
-    padding: 20px;
-    border-radius: 16px;
+    padding: 20px 16px;
+    border-radius: 20px;
   }
   .list-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .list-item > div:first-child {
+    width: 100%;
   }
   .list-item > div:last-child {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .btn-icon {
+    width: 44px; /* Larger tap target */
+    height: 44px;
   }
   .auth-box {
-    padding: 32px 20px;
-    margin: 0 10px;
-    border-radius: 20px;
+    padding: 32px 24px;
+    margin: 0 16px;
+    border-radius: 24px;
+    width: calc(100% - 32px);
   }
   .edit-item {
     grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 16px;
+    gap: 16px;
+    padding: 20px 16px;
   }
   .edit-item-row2 {
     flex-direction: column;
+    gap: 12px;
+  }
+  .modal-content {
+    padding: 32px 24px;
+    width: calc(100% - 32px);
+    border-radius: 24px;
+  }
+  .modal-close {
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
   }
 }
 

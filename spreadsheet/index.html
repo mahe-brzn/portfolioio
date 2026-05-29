@@ -155,6 +155,28 @@
       filter: blur(80px);
       border-radius: 50%;
     }
+
+    /* Mobile Optimization for Spreadsheet Index */
+    @media (max-width: 600px) {
+      .spreadsheet-hero {
+        padding: clamp(80px, 12vw, 120px) 20px clamp(40px, 8vw, 60px);
+        min-height: 30vh;
+      }
+      .shoes-grid {
+        grid-template-columns: 1fr;
+        padding: 0 16px clamp(60px, 10vw, 100px);
+        gap: 20px;
+      }
+      .spread-card {
+        padding: 30px 24px;
+      }
+      .spread-card-title {
+        font-size: 1.5rem;
+      }
+      .spread-card-desc {
+        font-size: 0.95rem;
+      }
+    }
   </style>
 </head>
 <body>

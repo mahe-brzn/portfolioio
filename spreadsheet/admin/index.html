@@ -15,6 +15,13 @@
   <link rel="stylesheet" href="/garagealpin/style.css" />
   <link rel="stylesheet" href="admin.css?v=16" />
   
+  <style>
+    /* Fix interactions */
+    #cursor-dot, #cursor-ring, #grain, .spread-ambient, .hero-grid {
+      pointer-events: none !important;
+    }
+  </style>
+
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/spreadsheet/supabase-config.js"></script>

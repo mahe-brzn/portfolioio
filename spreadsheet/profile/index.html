@@ -55,6 +55,11 @@
     .badge.pending { background: rgba(255,255,255,0.1); color: #fff; }
     .badge.approved { background: rgba(200,255,87,0.2); color: #c8ff57; }
     .badge.rejected { background: rgba(255,82,82,0.2); color: #ff5252; }
+
+    /* Fix interactions */
+    #cursor-dot, #cursor-ring, #grain, .spread-ambient, .hero-grid {
+      pointer-events: none !important;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +91,7 @@
     <div class="profile-tab active" data-target="sec-spreadsheets">Mes Spreadsheets</div>
     <div class="profile-tab" data-target="sec-favorites">Mes Favoris</div>
     <div class="profile-tab" data-target="sec-suggestions">Mes Suggestions</div>
+    <div class="profile-tab" data-target="sec-settings">Paramètres</div>
   </div>
 
   <!-- MES SPREADSHEETS -->
@@ -106,9 +112,23 @@
 
   <!-- MES SUGGESTIONS -->
   <section class="profile-section" id="sec-suggestions">
-    <h2 style="margin-bottom:20px; font-family:var(--font-display);">Statut de mes Suggestions</h2>
-    <div id="my-suggestions-list">
+    <h2 style="margin-bottom:20px; font-family:var(--font-display);">Mes Suggestions (Modération)</h2>
+    <div class="shoes-grid" id="my-suggestions-list" style="grid-template-columns: 1fr;">
       <p style="color:var(--text-muted);">Chargement...</p>
+    </div>
+  </section>
+
+  <!-- PARAMÈTRES -->
+  <section class="profile-section" id="sec-settings">
+    <h2 style="margin-bottom:20px; font-family:var(--font-display);">Paramètres du compte</h2>
+    <div class="spread-card" style="max-width: 500px; margin: 0 auto;">
+      <h3 style="margin-bottom: 20px;">Modifier mon mot de passe</h3>
+      <form id="form-change-password">
+        <input type="password" id="new-password" placeholder="Nouveau mot de passe" required style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;" />
+        <input type="password" id="confirm-password" placeholder="Confirmer le nouveau mot de passe" required style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px;" />
+        <button type="submit" style="width: 100%; padding: 12px; background: var(--sneaker-accent); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s;">Mettre à jour</button>
+        <p id="password-status" style="margin-top: 15px; font-size: 0.9rem; text-align: center;"></p>
+      </form>
     </div>
   </section>
 
@@ -119,15 +139,54 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Tabs logic
-      document.querySelectorAll('.profile-tab').forEach(tab => {
+      // Tab Navigation
+      const tabs = document.querySelectorAll('.profile-tab');
+      const sections = document.querySelectorAll('.profile-section');
+      
+      tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-          document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
+          tabs.forEach(t => t.classList.remove('active'));
+          sections.forEach(s => s.classList.remove('active'));
           tab.classList.add('active');
-          document.getElementById(tab.dataset.target).classList.add('active');
+          document.getElementById(tab.getAttribute('data-target')).classList.add('active');
         });
       });
+
+      // Handle Password Change
+      const formPwd = document.getElementById('form-change-password');
+      if (formPwd) {
+        formPwd.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const pwd1 = document.getElementById('new-password').value;
+          const pwd2 = document.getElementById('confirm-password').value;
+          const status = document.getElementById('password-status');
+          
+          if (pwd1 !== pwd2) {
+            status.style.color = '#ff5252';
+            status.textContent = 'Les mots de passe ne correspondent pas.';
+            return;
+          }
+          if (pwd1.length < 6) {
+            status.style.color = '#ff5252';
+            status.textContent = 'Le mot de passe doit faire au moins 6 caractères.';
+            return;
+          }
+          
+          status.style.color = '#fff';
+          status.textContent = 'Mise à jour en cours...';
+          
+          const { error } = await supabase.auth.updateUser({ password: pwd1 });
+          
+          if (error) {
+            status.style.color = '#ff5252';
+            status.textContent = 'Erreur : ' + error.message;
+          } else {
+            status.style.color = '#c8ff57';
+            status.textContent = 'Mot de passe mis à jour avec succès !';
+            formPwd.reset();
+          }
+        });
+      }
 
       // Fetch Data
       setTimeout(async () => {

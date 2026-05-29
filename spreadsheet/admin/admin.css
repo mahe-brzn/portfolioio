@@ -137,9 +137,11 @@
   padding: 32px;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.admin-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.15);
+@media (hover: hover) {
+  .admin-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
 }
 
 .admin-card h3 {
@@ -186,13 +188,15 @@
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-.list-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255,255,255,0.1);
-  transform: scale(1.01);
-}
-.list-item:hover::before {
-  opacity: 1;
+@media (hover: hover) {
+  .list-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255,255,255,0.1);
+    transform: scale(1.01);
+  }
+  .list-item:hover::before {
+    opacity: 1;
+  }
 }
 
 .list-item-title {
@@ -265,10 +269,12 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
-.modal-close:hover { 
-  color: white; 
-  background: rgba(255,255,255,0.1);
-  transform: rotate(90deg);
+@media (hover: hover) {
+  .modal-close:hover { 
+    color: white; 
+    background: rgba(255,255,255,0.1);
+    transform: rotate(90deg);
+  }
 }
 
 .input-group {
@@ -313,9 +319,11 @@
   align-items: center;
   transition: all 0.3s ease;
 }
-.edit-item:hover {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.1);
+@media (hover: hover) {
+  .edit-item:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.1);
+  }
 }
 .edit-item input {
   background: rgba(0,0,0,0.3);
@@ -347,15 +355,17 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
-.btn-icon:hover {
-  background: var(--sneaker-accent);
-  color: black;
-  transform: translateY(-2px);
-}
-.btn-icon.danger:hover {
-  background: #ff5252;
-  color: white;
-  border-color: #ff5252;
+@media (hover: hover) {
+  .btn-icon:hover {
+    background: var(--sneaker-accent);
+    color: black;
+    transform: translateY(-2px);
+  }
+  .btn-icon.danger:hover {
+    background: #ff5252;
+    color: white;
+    border-color: #ff5252;
+  }
 }
 
 /* Add Item Button */
@@ -375,10 +385,12 @@
   transition: all 0.3s ease;
   margin-bottom: 24px;
 }
-.btn-add-ghost:hover {
-  border-color: var(--sneaker-accent);
-  color: var(--sneaker-accent);
-  background: rgba(200, 255, 87, 0.05);
+@media (hover: hover) {
+  .btn-add-ghost:hover {
+    border-color: var(--sneaker-accent);
+    color: var(--sneaker-accent);
+    background: rgba(200, 255, 87, 0.05);
+  }
 }
 
 @media (max-width: 768px) {

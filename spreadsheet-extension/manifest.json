@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Spreadsheet Quick Add",
+  "version": "1.0.0",
+  "description": "Ajoute rapidement des chaussures et articles à vos spreadsheets directement depuis n'importe quel site.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ]
+}

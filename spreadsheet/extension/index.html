@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Télécharger l'Extension | Spreadsheets</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/garagealpin/style.css" />
+  <style>
+    body { background: var(--bg); color: var(--white); font-family: var(--font-body); }
+    .hero { padding: 120px 20px 80px; text-align: center; }
+    .hero-title { font-family: var(--font-title); font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; }
+    .accent { color: #c8ff57; }
+    .box { max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: left; }
+    .btn-magnetic { display: inline-flex; justify-content: center; align-items: center; background: #c8ff57; color: black; padding: 15px 30px; font-weight: bold; border-radius: 50px; text-decoration: none; margin-top: 20px; }
+    ol { margin-left: 20px; color: rgba(255,255,255,0.7); line-height: 1.8; margin-top: 20px; }
+    li strong { color: white; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1 class="hero-title">Extension <span class="accent">Chrome</span></h1>
+    <p style="color: rgba(255,255,255,0.6); margin-bottom: 40px;">Ajoutez des articles en 1 clic depuis Vinted, Nike, etc.</p>
+    
+    <div class="box">
+      <h2 style="font-size: 1.5rem; margin-bottom: 10px;">Comment l'installer ?</h2>
+      <ol>
+        <li>Cliquez sur le bouton ci-dessous pour télécharger le fichier ZIP de l'extension.</li>
+        <li>Décompressez (extrayez) le fichier ZIP sur votre ordinateur.</li>
+        <li>Ouvrez Google Chrome et allez sur la page <strong>chrome://extensions</strong>.</li>
+        <li>Activez le <strong>"Mode développeur"</strong> en haut à droite.</li>
+        <li>Cliquez sur <strong>"Charger l'extension non empaquetée"</strong> et sélectionnez le dossier `spreadsheet-extension` que vous venez d'extraire.</li>
+        <li>Ouvrez l'extension en cliquant sur l'icône de puzzle en haut à droite de Chrome, et connectez-vous avec vos identifiants Admin !</li>
+      </ol>
+
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="spreadsheet-extension.zip" class="btn-magnetic" download>Télécharger l'extension (.zip)</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+  <script src="supabase.js"></script>
+</head>
+<body>
+  <div id="auth-view" class="view">
+    <h3>Spreadsheets</h3>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Mot de passe" />
+    <button id="btn-login">Se connecter</button>
+    <p id="auth-error"></p>
+  </div>
+  
+  <div id="add-view" class="view" style="display:none;">
+    <h3>Ajouter un article</h3>
+    <label>Spreadsheet :</label>
+    <select id="spreadsheet-select"></select>
+    
+    <label>Titre :</label>
+    <input type="text" id="item-title" />
+    
+    <label>Prix :</label>
+    <input type="text" id="item-price" placeholder="ex: 50€" />
+    
+    <label>Mots-clés :</label>
+    <input type="text" id="item-keywords" placeholder="ex: nike, air max..." />
+    
+    <label>URL :</label>
+    <input type="url" id="item-url" />
+    
+    <button id="btn-add">Ajouter l'article</button>
+    <button id="btn-logout" class="btn-outline">Déconnexion</button>
+    <p id="add-status"></p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

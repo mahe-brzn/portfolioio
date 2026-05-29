@@ -13,15 +13,17 @@
       .single();
 
     if (error || !spreadsheet) {
-      // Show normal 404
-      document.getElementById('main-content').style.display = 'flex';
+      // Show normal page (index or 404)
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) mainContent.style.display = 'block';
       return;
     }
 
     renderSpreadsheet(spreadsheet);
 
   } catch (e) {
-    document.getElementById('main-content').style.display = 'flex';
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) mainContent.style.display = 'block';
   }
 })();
 

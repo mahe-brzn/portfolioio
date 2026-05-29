@@ -293,8 +293,12 @@ function renderSpreadsheet(spreadsheet) {
   let itemsHtml = '';
   if (spreadsheet.items && spreadsheet.items.length > 0) {
     spreadsheet.items.forEach((item, index) => {
+      // Parse price to numeric value for sorting
+      const rawPrice = item.price.replace(/[^0-9.,]/g, '').replace(',', '.');
+      const numPrice = parseFloat(rawPrice) || 0;
+      
       itemsHtml += `
-        <article class="sneaker-card reveal active" data-keywords="${(item.keywords || '').replace(/"/g, '&quot;').toLowerCase()}">
+        <article class="sneaker-card reveal active" data-index="${index}" data-price="${numPrice}" data-title="${item.title.replace(/"/g, '&quot;').toLowerCase()}" data-keywords="${(item.keywords || '').replace(/"/g, '&quot;').toLowerCase()}">
           <div class="sneaker-watermark">${String(index+1).padStart(2, '0')}</div>
           <div class="sneaker-content">
             <h2 class="sneaker-title">${item.title}</h2>
@@ -332,20 +336,20 @@ function renderSpreadsheet(spreadsheet) {
         <p class="spreadsheet-subtitle reveal active reveal-d2">${spreadsheet.description || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.'}</p>
         <p class="spreadsheet-subtitle reveal active reveal-d2" style="font-size:0.85rem; opacity:0.6; margin-top:10px;">Par ${spreadsheet.profiles?.email || 'Admin'} • Mis à jour le ${new Date(spreadsheet.created_at).toLocaleDateString('fr-FR')}</p>
         
-        <div class="social-actions reveal active" style="transition-delay: 0.3s;">
-          <button class="action-btn" id="btn-like">
+        <div class="social-actions reveal active" style="transition-delay: 0.3s; position: relative; z-index: 9999; pointer-events: auto !important;">
+          <button class="action-btn" id="btn-like" style="pointer-events: auto !important;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
             <span id="like-count">${spreadsheet.likes_count || 0}</span>
           </button>
-          <button class="action-btn" id="btn-fav">
+          <button class="action-btn" id="btn-fav" style="pointer-events: auto !important;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             Favoris
           </button>
-          <button class="action-btn" id="btn-suggest">
+          <button class="action-btn" id="btn-suggest" style="pointer-events: auto !important;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
             Suggérer
           </button>
-          <button class="action-btn" id="btn-duplicate">
+          <button class="action-btn" id="btn-duplicate" style="pointer-events: auto !important;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             Dupliquer
           </button>
@@ -353,11 +357,19 @@ function renderSpreadsheet(spreadsheet) {
       </section>
 
       
-      <div class="search-container" style="max-width: 600px; margin: -20px auto 40px auto; padding: 0 clamp(24px, 5vw, 80px); position: relative; z-index: 5;">
-        <input type="text" id="sneaker-search" placeholder="Rechercher (ex: Jordan, Nike...)" style="width: 100%; padding: 16px 24px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: white; font-family: var(--font-body); font-size: 1rem; outline: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s;" />
+      <div class="search-container" style="max-width: 800px; margin: -20px auto 40px auto; padding: 0 clamp(24px, 5vw, 80px); position: relative; z-index: 5; display: flex; gap: 15px; flex-wrap: wrap;">
+        <input type="text" id="sneaker-search" placeholder="Rechercher (ex: Jordan, Nike...)" style="flex: 1; min-width: 200px; padding: 16px 24px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: white; font-family: var(--font-body); font-size: 1rem; outline: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s;" />
+        
+        <select id="sneaker-sort" style="padding: 16px 24px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.8); color: white; font-family: var(--font-body); font-size: 1rem; outline: none; backdrop-filter: blur(10px); cursor: pointer;">
+          <option value="default">Tri par défaut</option>
+          <option value="price-asc">Prix Croissant</option>
+          <option value="price-desc">Prix Décroissant</option>
+          <option value="name-asc">Nom (A-Z)</option>
+          <option value="name-desc">Nom (Z-A)</option>
+        </select>
       </div>
-      <div class="shoes-grid">
-
+      
+      <div class="shoes-grid" id="items-grid-container">
         ${itemsHtml}
       </div>
 
@@ -403,6 +415,34 @@ function renderSpreadsheet(spreadsheet) {
           card.style.display = 'none';
         }
       });
+    });
+  }
+
+  // Sort logic
+  const sortSelect = document.getElementById('sneaker-sort');
+  const itemsGridContainer = document.getElementById('items-grid-container');
+  if (sortSelect && itemsGridContainer) {
+    sortSelect.addEventListener('change', (e) => {
+      const sortValue = e.target.value;
+      const cards = Array.from(itemsGridContainer.querySelectorAll('.sneaker-card'));
+      
+      cards.sort((a, b) => {
+        if (sortValue === 'price-asc') {
+          return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+        } else if (sortValue === 'price-desc') {
+          return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+        } else if (sortValue === 'name-asc') {
+          return a.getAttribute('data-title').localeCompare(b.getAttribute('data-title'));
+        } else if (sortValue === 'name-desc') {
+          return b.getAttribute('data-title').localeCompare(a.getAttribute('data-title'));
+        } else {
+          // Default: by original index
+          return parseInt(a.getAttribute('data-index')) - parseInt(b.getAttribute('data-index'));
+        }
+      });
+      
+      // Re-append in new order
+      cards.forEach(card => itemsGridContainer.appendChild(card));
     });
   }
 

@@ -256,7 +256,7 @@ const form2faVerify = document.getElementById('form-2fa-verify');
 if (form2faVerify) {
   form2faVerify.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const code = document.getElementById('2fa-verify-code').value;
+    const code = document.getElementById('2fa-verify-code').value.trim();
     const err = document.getElementById('2fa-verify-error');
     const btn = e.target.querySelector('button');
     
@@ -282,7 +282,7 @@ if (form2faVerify) {
     btn.textContent = 'Vérifier et Activer';
 
     if (error) {
-      err.textContent = "Code invalide. Essayez encore.";
+      err.textContent = "Code invalide : " + error.message;
     } else {
       document.getElementById('2fa-setup-step2').style.display = 'none';
       document.getElementById('2fa-setup-success').style.display = 'block';

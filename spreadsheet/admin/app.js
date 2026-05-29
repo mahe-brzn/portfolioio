@@ -88,6 +88,12 @@ async function handleLogin(user) {
   }
 
   currentProfile = profile;
+  
+  // Populate API key input if it exists
+  const apiKeyInput = document.getElementById('gemini-api-key');
+  if (apiKeyInput) {
+    apiKeyInput.value = currentProfile.gemini_api_key || localStorage.getItem('gemini_api_key') || '';
+  }
 
   if (profile.role === 'admin') {
     showView('admin');
@@ -560,7 +566,7 @@ window.deleteItem = (index) => {
 };
 
 window.generateKeywords = async (index) => {
-  const apiKey = localStorage.getItem('gemini_api_key');
+  const apiKey = currentProfile?.gemini_api_key || localStorage.getItem('gemini_api_key');
   if (!apiKey) {
     alert("Veuillez d'abord configurer votre clé API Gemini en bas de la page.");
     return;
@@ -589,7 +595,7 @@ window.generateKeywords = async (index) => {
     });
 
     if (!response.ok) {
-      throw new Error("Erreur de l'API Gemini. Vérifiez votre clé.");
+      throw new Error("Erreur de l'API Gemini. Clé invalide ou quota dépassé.");
     }
 
     const data = await response.json();
@@ -613,21 +619,36 @@ const saveKeyBtn = document.getElementById('btn-save-api-key');
 const keyStatus = document.getElementById('api-key-status');
 
 if (apiKeyInput && saveKeyBtn) {
-  // Load existing key
-  const existingKey = localStorage.getItem('gemini_api_key');
-  if (existingKey) {
-    apiKeyInput.value = existingKey;
-  }
-
-  saveKeyBtn.addEventListener('click', () => {
+  saveKeyBtn.addEventListener('click', async () => {
     const val = apiKeyInput.value.trim();
+    const originalText = saveKeyBtn.textContent;
+    saveKeyBtn.textContent = '...';
+    
     if (val) {
-      localStorage.setItem('gemini_api_key', val);
+      localStorage.setItem('gemini_api_key', val); // Backup
+      
+      // Save to Supabase
+      if (currentProfile && currentUser) {
+        await supabaseClient
+          .from('profiles')
+          .update({ gemini_api_key: val })
+          .eq('id', currentUser.id);
+        currentProfile.gemini_api_key = val;
+      }
+
       keyStatus.style.display = 'block';
       setTimeout(() => keyStatus.style.display = 'none', 3000);
     } else {
       localStorage.removeItem('gemini_api_key');
+      if (currentProfile && currentUser) {
+        await supabaseClient
+          .from('profiles')
+          .update({ gemini_api_key: null })
+          .eq('id', currentUser.id);
+        currentProfile.gemini_api_key = null;
+      }
     }
+    saveKeyBtn.textContent = originalText;
   });
 }
 

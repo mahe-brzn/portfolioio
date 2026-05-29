@@ -235,6 +235,7 @@ function renderSpreadsheet(spreadsheet) {
 
     <main id="main-content-dynamic">
       <section class="spreadsheet-hero">
+        <a href="/spreadsheet" class="btn-back-mobile" style="position: absolute; top: 20px; left: 20px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; z-index: 10; font-family: var(--font-body);">&larr; Retour aux Spreadsheets</a>
         <p class="s-label reveal active" data-num="01" aria-hidden="true">${spreadsheet.badge_text || 'La sélection du chef'}</p>
         <h1 class="spreadsheet-title reveal active reveal-d1">${spreadsheet.title.replace(' ', '<br><span class="accent">')}</span></h1>
         <p class="spreadsheet-subtitle reveal active reveal-d2">${spreadsheet.description || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.'}</p>

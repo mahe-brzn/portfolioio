@@ -503,8 +503,11 @@ function renderEditItems() {
           <input type="url" value="${item.url.replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'url', this.value)" placeholder="https://..." />
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.7rem;color:var(--text-muted);">Mots-clés (recherche)</label>
-          <input type="text" value="${(item.keywords || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'keywords', this.value)" placeholder="ex: LV, sneaker..." />
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:0.7rem;color:var(--text-muted);">Mots-clés (recherche)</label>
+            <button onclick="generateKeywords(${index})" class="btn-add-ghost" style="padding: 2px 8px; font-size: 0.7rem; margin-bottom: 2px;">✨ Générer</button>
+          </div>
+          <input type="text" id="kw-input-${index}" value="${(item.keywords || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'keywords', this.value)" placeholder="ex: LV, sneaker..." />
         </div>
       </div>
     `;
@@ -519,6 +522,78 @@ window.deleteItem = (index) => {
   editingItems.splice(index, 1);
   renderEditItems();
 };
+
+window.generateKeywords = async (index) => {
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (!apiKey) {
+    alert("Veuillez d'abord configurer votre clé API Gemini en bas de la page.");
+    return;
+  }
+  
+  const item = editingItems[index];
+  if (!item.title || item.title.trim() === '') {
+    alert("Veuillez d'abord entrer un titre pour cet article.");
+    return;
+  }
+
+  const inputEl = document.getElementById(`kw-input-${index}`);
+  const originalPlaceholder = inputEl.placeholder;
+  inputEl.value = "Génération en cours...";
+  inputEl.disabled = true;
+
+  const prompt = `Tu es un expert en sneakers et en streetwear. Génère une liste de mots-clés de recherche (abréviations, marque, surnoms, catégories, fautes de frappe courantes) pour la chaussure suivante : "${item.title}". Règles: Ne renvoie STRICTEMENT rien d'autre que la liste des mots-clés séparés par des virgules. Maximum 30 mots-clés. Tout en minuscules.`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur de l'API Gemini. Vérifiez votre clé.");
+    }
+
+    const data = await response.json();
+    let keywords = data.candidates[0].content.parts[0].text.trim();
+    // Remove any trailing period if AI added one
+    if (keywords.endsWith('.')) keywords = keywords.slice(0, -1);
+    
+    editingItems[index].keywords = keywords;
+    inputEl.value = keywords;
+  } catch (err) {
+    alert(err.message);
+    inputEl.value = item.keywords || '';
+  } finally {
+    inputEl.disabled = false;
+  }
+};
+
+// AI Settings Logic
+const apiKeyInput = document.getElementById('gemini-api-key');
+const saveKeyBtn = document.getElementById('btn-save-api-key');
+const keyStatus = document.getElementById('api-key-status');
+
+if (apiKeyInput && saveKeyBtn) {
+  // Load existing key
+  const existingKey = localStorage.getItem('gemini_api_key');
+  if (existingKey) {
+    apiKeyInput.value = existingKey;
+  }
+
+  saveKeyBtn.addEventListener('click', () => {
+    const val = apiKeyInput.value.trim();
+    if (val) {
+      localStorage.setItem('gemini_api_key', val);
+      keyStatus.style.display = 'block';
+      setTimeout(() => keyStatus.style.display = 'none', 3000);
+    } else {
+      localStorage.removeItem('gemini_api_key');
+    }
+  });
+}
 
 document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async (e) => {
   const btn = e.target;

@@ -1,9 +1,16 @@
+window.onerror = function(msg, url, line) { alert("JS Error: " + msg + " (Line: " + line + ")"); };
 (async function() {
   const supabaseClient = window.supabaseClient;
-  if (!supabaseClient) return;
+  if (!supabaseClient) {
+    alert("Erreur critique : Supabase n'a pas pu se charger. Vérifiez votre connexion ou désactivez votre bloqueur de publicités.");
+    return;
+  }
 
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-  const slug = pathParts[pathParts.length - 1]; // e.g. "mon-lien"
+  let slug = pathParts[pathParts.length - 1];
+  if (slug === 'index.html' || slug === 'index.htm') {
+    slug = pathParts[pathParts.length - 2];
+  }
 
   try {
     const { data: spreadsheet, error } = await supabaseClient
@@ -230,6 +237,43 @@ function renderSpreadsheet(spreadsheet) {
     .hero-ambient, .hero-grid, .cyan-orb { pointer-events: none !important; }
     .spreadsheet-hero { position: relative; z-index: 5; pointer-events: none; }
     .spreadsheet-hero > * { pointer-events: auto; }
+
+    /* Agent Modal */
+    .agent-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      z-index: 100000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .agent-modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .agent-modal {
+      background: rgba(20, 20, 20, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+      width: 90%; max-width: 500px; padding: 30px; position: relative;
+      transform: translateY(20px); transition: transform 0.3s; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+    }
+    .agent-modal-overlay.active .agent-modal { transform: translateY(0); }
+    .agent-modal-close {
+      position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; cursor: pointer; opacity: 0.5; transition: 0.3s; padding: 5px;
+    }
+    .agent-modal-close:hover { opacity: 1; transform: scale(1.1); }
+    
+    .am-title { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 10px; color: var(--white); }
+    .am-price { font-size: 1.2rem; font-weight: bold; color: var(--sneaker-accent); margin-bottom: 15px; }
+    .am-details { display: flex; gap: 15px; margin-bottom: 20px; font-size: 0.9rem; color: rgba(255,255,255,0.7); flex-wrap: wrap; }
+    .am-detail-pill { background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+    
+    .am-btn-copy {
+      width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+      color: white; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 30px; transition: 0.3s;
+    }
+    .am-btn-copy:hover { background: rgba(255,255,255,0.1); }
+    
+    .am-agents-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); margin-bottom: 15px; text-align: center; }
+    .am-agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+    .am-agent-btn {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      padding: 10px; color: white; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: 0.2s; text-align: center;
+    }
+    .am-agent-btn:hover { background: var(--sneaker-accent); color: black; border-color: var(--sneaker-accent); transform: translateY(-2px); }
   `;
   document.head.appendChild(style);
 
@@ -293,22 +337,26 @@ function renderSpreadsheet(spreadsheet) {
   let itemsHtml = '';
   if (spreadsheet.items && spreadsheet.items.length > 0) {
     spreadsheet.items.forEach((item, index) => {
-      // Parse price to numeric value for sorting
-      const rawPrice = item.price.replace(/[^0-9.,]/g, '').replace(',', '.');
+      if (!item) return; // Crash protection
+      
+      // Parse price to numeric value for sorting safely
+      const priceStr = String(item.price || '');
+      const titleStr = String(item.title || '');
+      const keywordsStr = String(item.keywords || '');
+      
+      const rawPrice = priceStr.replace(/[^0-9.,]/g, '').replace(',', '.');
       const numPrice = parseFloat(rawPrice) || 0;
       
       itemsHtml += `
-        <article class="sneaker-card reveal active" data-index="${index}" data-price="${numPrice}" data-title="${item.title.replace(/"/g, '&quot;').toLowerCase()}" data-keywords="${(item.keywords || '').replace(/"/g, '&quot;').toLowerCase()}">
+        <article class="sneaker-card reveal active" data-index="${index}" data-price="${numPrice}" data-title="${titleStr.replace(/"/g, '&quot;').toLowerCase()}" data-keywords="${keywordsStr.replace(/"/g, '&quot;').toLowerCase()}" style="cursor:pointer;" onclick="window.openAgentModal(${index})">
           <div class="sneaker-watermark">${String(index+1).padStart(2, '0')}</div>
           <div class="sneaker-content">
-            <h2 class="sneaker-title">${item.title}</h2>
-            <span class="sneaker-price">${item.price}</span>
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="sneaker-btn">
-              Acheter
-              <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
+            <h2 class="sneaker-title">${titleStr || 'Produit inconnu'}</h2>
+            <span class="sneaker-price">${priceStr || 'Prix inconnu'}</span>
+
+            <button onclick="window.fastBuy(event, ${index})" class="sneaker-btn">
+              Achat Rapide ⚡️
+            </button>
           </div>
         </article>
       `;
@@ -392,6 +440,27 @@ function renderSpreadsheet(spreadsheet) {
         </div>
       </div>
     </footer>
+
+    <!-- Agent Modal -->
+    <div class="agent-modal-overlay" id="agent-modal-overlay">
+      <div class="agent-modal">
+        <button class="agent-modal-close" id="agent-modal-close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h2 class="am-title" id="am-title">Nom du produit</h2>
+        <div class="am-price" id="am-price">25€</div>
+        <div class="am-details">
+          <div class="am-detail-pill" id="am-weight">~800g estimé</div>
+          <div class="am-detail-pill" id="am-shipping">~15-25€ livraison</div>
+        </div>
+        <button class="am-btn-copy" id="am-btn-copy">🔗 Copier le lien original</button>
+        
+        <div class="am-agents-title">CHOISIR UN AGENT D'ACHAT</div>
+        <div class="am-agents-grid" id="am-agents-grid">
+          <!-- Buttons injected dynamically -->
+        </div>
+      </div>
+    </div>
   `;
 
   document.body.appendChild(mainWrapper);
@@ -399,6 +468,67 @@ function renderSpreadsheet(spreadsheet) {
   // Remove the old main-content
   const oldMain = document.getElementById('main-content');
   if (oldMain) oldMain.remove();
+
+  // Agent Logic
+  window.convertAgentLink = (agent, url) => {
+    const encoded = encodeURIComponent(url || '');
+    switch(agent) {
+      case 'hippobuy': return `https://hippobuy.com/product/details?url=${encoded}`;
+      case 'acbuy': return `https://acbuy.com/item?url=${encoded}`;
+      case 'cnfans': return `https://cnfans.com/product/?url=${encoded}`;
+      case 'superbuy': return `https://www.superbuy.com/en/page/buy/?url=${encoded}`;
+      case 'wegobuy': return `https://www.wegobuy.com/en/page/buy?url=${encoded}`;
+      case 'cssbuy': return `https://www.cssbuy.com/item.html?url=${encoded}`;
+      case 'sugargoo': return `https://www.sugargoo.com/#/home/productDetail?productLink=${encoded}`;
+      case 'oopbuy': return `https://oopbuy.com/item?url=${encoded}`;
+      case 'lovegobuy': return `https://lovegobuy.com/item?url=${encoded}`;
+      case 'mulebuy': return `https://mulebuy.com/product/?url=${encoded}`;
+      case 'litbuy': return `https://litbuy.com/item?url=${encoded}`;
+      default: return `https://hippobuy.com/product/details?url=${encoded}`;
+    }
+  };
+
+  const agentsList = ['ACBuy', 'HippoBuy', 'CNFans', 'Superbuy', 'WeGoBuy', 'CSSBuy', 'Sugargoo', 'OopBuy', 'LoveGoBuy', 'Mulebuy', 'LitBuy'];
+
+  window.fastBuy = (e, index) => {
+    e.stopPropagation(); // prevent modal opening
+    const item = spreadsheet.items[index];
+    const favAgent = localStorage.getItem('favorite_agent') || 'hippobuy';
+    const link = window.convertAgentLink(favAgent, item.url);
+    window.open(link, '_blank');
+  };
+
+  window.openAgentModal = (index) => {
+    const item = spreadsheet.items[index];
+    document.getElementById('am-title').textContent = item.title;
+    document.getElementById('am-price').textContent = item.price;
+    document.getElementById('am-weight').textContent = item.weight || '~N/A estimé';
+    document.getElementById('am-shipping').textContent = item.shipping_cost || '~N/A livraison';
+    
+    const copyBtn = document.getElementById('am-btn-copy');
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(item.url);
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = "✅ Lien copié !";
+      setTimeout(() => copyBtn.textContent = originalText, 2000);
+    };
+
+    const grid = document.getElementById('am-agents-grid');
+    grid.innerHTML = agentsList.map(agent => `
+      <button class="am-agent-btn" onclick="window.open('${window.convertAgentLink(agent.toLowerCase(), item.url)}', '_blank')">${agent}</button>
+    `).join('');
+
+    document.getElementById('agent-modal-overlay').classList.add('active');
+  };
+
+  document.getElementById('agent-modal-close')?.addEventListener('click', () => {
+    document.getElementById('agent-modal-overlay').classList.remove('active');
+  });
+  document.getElementById('agent-modal-overlay')?.addEventListener('click', (e) => {
+    if (e.target.id === 'agent-modal-overlay') {
+      document.getElementById('agent-modal-overlay').classList.remove('active');
+    }
+  });
 
   // Search logic
   const searchInput = document.getElementById('sneaker-search');

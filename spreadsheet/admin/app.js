@@ -649,7 +649,7 @@ document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
 });
 
 document.getElementById('btn-add-item')?.addEventListener('click', () => {
-  editingItems.push({ title: '', price: '', url: '', keywords: '' });
+  editingItems.push({ title: '', price: '', url: '', keywords: '', weight: '', shipping_cost: '' });
   renderEditItems();
 });
 
@@ -668,25 +668,42 @@ function renderEditItems() {
     el.className = 'edit-item stagger-item';
     el.style.animationDelay = `${index * 0.05}s`;
     el.innerHTML = `
-      <div>
-        <label style="font-size:0.7rem;color:var(--text-muted);">Titre</label>
-        <input type="text" value="${item.title.replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'title', this.value)" placeholder="ex: Nike Dunk Low" />
+      <div style="display:grid; grid-template-columns: 2fr 1fr auto; gap:10px; margin-bottom:10px;">
+        <div>
+          <label style="font-size:0.7rem;color:var(--text-muted);">Titre</label>
+          <input type="text" value="${(item.title || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'title', this.value)" placeholder="ex: Nike Dunk Low" />
+        </div>
+        <div>
+          <label style="font-size:0.7rem;color:var(--text-muted);">Prix</label>
+          <input type="text" value="${(item.price || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'price', this.value)" placeholder="ex: 50€" />
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button class="btn-icon danger" onclick="deleteItem(${index})" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+        </div>
       </div>
-      <div>
-        <label style="font-size:0.7rem;color:var(--text-muted);">Prix</label>
-        <input type="text" value="${item.price.replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'price', this.value)" placeholder="ex: 50€" />
+      
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div style="position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:0.7rem;color:var(--text-muted);">Poids estimé</label>
+            <button onclick="generateShipping(${index})" class="btn-add-ghost" style="padding: 2px 8px; font-size: 0.7rem; margin-bottom: 2px;">✨ Estimer Livraison</button>
+          </div>
+          <input type="text" id="weight-input-${index}" value="${(item.weight || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'weight', this.value)" placeholder="ex: ~800g estimé" />
+        </div>
+        <div>
+          <label style="font-size:0.7rem;color:var(--text-muted);">Coût Livraison</label>
+          <input type="text" id="shipping-input-${index}" value="${(item.shipping_cost || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'shipping_cost', this.value)" placeholder="ex: ~15–25€ livraison" />
+        </div>
       </div>
-      <div style="display:flex; align-items:flex-end;">
-        <button class="btn-icon danger" onclick="deleteItem(${index})" title="Supprimer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
-      </div>
+
       <div class="edit-item-row2">
         <div style="flex:1;">
-          <label style="font-size:0.7rem;color:var(--text-muted);">Lien</label>
-          <input type="url" value="${item.url.replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'url', this.value)" placeholder="https://..." />
+          <label style="font-size:0.7rem;color:var(--text-muted);">Lien (URL Originale pure)</label>
+          <input type="url" value="${(item.url || '').replace(/"/g, '&quot;')}" onchange="updateUrlItem(${index}, this.value)" placeholder="https://weidian.com/..." />
         </div>
         <div style="flex:1;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:0.7rem;color:var(--text-muted);">Mots-clés (recherche)</label>
+            <label style="font-size:0.7rem;color:var(--text-muted);">Mots-clés</label>
             <button onclick="generateKeywords(${index})" class="btn-add-ghost" style="padding: 2px 8px; font-size: 0.7rem; margin-bottom: 2px;">✨ Générer</button>
           </div>
           <input type="text" id="kw-input-${index}" value="${(item.keywords || '').replace(/"/g, '&quot;')}" onchange="updateItem(${index}, 'keywords', this.value)" placeholder="ex: LV, sneaker..." />
@@ -696,6 +713,26 @@ function renderEditItems() {
     container.appendChild(el);
   });
 }
+
+window.updateUrlItem = (index, value) => {
+  let finalUrl = value;
+  // Extract original URL from agent links if possible
+  try {
+    if (value.includes('url=') || value.includes('productLink=')) {
+      const urlObj = new URL(value);
+      const extracted = urlObj.searchParams.get('url') || urlObj.searchParams.get('productLink');
+      if (extracted) {
+        // Decode it in case it's encoded
+        finalUrl = decodeURIComponent(extracted);
+      }
+    }
+  } catch (e) {
+    // Ignore parsing errors
+  }
+  updateItem(index, 'url', finalUrl);
+  // Re-render to show the cleaned URL
+  renderEditItems();
+};
 
 window.updateItem = (index, field, value) => {
   editingItems[index][field] = value;
@@ -753,6 +790,64 @@ window.generateKeywords = async (index) => {
     inputEl.value = item.keywords || '';
   } finally {
     inputEl.disabled = false;
+  }
+};
+
+window.generateShipping = async (index) => {
+  const apiKey = currentProfile?.gemini_api_key || localStorage.getItem('gemini_api_key');
+  if (!apiKey) {
+    alert("Veuillez d'abord configurer votre clé API Gemini en bas de la page.");
+    return;
+  }
+  
+  const item = editingItems[index];
+  if (!item.title || item.title.trim() === '') {
+    alert("Veuillez d'abord entrer un titre pour cet article.");
+    return;
+  }
+
+  const weightInput = document.getElementById(`weight-input-${index}`);
+  const shippingInput = document.getElementById(`shipping-input-${index}`);
+  weightInput.value = "Calcul...";
+  shippingInput.value = "Calcul...";
+
+  const prompt = `Tu es un expert en sneakers et streetwear importés de Chine (notamment des répliques/contrefaçons). Je dois estimer le poids avec la boîte et le coût de livraison vers l'Europe via un agent (ex: Sugargoo, CNFans).
+  Article : "${item.title}".
+  Règles : 
+  - Renvoie uniquement 2 lignes.
+  - Ligne 1 : poids (ex: "~1200g estimé")
+  - Ligne 2 : coût livraison (ex: "~20-30€ livraison")
+  Ne dis rien d'autre.`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error((data.error && data.error.message) ? data.error.message : "Erreur inconnue de l'API Gemini.");
+    }
+    const lines = data.candidates[0].content.parts[0].text.trim().split('\n');
+    const weight = lines[0] ? lines[0].trim() : '~800g estimé';
+    const shipping = lines[1] ? lines[1].trim() : '~15-25€ livraison';
+    
+    editingItems[index].weight = weight;
+    editingItems[index].shipping_cost = shipping;
+    weightInput.value = weight;
+    shippingInput.value = shipping;
+  } catch (err) {
+    alert(err.message);
+    weightInput.value = item.weight || '';
+    shippingInput.value = item.shipping_cost || '';
   }
 };
 

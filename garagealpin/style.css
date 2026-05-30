@@ -79,6 +79,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
    GRAIN OVERLAY
 ══════════════════════════════════════════════════════ */
 #grain {
+  display: none !important;
   position: fixed;
   inset: -200%;
   width: 400%; height: 400%;

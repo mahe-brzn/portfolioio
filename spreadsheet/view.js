@@ -32,6 +32,10 @@
     const mainContent = document.getElementById('main-content');
     if (mainContent) mainContent.style.display = 'block';
   }
+  } catch (globalError) {
+    alert("CRASH DANS VIEW.JS:\n" + globalError.message + "\n\nStack:\n" + globalError.stack);
+    console.error(globalError);
+  }
 })();
 
 function renderSpreadsheet(spreadsheet) {
@@ -740,9 +744,4 @@ function renderSpreadsheet(spreadsheet) {
 
   // Load comments (wait a bit for auth)
   setTimeout(loadComments, 500);
-
-} catch (globalError) {
-    alert("CRASH DANS VIEW.JS:\n" + globalError.message + "\n\nStack:\n" + globalError.stack);
-    console.error(globalError);
-  }
-})();
+}

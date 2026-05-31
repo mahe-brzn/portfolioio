@@ -1,10 +1,10 @@
-window.onerror = function(msg, url, line) { alert("JS Error: " + msg + " (Line: " + line + ")"); };
 (async function() {
-  const supabaseClient = window.supabaseClient;
-  if (!supabaseClient) {
-    alert("Erreur critique : Supabase n'a pas pu se charger. Vérifiez votre connexion ou désactivez votre bloqueur de publicités.");
-    return;
-  }
+  try {
+    const supabaseClient = window.supabaseClient;
+    if (!supabaseClient) {
+      alert("Erreur critique : Supabase n'a pas pu se charger. Vérifiez votre connexion ou désactivez votre bloqueur de publicités.");
+      return;
+    }
 
   const pathParts = window.location.pathname.split('/').filter(Boolean);
   let slug = pathParts[pathParts.length - 1];
@@ -741,4 +741,8 @@ function renderSpreadsheet(spreadsheet) {
   // Load comments (wait a bit for auth)
   setTimeout(loadComments, 500);
 
-}
+} catch (globalError) {
+    alert("CRASH DANS VIEW.JS:\n" + globalError.message + "\n\nStack:\n" + globalError.stack);
+    console.error(globalError);
+  }
+})();

@@ -179,6 +179,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 .list-item::before {
   content: '';

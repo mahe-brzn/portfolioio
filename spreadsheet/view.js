@@ -113,7 +113,6 @@ function renderSpreadsheet(spreadsheet) {
       margin-bottom: 24px;
       word-break: break-word;
       overflow-wrap: anywhere;
-      hyphens: auto;
     }
     .spreadsheet-title .accent { color: var(--sneaker-accent); }
     .shoes-grid {

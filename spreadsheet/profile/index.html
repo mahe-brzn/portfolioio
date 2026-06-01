@@ -110,12 +110,49 @@
     .btn-submit { width: 100%; padding: 16px; background: var(--sneaker-accent); color: #000; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
     .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--accent-glow); background: #fff; }
 
-    /* Responsive */
+    /* Responsive Profile Sidebar (Drawer) */
+    .profile-mobile-toggle { display: none; }
+    .profile-overlay { display: none; }
+    
     @media (max-width: 900px) {
       .account-layout { flex-direction: column; margin-top: 100px; gap: 20px; }
-      .account-sidebar { width: 100%; position: static; display: flex; flex-direction: column; }
-      .profile-nav { flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
-      .profile-tab { white-space: nowrap; }
+      
+      /* Mobile Toggle Button */
+      .profile-mobile-toggle {
+        display: flex; align-items: center; justify-content: space-between;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        padding: 15px 20px; border-radius: 16px; cursor: pointer; color: white;
+        font-weight: 600; font-size: 1.1rem; backdrop-filter: blur(10px);
+        margin-bottom: 10px; transition: 0.3s;
+      }
+      .profile-mobile-toggle:hover { background: rgba(255,255,255,0.1); }
+      
+      /* Overlay Backdrop */
+      .profile-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100;
+        opacity: 0; pointer-events: none; transition: opacity 0.3s ease; display: block;
+      }
+      .profile-overlay.open { opacity: 1; pointer-events: auto; }
+      
+      /* Sidebar Drawer */
+      .account-sidebar {
+        position: fixed; top: 0; left: -100%; width: 280px; height: 100vh;
+        border-radius: 0 24px 24px 0; z-index: 101; overflow-y: auto;
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-top: 0; border: none; border-right: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+      }
+      .account-sidebar.open { left: 0; }
+      
+      /* Close Button inside Drawer */
+      .profile-close-btn {
+        display: block !important; position: absolute; top: 20px; right: 20px;
+        background: none; border: none; color: rgba(255,255,255,0.6);
+        font-size: 24px; cursor: pointer;
+      }
+      
+      .profile-nav { flex-direction: column; gap: 10px; }
+      .profile-tab { padding: 16px 20px; font-size: 1.1rem; }
     }
 
     /* Modals */
@@ -163,8 +200,19 @@
   </header>
 
   <div class="account-layout">
+    
+    <!-- MOBILE TOGGLE BUTTON -->
+    <div class="profile-mobile-toggle" id="profile-mobile-toggle">
+      <span>Menu Profil</span>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </div>
+
+    <!-- OVERLAY FOR MOBILE -->
+    <div class="profile-overlay" id="profile-overlay"></div>
+
     <!-- SIDEBAR -->
-    <aside class="account-sidebar">
+    <aside class="account-sidebar" id="account-sidebar">
+      <button class="profile-close-btn" id="profile-close-btn" style="display:none;">&times;</button>
       <div class="user-avatar" id="avatar-container" style="cursor: pointer; position: relative; overflow: hidden;" title="Changer d'avatar">
          <span id="avatar-initial">?</span>
          <img id="avatar-image" src="" style="display:none; width:100%; height:100%; border-radius:50%; object-fit:cover; position:absolute; top:0; left:0;">
@@ -882,6 +930,36 @@
           btnDisable.style.display = 'none';
         }
       }
+      check2FAStatus();
+
+      // MOBILE MENU LOGIC
+      const mobileToggle = document.getElementById('profile-mobile-toggle');
+      const mobileOverlay = document.getElementById('profile-overlay');
+      const accountSidebar = document.getElementById('account-sidebar');
+      const mobileCloseBtn = document.getElementById('profile-close-btn');
+
+      function openMobileMenu() {
+        accountSidebar.classList.add('open');
+        mobileOverlay.classList.add('open');
+      }
+
+      function closeMobileMenu() {
+        accountSidebar.classList.remove('open');
+        mobileOverlay.classList.remove('open');
+      }
+
+      if (mobileToggle) mobileToggle.addEventListener('click', openMobileMenu);
+      if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', closeMobileMenu);
+      if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
+
+      // Close menu when clicking a tab (only on mobile)
+      document.querySelectorAll('.profile-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          if (window.innerWidth <= 900) {
+            closeMobileMenu();
+          }
+        });
+      });
 
       // 2FA Setup Flow
       document.getElementById('btn-setup-2fa-profile')?.addEventListener('click', () => {

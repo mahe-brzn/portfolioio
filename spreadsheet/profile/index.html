@@ -186,9 +186,12 @@
       
       <!-- SPREADSHEETS -->
       <section class="profile-section active" id="sec-spreadsheets">
-        <div class="section-header">
-          <h1 class="section-title">Mes Créations</h1>
-          <p class="section-desc">Retrouvez ici toutes les spreadsheets que vous avez créées ou dupliquées.</p>
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+          <div>
+            <h1 class="section-title">Mes Créations</h1>
+            <p class="section-desc">Retrouvez ici toutes les spreadsheets que vous avez créées ou dupliquées.</p>
+          </div>
+          <button id="btn-create-spreadsheet-profile" class="btn-magnetic" style="display: none; padding: 10px 20px; font-size: 0.9rem;">+ Créer une Spreadsheet</button>
         </div>
         <div class="shoes-grid" id="my-spreadsheets-list">
           <p style="color:var(--text-muted);">Chargement en cours...</p>
@@ -404,6 +407,18 @@
         document.getElementById('sidebar-email').textContent = window.currentUser.email;
         document.getElementById('sidebar-role').textContent = window.currentProfile?.role || 'user';
         document.getElementById('avatar-initial').textContent = window.currentUser.email.charAt(0).toUpperCase();
+        
+        // Show create button if admin or creator
+        const role = window.currentProfile?.role;
+        if (role === 'admin' || role === 'creator') {
+          const btnCreate = document.getElementById('btn-create-spreadsheet-profile');
+          if (btnCreate) {
+            btnCreate.style.display = 'inline-block';
+            btnCreate.addEventListener('click', () => {
+              window.location.href = '/spreadsheet/admin/index.html?action=create';
+            });
+          }
+        }
 
         const supabase = window.supabaseClient;
 

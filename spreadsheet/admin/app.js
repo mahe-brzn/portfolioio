@@ -98,11 +98,24 @@ async function handleLogin(user) {
   if (profile.role === 'admin') {
     showView('admin');
     loadAdminData();
-  } else if (profile.role === 'user') {
+  } else if (profile.role === 'user' || profile.role === 'creator') {
     showView('user');
     loadUserData();
+    
+    const btnCreateUser = document.getElementById('btn-show-create');
+    if (btnCreateUser) {
+      btnCreateUser.style.display = profile.role === 'creator' ? 'inline-block' : 'none';
+    }
   } else {
     showView('pending');
+  }
+
+  // Handle ?action=create from profile page
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('action') === 'create' && (profile.role === 'admin' || profile.role === 'creator')) {
+    document.getElementById('modal-create').classList.add('active');
+    // clean url
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
 }
 
@@ -405,7 +418,8 @@ async function loadAdminData() {
         el.innerHTML = `
           <div><div class="list-item-title">${p.email}</div><div class="badge ${p.role}">${p.role}</div></div>
           <div style="display:flex; gap:8px;">
-            ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+            ${p.role === 'user' ? `<button class="btn-icon" onclick="promoteToCreator('${p.id}')" title="Promouvoir Créateur" style="color:#c8ff57; border-color:#c8ff57;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg></button>` : ''}
+            ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Rétrograder / Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
             ${p.id !== currentUser.id ? `<button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
           </div>
         `;
@@ -440,6 +454,10 @@ async function loadAdminData() {
 
 window.approveUser = async (userId) => {
   await supabaseClient.from('profiles').update({ role: 'user' }).eq('id', userId);
+  loadAdminData();
+};
+window.promoteToCreator = async (userId) => {
+  await supabaseClient.from('profiles').update({ role: 'creator' }).eq('id', userId);
   loadAdminData();
 };
 window.revokeUser = async (userId) => {
@@ -520,7 +538,7 @@ document.getElementById('form-create-spreadsheet')?.addEventListener('submit', a
     document.getElementById('modal-create').classList.remove('active');
     openEditSpreadsheet(data[0].id);
     if (currentProfile.role === 'admin') loadAdminData();
-    else loadUserData();
+    else if (currentProfile.role === 'creator') loadUserData();
   }
 });
 
@@ -645,7 +663,7 @@ window.rejectSuggestion = async (id) => {
 
 document.getElementById('btn-back-to-list')?.addEventListener('click', () => {
   if (currentProfile.role === 'admin') showView('admin');
-  else showView('user');
+  else if (currentProfile.role === 'creator' || currentProfile.role === 'user') showView('user');
 });
 
 document.getElementById('btn-add-item')?.addEventListener('click', () => {

@@ -403,8 +403,17 @@ function renderSpreadsheet(spreadsheet) {
     
 
     <main id="main-content-dynamic">
-      <section class="spreadsheet-hero">
-        <a href="/spreadsheet" class="btn-back-mobile" style="position: absolute; top: 20px; left: 20px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; z-index: 10; font-family: var(--font-body);">&larr; Retour aux Spreadsheets</a>
+      <section class="spreadsheet-hero" style="position: relative;">
+        <!-- Top Nav within hero -->
+        <div style="position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10;">
+          <a href="/spreadsheet" class="btn-back-mobile" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-family: var(--font-body); transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">&larr; Retour</a>
+          
+          <a href="/spreadsheet/profile/index.html" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-family: var(--font-body); transition: color 0.3s;" onmouseover="this.style.color='var(--sneaker-accent)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
+            Mon Profil 
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </a>
+        </div>
+        
         <p class="s-label reveal active" data-num="01" aria-hidden="true">${spreadsheet.badge_text || 'La sélection du chef'}</p>
         <h1 class="spreadsheet-title reveal active reveal-d1">${spreadsheet.title.includes(' ') ? spreadsheet.title.replace(' ', '<br><span class="accent">') + '</span>' : spreadsheet.title}</h1>
         <p class="spreadsheet-subtitle reveal active reveal-d2">${spreadsheet.description || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.'}</p>

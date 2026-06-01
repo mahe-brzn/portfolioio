@@ -61,6 +61,22 @@ async function init() {
 async function handleLogin(user) {
   currentUser = user;
   
+  // Check 2FA Status
+  const { data: factors } = await supabaseClient.auth.mfa.listFactors();
+  const has2FA = factors && factors.all && factors.all.some(f => f.status === 'verified');
+  
+  const btnSec = document.getElementById('btn-security');
+  if (btnSec) {
+    if (has2FA) {
+      btnSec.innerHTML = 'Sécurité <span style="color:#4caf50;">(2FA ✅)</span>';
+      btnSec.style.borderColor = '#4caf50';
+    } else {
+      btnSec.innerHTML = 'Sécurité <span style="color:#ffb74d;">(2FA ❌)</span>';
+      btnSec.style.borderColor = '#ffb74d';
+    }
+    btnSec.dataset.has2fa = has2FA ? 'true' : 'false';
+  }
+  
   // Check 2FA Assurance Level
   const { data: aal, error: aalError } = await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aalError) {
@@ -183,7 +199,14 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 const btnSecurity = document.getElementById('btn-security');
 if (btnSecurity) {
   btnSecurity.addEventListener('click', () => {
-    document.getElementById('2fa-setup-step1').style.display = 'block';
+    const is2FA = btnSecurity.dataset.has2fa === 'true';
+    if (is2FA) {
+      document.getElementById('2fa-setup-step1').style.display = 'none';
+      document.getElementById('2fa-already-active').style.display = 'block';
+    } else {
+      document.getElementById('2fa-setup-step1').style.display = 'block';
+      document.getElementById('2fa-already-active').style.display = 'none';
+    }
     document.getElementById('2fa-setup-step2').style.display = 'none';
     document.getElementById('2fa-setup-success').style.display = 'none';
     showView('2fa-setup');
@@ -392,40 +415,40 @@ async function loadAdminData() {
       s.profiles = ownerProfile ? { email: ownerProfile.email, display_name: ownerProfile.display_name } : null;
     });
   }
-  const pendingList = document.getElementById('pending-users-list');
-  const approvedList = document.getElementById('approved-users-list');
+  const adminsList = document.getElementById('admins-list');
+  const usersList = document.getElementById('users-list');
   const spreadsheetsList = document.getElementById('all-spreadsheets-list');
   
-  if(pendingList) pendingList.innerHTML = '';
-  if(approvedList) approvedList.innerHTML = '';
+  if(adminsList) adminsList.innerHTML = '';
+  if(usersList) usersList.innerHTML = '';
   if(spreadsheetsList) spreadsheetsList.innerHTML = '';
 
-  if (profiles && pendingList && approvedList) {
+  if (profiles && adminsList && usersList) {
     profiles.forEach((p, i) => {
       const el = document.createElement('div');
       el.className = 'list-item stagger-item';
       el.style.animationDelay = `${i * 0.05}s`;
       const displayNameStr = p.display_name ? `${p.display_name} <span style="opacity:0.5;font-size:0.8em">(${p.email})</span>` : p.email;
       
-      if (p.role === 'pending') {
-        el.innerHTML = `
-          <div onclick="openUserDetail('${p.id}')" style="cursor: pointer; flex: 1;"><div class="list-item-title">${displayNameStr}</div><div class="badge pending">En attente</div></div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn-icon" onclick="approveUser('${p.id}')" title="Approuver"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
-            <button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-          </div>
-        `;
-        pendingList.appendChild(el);
-      } else {
+      if (p.role === 'admin' || p.role === 'creator') {
         el.innerHTML = `
           <div onclick="openUserDetail('${p.id}')" style="cursor: pointer; flex: 1;"><div class="list-item-title">${displayNameStr}</div><div class="badge ${p.role}">${p.role}</div></div>
           <div style="display:flex; gap:8px;">
-            ${p.role === 'user' ? `<button class="btn-icon" onclick="promoteToCreator('${p.id}')" title="Promouvoir Créateur" style="color:#c8ff57; border-color:#c8ff57;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg></button>` : ''}
-            ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Rétrograder / Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+            ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Rétrograder (User)"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
             ${p.id !== currentUser.id ? `<button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
           </div>
         `;
-        approvedList.appendChild(el);
+        adminsList.appendChild(el);
+      } else {
+        el.innerHTML = `
+          <div onclick="openUserDetail('${p.id}')" style="cursor: pointer; flex: 1;"><div class="list-item-title">${displayNameStr}</div><div class="badge ${p.role}">${p.role === 'pending' ? 'En attente' : p.role}</div></div>
+          <div style="display:flex; gap:8px;">
+            ${p.role === 'pending' ? `<button class="btn-icon" onclick="approveUser('${p.id}')" title="Approuver"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>` : ''}
+            ${p.role === 'user' ? `<button class="btn-icon" onclick="promoteToCreator('${p.id}')" title="Promouvoir Créateur" style="color:#c8ff57; border-color:#c8ff57;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg></button>` : ''}
+            ${p.id !== currentUser.id ? `<button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
+          </div>
+        `;
+        usersList.appendChild(el);
       }
     });
   }
@@ -529,7 +552,7 @@ document.getElementById('btn-save-user-role')?.addEventListener('click', async (
 
 document.getElementById('search-users')?.addEventListener('input', (e) => {
   const term = e.target.value.toLowerCase();
-  const lists = [document.getElementById('approved-users-list'), document.getElementById('pending-users-list')];
+  const lists = [document.getElementById('users-list')];
   
   lists.forEach(list => {
     if(!list) return;

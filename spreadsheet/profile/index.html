@@ -300,9 +300,50 @@
             <button type="submit" class="btn-submit">Mettre à jour la sécurité</button>
             <p id="password-status" style="margin-top: 15px; font-size: 0.95rem; text-align: center;"></p>
           </form>
+
+          <h3 style="margin-top: 35px; margin-bottom: 25px; font-size: 1.4rem;">Double Facteur (2FA)</h3>
+          <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">
+            Sécurisez votre compte en activant l'authentification à double facteur.
+          </p>
+          <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+            <div id="2fa-status-profile" style="margin-bottom: 15px; font-weight: 600;">Statut : <span style="color: var(--text-muted);">Vérification...</span></div>
+            <button id="btn-setup-2fa-profile" class="btn-outline" style="border-color: var(--sneaker-accent); color: var(--sneaker-accent); display: none;">Activer la 2FA</button>
+            <button id="btn-disable-2fa-profile" class="btn-outline danger" style="border-color: #ff5252; color: #ff5252; display: none;">Désactiver la 2FA</button>
+          </div>
         </div>
       </section>
 
+    </div>
+  </div>
+
+  <!-- 2FA SETUP MODAL -->
+  <div id="modal-2fa-setup" class="modal">
+    <div class="modal-content glass-panel" style="max-width: 500px; text-align: center;">
+      <button class="modal-close" id="btn-close-2fa">&times;</button>
+      <h2 class="admin-title" style="font-size: 1.8rem; margin-bottom: 20px;">Configuration <span class="accent">2FA</span></h2>
+      
+      <div id="2fa-prof-step1">
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Nécessite Google Authenticator, Authy, ou une app compatible.</p>
+        <button id="btn-prof-start-2fa" class="btn-magnetic">Générer le QR Code</button>
+      </div>
+
+      <div id="2fa-prof-step2" style="display: none;">
+        <p style="margin-bottom: 15px;">1. Scannez ce QR Code avec votre application :</p>
+        <div id="2fa-prof-qr-container" style="background: white; padding: 20px; border-radius: 12px; display: inline-block; margin-bottom: 20px;"></div>
+        
+        <form id="form-prof-verify-2fa">
+          <p style="margin-bottom: 10px;">2. Entrez le code à 6 chiffres :</p>
+          <input type="text" id="2fa-prof-code" placeholder="000000" pattern="[0-9]{6}" maxlength="6" required style="text-align: center; letter-spacing: 0.5em; font-size: 1.5rem; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; width: 100%; max-width: 250px; margin-bottom: 15px;" />
+          <br>
+          <button type="submit" class="btn-magnetic">Vérifier et Activer</button>
+          <p class="auth-error" id="2fa-prof-error" style="margin-top: 10px;"></p>
+        </form>
+      </div>
+
+      <div id="2fa-prof-success" style="display: none;">
+        <h2 style="color: #4caf50; margin-bottom: 10px;">2FA Activée ! 🎉</h2>
+        <p style="color: var(--text-muted);">Votre compte est désormais sécurisé.</p>
+      </div>
     </div>
   </div>
 
@@ -418,10 +459,155 @@
 
       // Fetch Data
       setTimeout(async () => {
-        if (!window.currentUser) {
-          window.location.href = '/spreadsheet';
+        if (window.currentUser) {
+          // Load 2FA status
+          check2FAStatus();
+        } else {
+          // Non loggé
+          window.location.href = "/spreadsheet/admin/";
+        }
+      });
+      
+      let pendingFactorId = null;
+      
+      async function check2FAStatus() {
+        const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
+        const has2FA = factors && factors.all && factors.all.some(f => f.status === 'verified');
+        
+        const statusEl = document.getElementById('2fa-status-profile');
+        const btnSetup = document.getElementById('btn-setup-2fa-profile');
+        const btnDisable = document.getElementById('btn-disable-2fa-profile');
+        
+        if (has2FA) {
+          statusEl.innerHTML = 'Statut : <span style="color: #4caf50;">Activée ✅</span>';
+          btnSetup.style.display = 'none';
+          btnDisable.style.display = 'inline-block';
+        } else {
+          statusEl.innerHTML = 'Statut : <span style="color: #ffb74d;">Désactivée ❌</span>';
+          btnSetup.style.display = 'inline-block';
+          btnDisable.style.display = 'none';
+        }
+      }
+
+      // 2FA Setup Flow
+      document.getElementById('btn-setup-2fa-profile')?.addEventListener('click', () => {
+        document.getElementById('2fa-prof-step1').style.display = 'block';
+        document.getElementById('2fa-prof-step2').style.display = 'none';
+        document.getElementById('2fa-prof-success').style.display = 'none';
+        document.getElementById('modal-2fa-setup').classList.add('active');
+      });
+
+      document.getElementById('btn-close-2fa')?.addEventListener('click', () => {
+        document.getElementById('modal-2fa-setup').classList.remove('active');
+      });
+
+      document.getElementById('btn-prof-start-2fa')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btn-prof-start-2fa');
+        btn.textContent = 'Génération...';
+        
+        // Unenroll unverified
+        const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
+        if (factors && factors.all) {
+          for (const factor of factors.all) {
+            if (factor.status === 'unverified') await window.supabaseClient.auth.mfa.unenroll({ factorId: factor.id });
+          }
+        }
+
+        const { data, error } = await window.supabaseClient.auth.mfa.enroll({
+          factorType: 'totp',
+          friendlyName: 'Portfolio Profile'
+        });
+        
+        btn.textContent = 'Générer le QR Code';
+
+        if (error) {
+          alert("Erreur: " + error.message);
           return;
         }
+
+        pendingFactorId = data.id;
+        const qrContainer = document.getElementById('2fa-prof-qr-container');
+        qrContainer.innerHTML = ''; 
+
+        let qrData = data.totp.qr_code;
+        if (qrData.startsWith('data:image')) {
+          const img = document.createElement('img');
+          img.src = qrData;
+          img.style.width = '100%';
+          img.style.maxWidth = '200px';
+          img.style.display = 'block';
+          img.style.margin = '0 auto';
+          qrContainer.appendChild(img);
+        } else {
+          qrContainer.innerHTML = qrData;
+          const svg = qrContainer.querySelector('svg');
+          if (svg) {
+            svg.style.width = '200px';
+            svg.style.height = '200px';
+            svg.style.display = 'block';
+            svg.style.margin = '0 auto';
+          }
+        }
+        
+        document.getElementById('2fa-prof-step1').style.display = 'none';
+        document.getElementById('2fa-prof-step2').style.display = 'block';
+      });
+
+      document.getElementById('form-prof-verify-2fa')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = document.getElementById('2fa-prof-code').value;
+        const err = document.getElementById('2fa-prof-error');
+        const btn = e.target.querySelector('button');
+        
+        btn.textContent = 'Vérification...';
+        err.textContent = '';
+
+        const { data: challengeData, error: challengeError } = await window.supabaseClient.auth.mfa.challenge({
+          factorId: pendingFactorId
+        });
+
+        if (challengeError) {
+          err.textContent = "Erreur système.";
+          btn.textContent = 'Vérifier et Activer';
+          return;
+        }
+
+        const { data, error } = await window.supabaseClient.auth.mfa.verify({
+          factorId: pendingFactorId,
+          challengeId: challengeData.id,
+          code: code
+        });
+
+        if (error) {
+          err.textContent = "Code invalide.";
+          btn.textContent = 'Vérifier et Activer';
+        } else {
+          document.getElementById('2fa-prof-step2').style.display = 'none';
+          document.getElementById('2fa-prof-success').style.display = 'block';
+          check2FAStatus();
+          setTimeout(() => {
+            document.getElementById('modal-2fa-setup').classList.remove('active');
+          }, 2000);
+        }
+      });
+
+      document.getElementById('btn-disable-2fa-profile')?.addEventListener('click', async () => {
+        if (!confirm("Voulez-vous vraiment désactiver la 2FA ?")) return;
+        const btn = document.getElementById('btn-disable-2fa-profile');
+        btn.textContent = 'Désactivation...';
+        
+        const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
+        if (factors && factors.all) {
+          for (const factor of factors.all) {
+            if (factor.status === 'verified') {
+              await window.supabaseClient.auth.mfa.unenroll({ factorId: factor.id });
+            }
+          }
+        }
+        btn.textContent = 'Désactiver la 2FA';
+        check2FAStatus();
+        alert("2FA désactivée avec succès.");
+      });
 
         // Fill user info
         const displayName = window.currentProfile?.display_name || window.currentUser.email.split('@')[0];

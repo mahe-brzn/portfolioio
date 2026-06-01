@@ -25,6 +25,12 @@
       if (mainContent) mainContent.style.display = 'block';
       return;
     }
+    
+    try {
+      let visitedData = JSON.parse(localStorage.getItem('visited_spreadsheets') || '{}');
+      visitedData[slug] = new Date().toISOString();
+      localStorage.setItem('visited_spreadsheets', JSON.stringify(visitedData));
+    } catch(e) {}
 
     renderSpreadsheet(spreadsheet);
 

@@ -320,10 +320,12 @@
         return;
       }
 
-      // Setup reference date for NEW badge
-      const maxPast = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000); // 14 days max
-      let lastLoginDate = window.lastSignInAt ? new Date(window.lastSignInAt) : maxPast;
-      if (lastLoginDate < maxPast) lastLoginDate = maxPast;
+      // Setup reference for visited spreadsheets tracking
+      let visitedData = {};
+      try {
+        visitedData = JSON.parse(localStorage.getItem('visited_spreadsheets') || '{}');
+      } catch(e) {}
+
 
       container.innerHTML = '';
       filtered.forEach(s => {
@@ -335,19 +337,29 @@
         }
         
         // Badges logic
-        let badgesHtml = '';
+        let badgesArray = [];
         const updatedAt = new Date(s.updated_at || s.created_at);
         const daysSinceUpdate = (Date.now() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
         
-        if (updatedAt > lastLoginDate || daysSinceUpdate < 2) {
-           badgesHtml += `<span style="display:inline-block; background: var(--accent); color: var(--black); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px; margin-bottom: 12px; box-shadow: 0 0 10px rgba(200,255,87,0.3);">New ✨</span>`;
+        const lastVisitedStr = visitedData[s.slug];
+        let isNew = false;
+        if (lastVisitedStr) {
+           isNew = (updatedAt > new Date(lastVisitedStr));
+        } else {
+           isNew = (daysSinceUpdate < 14); // unvisited and updated recently
+        }
+        
+        if (isNew) {
+           badgesArray.push(`<span style="display:inline-block; background: var(--accent); color: var(--black); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px; margin-bottom: 12px; box-shadow: 0 0 10px rgba(200,255,87,0.3);">New ✨</span>`);
         } else if (daysSinceUpdate < 7) {
-           badgesHtml += `<span style="display:inline-block; background: rgba(255,255,255,0.1); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.2);">Actif récemment</span>`;
+           badgesArray.push(`<span style="display:inline-block; background: rgba(255,255,255,0.1); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.2);">Actif récemment</span>`);
         }
         
         if (s.likes_count >= 5) {
-           badgesHtml += `<span style="display:inline-block; background: rgba(255,75,75,0.15); color: #ff4b4b; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px; margin-bottom: 12px; border: 1px solid rgba(255,75,75,0.3);">Populaire 🔥</span>`;
+           badgesArray.push(`<span style="display:inline-block; background: rgba(255,75,75,0.15); color: #ff4b4b; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px; margin-bottom: 12px; border: 1px solid rgba(255,75,75,0.3);">Populaire 🔥</span>`);
         }
+        
+        const badgesHtml = badgesArray.slice(0, 2).join(''); // 2 badges max
         
         container.innerHTML += `
           <a href="/spreadsheet/${s.slug}" class="spread-card" style="height: 100%; min-height: 250px;">

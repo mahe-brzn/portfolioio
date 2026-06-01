@@ -498,13 +498,41 @@ function renderSpreadsheet(spreadsheet) {
   window.convertAgentLink = (agent, rawUrl) => {
     // 1. Force extract the original Weidian/Taobao URL if it's hidden in an agent link
     let url = window.extractOriginalLink(rawUrl);
-    
-    // 2. If for some reason the URL is still a hipobuy.cn shortlink (cache issue), fallback to Weidian search or something?
-    // We assume the DB has been correctly updated to raw weidian/taobao links now.
-    
     const encoded = encodeURIComponent(url || '');
 
-    // 3. Universal ?url= routing. Almost all modern agents use this on their product or search endpoints.
+    // 2. Parse platform and ID
+    let platform = null;
+    let id = null;
+    if (url.includes('weidian.com')) {
+      platform = 'weidian';
+      const match = url.match(/itemID=(\d+)/);
+      if (match) id = match[1];
+    } else if (url.includes('taobao.com')) {
+      platform = 'taobao';
+      const match = url.match(/id=(\d+)/);
+      if (match) id = match[1];
+    } else if (url.includes('1688.com')) {
+      platform = '1688';
+      const match = url.match(/offer\/(\d+)/);
+      if (match) id = match[1];
+    }
+
+    // 3. Platform specific optimized links
+    if (platform && id) {
+      const pAlias = platform;
+      const hipoId = platform === 'taobao' ? '1' : platform === 'weidian' ? '2' : '3';
+      switch(agent) {
+        case 'hippobuy':
+        case 'hipobuy': return `https://hipobuy.com/product/${hipoId}/${id}`;
+        case 'cnfans': return `https://cnfans.com/product/?shop_type=${pAlias}&id=${id}`;
+        case 'mulebuy': return `https://mulebuy.com/product/?shop_type=${pAlias}&id=${id}`;
+        case 'joyabuy': return `https://joyabuy.com/product/?shop_type=${pAlias}&id=${id}`;
+        case 'oopbuy': return `https://www.oopbuy.com/product/${pAlias}/${id}`;
+        case 'cssbuy': return `https://www.cssbuy.com/item-${pAlias === 'weidian' ? 'micro' : pAlias}-${id}.html`;
+      }
+    }
+
+    // 4. Universal ?url= fallback for agents that support it
     switch(agent) {
       case 'hippobuy':
       case 'hipobuy': return `https://hipobuy.com/product/details?url=${encoded}`;

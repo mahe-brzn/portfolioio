@@ -196,7 +196,6 @@
       <div class="wrap nav-row">
         <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB</a>
         <ul class="nav-links" role="list">
-          <li role="listitem"><a href="/">Accueil</a></li>
           <li role="listitem"><a href="/spreadsheet" class="on">Spreadsheets</a></li>
         </ul>
         <div class="nav-right">
@@ -210,10 +209,23 @@
   </header>
 
   <main id="main-content">
-    <section class="spreadsheet-hero">
+    <section class="spreadsheet-hero" style="min-height: 35vh; padding-bottom: 40px;">
       <p class="s-label reveal on" data-num="01" aria-hidden="true">Index</p>
       <h1 class="spreadsheet-title reveal on reveal-d1">Les <span class="accent">Spreadsheets</span></h1>
     </section>
+
+    <div class="spread-controls reveal on reveal-d2" style="max-width: 1360px; margin: 0 auto 40px; padding: 0 clamp(24px, 5vw, 80px); display: flex; gap: 20px; flex-wrap: wrap; z-index: 2; position: relative;">
+      <div style="flex: 1; min-width: 250px; position: relative;">
+        <svg style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4);" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="search-spreadsheets" placeholder="Rechercher une spreadsheet..." style="width: 100%; padding: 16px 20px 16px 48px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; font-size: 1rem; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.background='rgba(0,0,0,0.5)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(0,0,0,0.3)';" />
+      </div>
+      <select id="sort-spreadsheets" style="padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; font-size: 1rem; outline: none; cursor: pointer; transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+        <option value="recent" style="color: black;">Modifié récemment</option>
+        <option value="oldest" style="color: black;">Les plus anciens</option>
+        <option value="likes" style="color: black;">Les plus populaires</option>
+        <option value="az" style="color: black;">De A à Z</option>
+      </select>
+    </div>
 
     <div class="shoes-grid reveal on reveal-d2" id="public-spreadsheets-list">
       <!-- Rempli dynamiquement par JS -->
@@ -224,7 +236,7 @@
   <footer role="contentinfo" style="position: relative; z-index: 2;">
     <div class="wrap footer-row" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 28px;">
       <p class="footer-copy">
-        &copy; 2026 <span>Mahé Brizion</span> — Développeur iOS &amp; Sysadmin en Savoie
+        &copy; 2026 <span>Mahé Brizion</span>
       </p>
     </div>
   </footer>
@@ -237,10 +249,9 @@
   <script src="/spreadsheet/auth-modal.js" defer></script>
 
   <!-- Load Public Spreadsheets -->
-  <script>
+    let allSpreadsheets = [];
+
     document.addEventListener('DOMContentLoaded', async () => {
-      // Si on est sur une page spreadsheet individuelle (le slug n'est pas vide et pas 'spreadsheet' ni 'index.html'), 
-      // view.js s'occupera du rendu. Ici on ne charge la liste que si on est sur l'index.
       const pathParts = window.location.pathname.split('/').filter(Boolean);
       const isIndex = pathParts.length === 1 && pathParts[0] === 'spreadsheet' || window.location.pathname.endsWith('index.html');
       
@@ -255,41 +266,87 @@
       const { data, error } = await window.supabaseClient
         .from('spreadsheets')
         .select('*')
-        .eq('visibility', 'public')
-        .order('created_at', { ascending: false });
+        .eq('visibility', 'public');
 
-      // Manual join to avoid Supabase PostgREST ambiguity
-      const { data: profilesData } = await window.supabaseClient.from('profiles').select('id, email');
+      const { data: profilesData } = await window.supabaseClient.from('profiles').select('id, email, display_name');
+      
       if (data && profilesData) {
         data.forEach(s => {
           const ownerProfile = profilesData.find(p => p.id === s.owner_id);
-          s.profiles = ownerProfile ? { email: ownerProfile.email } : null;
+          s.authorName = ownerProfile ? (ownerProfile.display_name || ownerProfile.email.split('@')[0]) : 'Communauté';
         });
       }
 
       if (error) {
         container.innerHTML = '<p style="color:red; text-align:center;">Erreur de chargement : ' + error.message + '</p>';
       } else if (data && data.length > 0) {
-        container.innerHTML = '';
-        data.forEach(s => {
-          const author = s.profiles?.email ? s.profiles.email.split('@')[0] : 'Communauté';
-          container.innerHTML += `
-            <a href="/spreadsheet/${s.slug}" class="spread-card">
-              <h2 class="spread-card-title">${s.title}</h2>
-              <p class="spread-card-desc">${s.description || 'Une sélection au meilleur prix.'}</p>
-              <p style="font-size:0.8rem; opacity:0.5; margin-top:10px;">Par ${author} • ${s.likes_count || 0} ❤️</p>
-              <div class="spread-card-arrow">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-            </a>
-          `;
-        });
+        allSpreadsheets = data;
+        renderSpreadsheets();
       } else {
         container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucune spreadsheet publique pour le moment.</p>';
       }
     });
+
+    function renderSpreadsheets() {
+      const container = document.getElementById('public-spreadsheets-list');
+      const searchTerm = document.getElementById('search-spreadsheets').value.toLowerCase();
+      const sortValue = document.getElementById('sort-spreadsheets').value;
+
+      let filtered = allSpreadsheets.filter(s => 
+        s.title.toLowerCase().includes(searchTerm) || 
+        (s.description && s.description.toLowerCase().includes(searchTerm)) ||
+        s.authorName.toLowerCase().includes(searchTerm)
+      );
+
+      filtered.sort((a, b) => {
+        if (sortValue === 'recent') {
+          return new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at);
+        } else if (sortValue === 'oldest') {
+          return new Date(a.created_at) - new Date(b.created_at);
+        } else if (sortValue === 'likes') {
+          return (b.likes_count || 0) - (a.likes_count || 0);
+        } else if (sortValue === 'az') {
+          return a.title.localeCompare(b.title);
+        }
+        return 0;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Aucun résultat trouvé.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      filtered.forEach(s => {
+        container.innerHTML += `
+          <a href="/spreadsheet/${s.slug}" class="spread-card" style="height: 100%; min-height: 250px;">
+            <h2 class="spread-card-title">${s.title}</h2>
+            <p class="spread-card-desc">${s.description || 'Une sélection au meilleur prix.'}</p>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+              <div style="max-width: 60%;">
+                <p style="font-size:0.75rem; opacity:0.5; margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">Créateur</p>
+                <p style="font-size:0.95rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--white); font-weight: 500;">${s.authorName}</p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="#ff4b4b" stroke-width="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                  <span style="font-size:0.85rem; font-weight: 600; color: white;">${s.likes_count || 0}</span>
+                </div>
+                <div class="spread-card-arrow" style="margin: 0;">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </a>
+        `;
+      });
+    }
+    
+    document.getElementById('search-spreadsheets')?.addEventListener('input', renderSpreadsheets);
+    document.getElementById('sort-spreadsheets')?.addEventListener('change', renderSpreadsheets);
   </script>
   
   <!-- View Logic (s'exécute si on est sur un /slug) -->

@@ -126,12 +126,20 @@ async function handleLogin(user) {
     showView('pending');
   }
 
-  // Handle ?action=create from profile page
+  // Handle ?action=create or ?action=edit from profile page
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('action') === 'create' && (profile.role === 'admin' || profile.role === 'creator')) {
     document.getElementById('modal-create').classList.add('active');
-    // clean url
     window.history.replaceState({}, document.title, window.location.pathname);
+  } else if (urlParams.get('action') === 'edit' && urlParams.get('id')) {
+    const editId = urlParams.get('id');
+    // We must wait for the data to be loaded before trying to edit it
+    setTimeout(() => {
+      if (typeof window.openEditSpreadsheet === 'function') {
+        window.openEditSpreadsheet(editId);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }, 500);
   }
 }
 

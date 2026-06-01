@@ -31,7 +31,7 @@
       .from('profiles')
       .select('email, display_name')
       .eq('id', spreadsheet.owner_id)
-      .single();
+      .maybeSingle();
       
     if (profile) {
       spreadsheet.profiles = profile;

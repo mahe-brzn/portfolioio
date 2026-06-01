@@ -610,7 +610,7 @@
         const supabase = window.supabaseClient;
 
         // 1. My Spreadsheets
-        const { data: mySheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', window.currentUser.id);
+        const { data: mySheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', window.currentUser.id).is('deleted_at', null);
         const mySheetsList = document.getElementById('my-spreadsheets-list');
         if (mySheets && mySheets.length > 0) {
           mySheetsList.innerHTML = mySheets.map(s => `

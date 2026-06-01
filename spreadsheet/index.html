@@ -272,7 +272,8 @@
       const { data, error } = await window.supabaseClient
         .from('spreadsheets')
         .select('*')
-        .eq('visibility', 'public');
+        .eq('visibility', 'public')
+        .is('deleted_at', null);
 
       const { data: profilesData } = await window.supabaseClient.from('profiles').select('id, email, display_name');
       

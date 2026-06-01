@@ -19,6 +19,7 @@
       .from('spreadsheets')
       .select('*')
       .eq('slug', slug)
+      .is('deleted_at', null)
       .single();
 
     if (error || !spreadsheet) {

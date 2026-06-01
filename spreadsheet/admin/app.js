@@ -413,7 +413,7 @@ async function loadAdminData() {
   const { data: profiles, error: errProfiles } = await supabaseClient.from('profiles').select('*');
   if (errProfiles) alert("Erreur profils : " + errProfiles.message);
   
-  const { data: spreadsheets, error: errSpreadsheets } = await supabaseClient.from('spreadsheets').select('*');
+  const { data: spreadsheets, error: errSpreadsheets } = await supabaseClient.from('spreadsheets').select('*').is('deleted_at', null);
   if (errSpreadsheets) alert("Erreur spreadsheets : " + errSpreadsheets.message);
   
   // Manual join to avoid Supabase PostgREST ambiguity
@@ -519,7 +519,7 @@ window.openUserDetail = async (userId) => {
   document.getElementById('detail-role-status').textContent = '';
 
   // Find user spreadsheets
-  const { data: userSheets } = await supabaseClient.from('spreadsheets').select('*').eq('owner_id', userId);
+  const { data: userSheets } = await supabaseClient.from('spreadsheets').select('*').eq('owner_id', userId).is('deleted_at', null);
   const sheetsContainer = document.getElementById('detail-user-spreadsheets');
   
   if (userSheets && userSheets.length > 0) {
@@ -600,7 +600,7 @@ window.deleteUser = async (userId) => {
 // USER DASHBOARD
 // ----------------------------------------------------
 async function loadUserData() {
-  const { data: spreadsheets } = await supabaseClient.from('spreadsheets').select('*').eq('owner_id', currentUser.id);
+  const { data: spreadsheets } = await supabaseClient.from('spreadsheets').select('*').eq('owner_id', currentUser.id).is('deleted_at', null);
   const list = document.getElementById('my-spreadsheets-list');
   if(!list) return;
   list.innerHTML = '';
@@ -1131,11 +1131,11 @@ document.getElementById('btn-delete-spreadsheet')?.addEventListener('click', asy
 
   const { error } = await supabaseClient
     .from('spreadsheets')
-    .delete()
+    .update({ deleted_at: new Date().toISOString(), visibility: 'private' })
     .eq('id', editingSpreadsheetId);
 
   if (error) {
-    alert("Erreur lors de la suppression: " + error.message + "\n\n(Vérifiez que vous avez bien une politique RLS pour DELETE dans Supabase)");
+    alert("Erreur lors de la suppression: " + error.message);
     btn.textContent = originalText;
   } else {
     alert("Spreadsheet supprimée avec succès.");

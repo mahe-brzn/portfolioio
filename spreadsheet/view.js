@@ -836,9 +836,19 @@ function renderSpreadsheet(spreadsheet) {
       spreadsheet_id: spreadsheet.id,
       user_id: window.currentUser.id,
       title, url, price, note
-    }).then(({error}) => {
+    }).then(async ({error}) => {
       if (error) alert("Erreur: " + error.message);
-      else alert("Suggestion envoyée ! Le créateur devra l'approuver.");
+      else {
+        alert("Suggestion envoyée ! Le créateur devra l'approuver.");
+        // Send notification to owner
+        const displayName = window.currentProfile?.display_name || window.currentUser.email.split('@')[0];
+        await supabaseClient.from('notifications').insert({
+          user_id: spreadsheet.owner_id,
+          type: 'suggestion',
+          title: 'Nouvelle Suggestion',
+          message: `${displayName} a fait une suggestion pour la spreadsheet "${spreadsheet.title}".`
+        });
+      }
     });
   });
 

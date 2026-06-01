@@ -1342,6 +1342,16 @@ async function addCollaborator(userId, role) {
 
   const { error } = await supabaseClient.from('spreadsheets').update({ editors, viewers }).eq('id', spreadsheet.id);
   if (!error) {
+    // Send Notification
+    const displayName = currentProfile?.display_name || currentUser.email.split('@')[0];
+    const roleStr = role === 'editor' ? 'Éditeur' : 'Lecteur';
+    await supabaseClient.from('notifications').insert({
+      user_id: userId,
+      type: 'collab_add',
+      title: 'Nouvelle Collaboration',
+      message: `${displayName} vous a ajouté en tant que ${roleStr} sur la spreadsheet "${spreadsheet.title}".`
+    });
+
     spreadsheet.editors = editors;
     spreadsheet.viewers = viewers;
     document.getElementById('collab-count').textContent = editors.length + viewers.length;

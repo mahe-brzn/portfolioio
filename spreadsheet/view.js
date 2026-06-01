@@ -496,18 +496,18 @@ function renderSpreadsheet(spreadsheet) {
   };
 
   window.convertAgentLink = (agent, rawUrl) => {
-    // 1. Force extract the original Weidian/Taobao URL if it's hidden in an agent link
+    // 1. Force extract the original Weidian/Taobao/1688 URL if hidden in an agent link
     let url = window.extractOriginalLink(rawUrl);
     const encoded = encodeURIComponent(url || '');
 
-    // 2. Parse platform and ID
+    // 2. Parse platform and product ID from the raw URL
     let platform = null;
     let id = null;
     if (url.includes('weidian.com')) {
       platform = 'weidian';
       const match = url.match(/itemID=(\d+)/);
       if (match) id = match[1];
-    } else if (url.includes('taobao.com')) {
+    } else if (url.includes('taobao.com') || url.includes('tmall.com')) {
       platform = 'taobao';
       const match = url.match(/id=(\d+)/);
       if (match) id = match[1];
@@ -517,38 +517,63 @@ function renderSpreadsheet(spreadsheet) {
       if (match) id = match[1];
     }
 
-    // 3. Platform specific optimized links
-    if (platform && id) {
-      const pAlias = platform;
-      const hipoId = platform === 'taobao' ? '1' : platform === 'weidian' ? '2' : '3';
-      switch(agent) {
-        case 'hippobuy':
-        case 'hipobuy': return `https://hipobuy.com/product/${hipoId}/${id}`;
-        case 'cnfans': return `https://cnfans.com/product/?shop_type=${pAlias}&id=${id}`;
-        case 'mulebuy': return `https://mulebuy.com/product/?shop_type=${pAlias}&id=${id}`;
-        case 'joyabuy': return `https://joyabuy.com/product/?shop_type=${pAlias}&id=${id}`;
-        case 'oopbuy': return `https://www.oopbuy.com/product/${pAlias}/${id}`;
-        case 'cssbuy': return `https://www.cssbuy.com/item-${pAlias === 'weidian' ? 'micro' : pAlias}-${id}.html`;
-      }
-    }
+    // Normalize agent name
+    const a = agent.toLowerCase().replace(/\s+/g, '');
 
-    // 4. Universal ?url= fallback for agents that support it
-    switch(agent) {
+    // 3. Generate agent link — platform+id routes first (optimized), ?url= fallback
+    switch(a) {
       case 'hippobuy':
-      case 'hipobuy': return `https://hipobuy.com/product/details?url=${encoded}`;
+      case 'hipobuy':
+        // Official format: /product/weidian/ID  (confirmed via Reddit + HipoBuy SPA)
+        if (platform && id) return `https://hipobuy.com/product/${platform}/${id}`;
+        return `https://hipobuy.com/product/details?url=${encoded}`;
+
       case 'acbuy':
-      case 'allchinabuy': return `https://www.allchinabuy.com/en/page/buy/?url=${encoded}`;
-      case 'cnfans': return `https://cnfans.com/product/?url=${encoded}`;
-      case 'superbuy': return `https://www.superbuy.com/en/page/buy/?nTag=Home-search&url=${encoded}`;
-      case 'wegobuy': return `https://www.wegobuy.com/en/page/buy?url=${encoded}`;
-      case 'cssbuy': return `https://www.cssbuy.com/item.html?url=${encoded}`;
-      case 'sugargoo': return `https://www.sugargoo.com/#/home/productDetail?productLink=${encoded}`;
-      case 'oopbuy': return `https://oopbuy.com/item?url=${encoded}`;
-      case 'lovegobuy': return `https://lovegobuy.com/item?url=${encoded}`;
-      case 'mulebuy': return `https://mulebuy.com/product/?url=${encoded}`;
-      case 'litbuy': return `https://litbuy.com/item?url=${encoded}`;
-      case 'joyabuy': return `https://joyabuy.com/product/?url=${encoded}`;
-      default: return `https://hipobuy.com/product/details?url=${encoded}`;
+      case 'allchinabuy':
+        return `https://www.allchinabuy.com/en/page/buy/?url=${encoded}`;
+
+      case 'cnfans':
+        if (platform && id) return `https://cnfans.com/product/?shop_type=${platform}&id=${id}`;
+        return `https://cnfans.com/product/?url=${encoded}`;
+
+      case 'superbuy':
+        return `https://www.superbuy.com/en/page/buy/?nTag=Home-search&url=${encoded}`;
+
+      case 'wegobuy':
+        return `https://www.wegobuy.com/en/page/buy?url=${encoded}`;
+
+      case 'cssbuy':
+        if (platform && id) {
+          const cssType = platform === 'weidian' ? 'micro' : platform;
+          return `https://www.cssbuy.com/item-${cssType}-${id}.html`;
+        }
+        return `https://www.cssbuy.com/item.html?url=${encoded}`;
+
+      case 'sugargoo':
+        return `https://www.sugargoo.com/#/home/productDetail?productLink=${encoded}`;
+
+      case 'oopbuy':
+        if (platform && id) return `https://www.oopbuy.com/product/${platform}/${id}`;
+        return `https://www.oopbuy.com/product/?url=${encoded}`;
+
+      case 'lovegobuy':
+        return `https://www.lovegobuy.com/product?url=${encoded}`;
+
+      case 'mulebuy':
+        if (platform && id) return `https://mulebuy.com/product/?shop_type=${platform}&id=${id}`;
+        return `https://mulebuy.com/product/?url=${encoded}`;
+
+      case 'litbuy':
+        return `https://litbuy.com/product/?url=${encoded}`;
+
+      case 'joyabuy':
+        if (platform && id) return `https://joyabuy.com/product/?shop_type=${platform}&id=${id}`;
+        return `https://joyabuy.com/product/?url=${encoded}`;
+
+      default:
+        // Default: HipoBuy with platform route
+        if (platform && id) return `https://hipobuy.com/product/${platform}/${id}`;
+        return `https://hipobuy.com/product/details?url=${encoded}`;
     }
   };
 

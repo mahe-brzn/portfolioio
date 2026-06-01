@@ -564,14 +564,13 @@ function renderSpreadsheet(spreadsheet) {
         return `https://www.allchinabuy.com/en/page/buy/?url=${encoded}`;
 
       case 'cnfans':
-        if (platform && id) return `https://cnfans.com/product/?shop_type=${platform}&id=${id}`;
         return `https://cnfans.com/product/?url=${encoded}`;
 
       case 'superbuy':
         return `https://www.superbuy.com/en/page/buy/?nTag=Home-search&url=${encoded}`;
 
       case 'wegobuy':
-        return `https://www.wegobuy.com/en/page/buy?url=${encoded}`;
+        return `https://www.wegobuy.com/en/page/buy/?url=${encoded}`;
 
       case 'cssbuy':
         if (platform && id) {
@@ -588,7 +587,7 @@ function renderSpreadsheet(spreadsheet) {
         return `https://www.oopbuy.com/product/?url=${encoded}`;
 
       case 'lovegobuy':
-        return `https://www.lovegobuy.com/product?url=${encoded}`;
+        return `https://lovegobuy.com/product/?url=${encoded}`;
 
       case 'mulebuy':
         if (platform && id) return `https://mulebuy.com/product/?shop_type=${platform}&id=${id}`;

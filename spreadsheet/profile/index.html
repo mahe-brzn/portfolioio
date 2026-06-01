@@ -166,7 +166,15 @@
   <div class="account-layout">
     <!-- SIDEBAR -->
     <aside class="account-sidebar">
-      <div class="user-avatar" id="avatar-initial">?</div>
+      <div class="user-avatar" id="avatar-container" style="cursor: pointer; position: relative; overflow: hidden;" title="Changer d'avatar">
+         <span id="avatar-initial">?</span>
+         <img id="avatar-image" src="" style="display:none; width:100%; height:100%; border-radius:50%; object-fit:cover; position:absolute; top:0; left:0;">
+         <div class="avatar-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:50%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s;">
+            <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>
+         </div>
+      </div>
+      <input type="file" id="avatar-upload-input" accept="image/jpeg, image/png, image/webp" style="display:none;">
+      
       <div class="user-info">
         <div class="user-email" id="sidebar-name" style="font-size: 1.1rem; font-weight: 600; color: white;">Chargement...</div>
         <div class="user-email" id="sidebar-email" style="font-size: 0.8rem; opacity: 0.6; margin-top: 2px;"></div>
@@ -479,6 +487,79 @@
         });
       }
 
+      // Avatar Upload Logic
+      const avatarContainer = document.getElementById('avatar-container');
+      const avatarOverlay = avatarContainer.querySelector('.avatar-overlay');
+      const avatarInput = document.getElementById('avatar-upload-input');
+      
+      if (avatarContainer && avatarInput) {
+        avatarContainer.addEventListener('mouseenter', () => avatarOverlay.style.opacity = '1');
+        avatarContainer.addEventListener('mouseleave', () => avatarOverlay.style.opacity = '0');
+        avatarContainer.addEventListener('click', () => avatarInput.click());
+
+        avatarInput.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // Visual feedback
+          avatarOverlay.innerHTML = '<span style="font-size:12px; color:white;">⏳</span>';
+          avatarOverlay.style.opacity = '1';
+
+          try {
+            // Compress image client-side
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            await new Promise(r => img.onload = r);
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const MAX_SIZE = 150;
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > height) {
+              if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+            } else {
+              if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            canvas.toBlob(async (blob) => {
+              const fileName = `\${window.currentUser.id}-\${Date.now()}.jpg`;
+              const { data, error } = await window.supabaseClient.storage.from('avatars').upload(fileName, blob, { contentType: 'image/jpeg', upsert: true });
+              
+              if (error) {
+                alert("Erreur upload: " + error.message);
+                avatarOverlay.style.opacity = '0';
+                avatarOverlay.innerHTML = '<svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>';
+                return;
+              }
+
+              const { data: publicUrlData } = window.supabaseClient.storage.from('avatars').getPublicUrl(fileName);
+              const publicUrl = publicUrlData.publicUrl;
+
+              await window.supabaseClient.from('profiles').update({ avatar_url: publicUrl }).eq('id', window.currentUser.id);
+              
+              // Update UI
+              document.getElementById('avatar-image').src = publicUrl;
+              document.getElementById('avatar-image').style.display = 'block';
+              document.getElementById('avatar-initial').style.display = 'none';
+              avatarOverlay.style.opacity = '0';
+              avatarOverlay.innerHTML = '<svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>';
+              
+              // Optionally update window.currentProfile
+              if(window.currentProfile) window.currentProfile.avatar_url = publicUrl;
+            }, 'image/jpeg', 0.8);
+          } catch(err) {
+            console.error(err);
+            alert("Erreur inattendue");
+            avatarOverlay.style.opacity = '0';
+          }
+        });
+      }
+
       // Fetch Data & Init
       async function initProfile() {
         const { data: { session } } = await window.supabaseClient.auth.getSession();
@@ -500,7 +581,15 @@
         document.getElementById('sidebar-name').textContent = displayName;
         document.getElementById('sidebar-email').textContent = window.currentUser.email;
         document.getElementById('sidebar-role').textContent = window.currentProfile?.role || 'user';
-        document.getElementById('avatar-initial').textContent = displayName.charAt(0).toUpperCase();
+        
+        if (window.currentProfile?.avatar_url) {
+          const img = document.getElementById('avatar-image');
+          img.src = window.currentProfile.avatar_url;
+          img.style.display = 'block';
+          document.getElementById('avatar-initial').style.display = 'none';
+        } else {
+          document.getElementById('avatar-initial').textContent = displayName.charAt(0).toUpperCase();
+        }
         
         if (document.getElementById('pref-display-name')) {
           document.getElementById('pref-display-name').value = window.currentProfile?.display_name || '';

@@ -212,6 +212,16 @@
     currentUser = session.user;
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
     currentProfile = profile;
+    
+    // Google Avatar auto-fill logic
+    if (currentUser.user_metadata?.avatar_url && (!currentProfile || !currentProfile.avatar_url)) {
+      const googleAvatar = currentUser.user_metadata.avatar_url;
+      const { error } = await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', currentUser.id);
+      if (!error && currentProfile) {
+        currentProfile.avatar_url = googleAvatar;
+      }
+    }
+
     window.currentUser = currentUser;
     window.currentProfile = currentProfile;
   }
@@ -221,10 +231,17 @@
     const navRight = document.querySelector('.nav-right');
     if (navRight) {
       if (currentUser) {
+        const displayName = currentProfile?.display_name || currentProfile?.email?.split('@')[0] || 'Utilisateur';
+        const avatarUrl = currentProfile?.avatar_url;
+        const avatarHtml = avatarUrl 
+          ? `<img src="${avatarUrl}" alt="Avatar" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">`
+          : `<div style="width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold;">${displayName.charAt(0).toUpperCase()}</div>`;
+
         navRight.innerHTML = `
           <div class="nav-user-menu" id="nav-user-menu">
             <button class="nav-login-btn" style="display:flex; align-items:center; gap:8px;">
-              ${currentProfile?.display_name || currentProfile?.email?.split('@')[0] || 'Utilisateur'}
+              ${avatarHtml}
+              ${displayName}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="nav-user-dropdown">

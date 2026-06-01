@@ -11,3 +11,24 @@ CREATE POLICY "Users can update own profile"
 ON public.profiles 
 FOR UPDATE 
 USING ( auth.uid() = id );
+
+-- 4. Ajouter la colonne 'avatar_url' à la table 'profiles'
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url text;
+
+-- 5. Créer le bucket de stockage 'avatars' (à exécuter dans la console Supabase, la création de bucket via SQL peut nécessiter des droits d'admin postgres complets, mais c'est supporté par le dashboard Supabase)
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('avatars', 'avatars', true) 
+ON CONFLICT (id) DO NOTHING;
+
+-- 6. Configurer les règles de sécurité (RLS) pour le bucket 'avatars'
+CREATE POLICY "Avatar Public Access" 
+ON storage.objects FOR SELECT 
+USING ( bucket_id = 'avatars' );
+
+CREATE POLICY "Avatar Upload" 
+ON storage.objects FOR INSERT 
+WITH CHECK ( bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1] );
+
+CREATE POLICY "Avatar Update" 
+ON storage.objects FOR UPDATE 
+WITH CHECK ( bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1] );

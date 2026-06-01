@@ -101,7 +101,7 @@
       
       // Load dynamic viewer
       const script = document.createElement('script');
-      script.src = '/spreadsheet/view.js?v=10';
+      script.src = '/spreadsheet/view.js?v=' + Date.now();
       document.head.appendChild(script);
 
       // Load cursor logic

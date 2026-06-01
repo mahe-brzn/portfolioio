@@ -700,7 +700,7 @@ document.getElementById('form-create-spreadsheet')?.addEventListener('submit', a
 
   const { data, error } = await supabaseClient
     .from('spreadsheets')
-    .insert([{ owner_id: currentUser.id, slug, title, items: [], accent_color, badge_text, description }])
+    .insert([{ owner_id: currentUser.id, slug, title, items: [], accent_color, badge_text, description, visibility: 'private', editors: [] }])
     .select();
 
   if (error) {

@@ -118,6 +118,22 @@
       .profile-tab { white-space: nowrap; }
     }
 
+    /* Modals */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none;
+      align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+      padding: 30px; width: 100%; max-width: 500px; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 15px; right: 15px; background: none; border: none;
+      color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: 0.3s;
+    }
+    .modal-close:hover { color: white; }
+
     /* Fix interactions */
     #cursor-dot, #cursor-ring, #grain, .account-ambient { pointer-events: none !important; }
   </style>

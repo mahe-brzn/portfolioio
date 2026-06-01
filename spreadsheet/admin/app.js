@@ -556,10 +556,22 @@ document.getElementById('search-users')?.addEventListener('input', (e) => {
   
   lists.forEach(list => {
     if(!list) return;
-    const items = list.querySelectorAll('.list-item');
-    items.forEach(item => {
-      const text = item.textContent.toLowerCase();
-      item.style.display = text.includes(term) ? 'flex' : 'none';
+    Array.from(list.children).forEach(child => {
+      const text = child.textContent.toLowerCase();
+      child.style.display = text.includes(term) ? 'flex' : 'none';
+    });
+  });
+});
+
+document.getElementById('search-admins')?.addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase();
+  const lists = [document.getElementById('admins-list')];
+  
+  lists.forEach(list => {
+    if(!list) return;
+    Array.from(list.children).forEach(child => {
+      const text = child.textContent.toLowerCase();
+      child.style.display = text.includes(term) ? 'flex' : 'none';
     });
   });
 });

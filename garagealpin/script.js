@@ -66,11 +66,35 @@
       card.addEventListener('mouseleave', () => ring.classList.remove('glow'));
     });
 
-    // Hover state on interactive elements
-    const hoverEls = document.querySelectorAll('a, button, .service-card, .team-card, .equipe-card, .mob-link, .btn-magnetic, .btn-outline');
-    hoverEls.forEach(el => {
-      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
-      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+    // Hover state on interactive elements with dynamic color picking
+    const interactiveSelector = 'a, button, .service-card, .team-card, .equipe-card, .mob-link, .btn-magnetic, .btn-outline, .sneaker-card, .action-btn, select, input, [style*="cursor: pointer"]';
+    
+    document.addEventListener('mouseover', e => {
+      const target = e.target.closest(interactiveSelector);
+      if (target) {
+        ring.classList.add('hover');
+        
+        // Take the color of the element it is on
+        const style = window.getComputedStyle(target);
+        // Prioritize background color if it's visible, else use text color
+        let color = style.backgroundColor;
+        if (color === 'rgba(0, 0, 0, 0)' || color === 'transparent') {
+          color = style.color;
+        }
+        
+        // Avoid setting border to black/white on dark mode if it's generic
+        if (color && color !== 'rgba(0, 0, 0, 0)') {
+          ring.style.borderColor = color;
+        }
+      }
+    });
+
+    document.addEventListener('mouseout', e => {
+      const target = e.target.closest(interactiveSelector);
+      if (target) {
+        ring.classList.remove('hover');
+        ring.style.borderColor = ''; // Revert to default
+      }
     });
 
     document.addEventListener('mousedown', () => ring.classList.add('click'));

@@ -474,13 +474,44 @@ function renderSpreadsheet(spreadsheet) {
   if (oldMain) oldMain.remove();
 
   // Agent Logic
-  window.convertAgentLink = (agent, url) => {
+  window.extractOriginalLink = (url) => {
+    if (!url) return '';
+    try {
+      const urlObj = new URL(url);
+      const searchParams = urlObj.searchParams;
+      
+      const possibleParams = ['url', 'productLink', 'product_url', 'src'];
+      for (const param of possibleParams) {
+        if (searchParams.has(param)) {
+          let innerUrl = searchParams.get(param);
+          if (innerUrl.startsWith('http')) {
+            return window.extractOriginalLink(innerUrl); // extract recursively
+          }
+        }
+      }
+      return url; // Return original if no agent url param found
+    } catch (e) {
+      return url;
+    }
+  };
+
+  window.convertAgentLink = (agent, rawUrl) => {
+    // 1. Force extract the original Weidian/Taobao URL if it's hidden in an agent link
+    let url = window.extractOriginalLink(rawUrl);
+    
+    // 2. If for some reason the URL is still a hipobuy.cn shortlink (cache issue), fallback to Weidian search or something?
+    // We assume the DB has been correctly updated to raw weidian/taobao links now.
+    
     const encoded = encodeURIComponent(url || '');
+
+    // 3. Universal ?url= routing. Almost all modern agents use this on their product or search endpoints.
     switch(agent) {
-      case 'hippobuy': return `https://hippobuy.com/product/details?url=${encoded}`;
-      case 'acbuy': return `https://acbuy.com/item?url=${encoded}`;
+      case 'hippobuy':
+      case 'hipobuy': return `https://hipobuy.com/product/details?url=${encoded}`;
+      case 'acbuy':
+      case 'allchinabuy': return `https://www.allchinabuy.com/en/page/buy/?url=${encoded}`;
       case 'cnfans': return `https://cnfans.com/product/?url=${encoded}`;
-      case 'superbuy': return `https://www.superbuy.com/en/page/buy/?url=${encoded}`;
+      case 'superbuy': return `https://www.superbuy.com/en/page/buy/?nTag=Home-search&url=${encoded}`;
       case 'wegobuy': return `https://www.wegobuy.com/en/page/buy?url=${encoded}`;
       case 'cssbuy': return `https://www.cssbuy.com/item.html?url=${encoded}`;
       case 'sugargoo': return `https://www.sugargoo.com/#/home/productDetail?productLink=${encoded}`;
@@ -488,11 +519,12 @@ function renderSpreadsheet(spreadsheet) {
       case 'lovegobuy': return `https://lovegobuy.com/item?url=${encoded}`;
       case 'mulebuy': return `https://mulebuy.com/product/?url=${encoded}`;
       case 'litbuy': return `https://litbuy.com/item?url=${encoded}`;
-      default: return `https://hippobuy.com/product/details?url=${encoded}`;
+      case 'joyabuy': return `https://joyabuy.com/product/?url=${encoded}`;
+      default: return `https://hipobuy.com/product/details?url=${encoded}`;
     }
   };
 
-  const agentsList = ['ACBuy', 'HippoBuy', 'CNFans', 'Superbuy', 'WeGoBuy', 'CSSBuy', 'Sugargoo', 'OopBuy', 'LoveGoBuy', 'Mulebuy', 'LitBuy'];
+  const agentsList = ['AllChinaBuy', 'HipoBuy', 'CNFans', 'Superbuy', 'WeGoBuy', 'CSSBuy', 'Sugargoo', 'OopBuy', 'LoveGoBuy', 'Mulebuy', 'LitBuy'];
 
   window.fastBuy = (e, index) => {
     e.stopPropagation(); // prevent modal opening

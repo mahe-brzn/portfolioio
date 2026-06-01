@@ -138,7 +138,7 @@ button { font-family: inherit; cursor: none; border: none; background: none; }
 }
 #cursor-ring.hover {
   width: 56px; height: 56px;
-  border-color: var(--red);
+  border-color: var(--sneaker-accent, var(--accent));
 }
 #cursor-ring.click {
   width: 24px; height: 24px;

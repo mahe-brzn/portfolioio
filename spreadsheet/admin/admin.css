@@ -221,6 +221,8 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   backdrop-filter: blur(4px);
+  width: fit-content;
+  display: inline-block;
 }
 .badge.pending { background: rgba(255, 152, 0, 0.15); color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.3); }
 .badge.user { background: rgba(76, 175, 80, 0.15); color: #81c784; border: 1px solid rgba(76, 175, 80, 0.3); }

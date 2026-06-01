@@ -274,7 +274,7 @@
       if (data && profilesData) {
         data.forEach(s => {
           const ownerProfile = profilesData.find(p => p.id === s.owner_id);
-          s.authorName = ownerProfile ? (ownerProfile.display_name || ownerProfile.email.split('@')[0]) : 'Communauté';
+          s.authorName = ownerProfile ? (ownerProfile.display_name || (ownerProfile.email ? ownerProfile.email.split('@')[0] : 'Communauté')) : 'Communauté';
         });
       }
 

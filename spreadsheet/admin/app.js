@@ -461,10 +461,11 @@ async function loadAdminData() {
       const el = document.createElement('div');
       el.className = 'list-item stagger-item';
       el.style.animationDelay = `${i * 0.05}s`;
+      const authorStr = s.profiles ? (s.profiles.display_name || (s.profiles.email ? s.profiles.email.split('@')[0] : 'Communauté')) : 'Communauté';
       el.innerHTML = `
         <div>
           <div class="list-item-title">${s.title}</div>
-          <div class="list-item-sub">/spreadsheet/${s.slug} — par ${s.profiles?.display_name || s.profiles?.email}</div>
+          <div class="list-item-sub">/spreadsheet/${s.slug} — par ${authorStr}</div>
         </div>
         <div style="display:flex; gap:8px;">
           <a href="/spreadsheet/${s.slug}" target="_blank" class="btn-icon" title="Voir"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>

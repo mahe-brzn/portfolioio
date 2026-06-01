@@ -473,16 +473,104 @@
         });
       }
 
-      // Fetch Data
-      setTimeout(async () => {
-        if (window.currentUser) {
-          // Load 2FA status
-          check2FAStatus();
-        } else {
-          // Non loggé
+      // Fetch Data & Init
+      async function initProfile() {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session) {
           window.location.href = "/spreadsheet/admin/";
+          return;
         }
-      });
+        window.currentUser = session.user;
+        
+        // Load 2FA status
+        check2FAStatus();
+
+        // Fetch current profile
+        const { data: profile } = await window.supabaseClient.from('profiles').select('*').eq('id', window.currentUser.id).single();
+        window.currentProfile = profile;
+
+        // Fill user info
+        const displayName = window.currentProfile?.display_name || window.currentUser.email.split('@')[0];
+        document.getElementById('sidebar-name').textContent = displayName;
+        document.getElementById('sidebar-email').textContent = window.currentUser.email;
+        document.getElementById('sidebar-role').textContent = window.currentProfile?.role || 'user';
+        document.getElementById('avatar-initial').textContent = displayName.charAt(0).toUpperCase();
+        
+        if (document.getElementById('pref-display-name')) {
+          document.getElementById('pref-display-name').value = window.currentProfile?.display_name || '';
+        }
+        
+        // Show create button if admin or creator
+        const role = window.currentProfile?.role;
+        if (role === 'admin' || role === 'creator') {
+          const btnCreate = document.getElementById('btn-create-spreadsheet-profile');
+          if (btnCreate) {
+            btnCreate.style.display = 'inline-block';
+            btnCreate.addEventListener('click', () => {
+              window.location.href = '/spreadsheet/admin/index.html?action=create';
+            });
+          }
+        }
+
+        const supabase = window.supabaseClient;
+
+        // 1. My Spreadsheets
+        const { data: mySheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', window.currentUser.id);
+        const mySheetsList = document.getElementById('my-spreadsheets-list');
+        if (mySheets && mySheets.length > 0) {
+          mySheetsList.innerHTML = mySheets.map(s => `
+            <a href="/spreadsheet/${s.slug}" class="spread-card">
+              <span class="badge-visibility">${s.visibility}</span>
+              <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${s.title}</h3>
+              <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${s.description || 'Aucune description'}</p>
+            </a>
+          `).join('');
+          bindCardHover();
+        } else {
+          mySheetsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez pas encore créé ou copié de spreadsheet.</p>';
+        }
+
+        // 2. My Favorites
+        const { data: myFavs } = await supabase.from('favorites').select('*, spreadsheets(*)').eq('user_id', window.currentUser.id);
+        const myFavsList = document.getElementById('my-favorites-list');
+        if (myFavs && myFavs.length > 0) {
+          const validFavs = myFavs.filter(f => f.spreadsheets);
+          if (validFavs.length > 0) {
+            myFavsList.innerHTML = validFavs.map(f => `
+              <a href="/spreadsheet/${f.spreadsheets.slug}" class="spread-card">
+                <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${f.spreadsheets.title}</h3>
+                <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${f.spreadsheets.description || 'Aucune description'}</p>
+              </a>
+            `).join('');
+            bindCardHover();
+          } else {
+            myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Aucun favori valide.</p>';
+          }
+        } else {
+          myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez ajouté aucune spreadsheet à vos favoris.</p>';
+        }
+
+        // 3. My Suggestions
+        const { data: mySuggs } = await supabase.from('suggestions').select('*, spreadsheets(title)').eq('user_id', window.currentUser.id).order('created_at', { ascending: false });
+        const mySuggsList = document.getElementById('my-suggestions-list');
+        if (mySuggs && mySuggs.length > 0) {
+          mySuggsList.innerHTML = mySuggs.map(s => {
+            const statusClass = s.status === 'pending' ? 'status-pending' : s.status === 'approved' ? 'status-approved' : 'status-rejected';
+            const statusText = s.status === 'pending' ? 'En attente' : s.status === 'approved' ? 'Approuvé' : 'Rejeté';
+            return `
+              <div class="list-item">
+                <div>
+                  <h4 style="margin-bottom:8px; font-size:1.1rem;">${s.title}</h4>
+                  <p style="font-size:0.9rem; color:rgba(255,255,255,0.5);">Pour : <strong style="color:#fff;">${s.spreadsheets?.title || 'Base inconnue'}</strong> — le ${new Date(s.created_at).toLocaleDateString()}</p>
+                </div>
+                <span class="status-badge ${statusClass}">${statusText}</span>
+              </div>
+            `;
+          }).join('');
+        } else {
+          mySuggsList.innerHTML = '<p style="color:var(--text-muted);">Vous n\'avez fait aucune suggestion pour le moment.</p>';
+        }
+      }
       
       let pendingFactorId = null;
       
@@ -625,89 +713,7 @@
         alert("2FA désactivée avec succès.");
       });
 
-        // Fill user info
-        const displayName = window.currentProfile?.display_name || window.currentUser.email.split('@')[0];
-        document.getElementById('sidebar-name').textContent = displayName;
-        document.getElementById('sidebar-email').textContent = window.currentUser.email;
-        document.getElementById('sidebar-role').textContent = window.currentProfile?.role || 'user';
-        document.getElementById('avatar-initial').textContent = displayName.charAt(0).toUpperCase();
-        
-        if (document.getElementById('pref-display-name')) {
-          document.getElementById('pref-display-name').value = window.currentProfile?.display_name || '';
-        }
-        
-        // Show create button if admin or creator
-        const role = window.currentProfile?.role;
-        if (role === 'admin' || role === 'creator') {
-          const btnCreate = document.getElementById('btn-create-spreadsheet-profile');
-          if (btnCreate) {
-            btnCreate.style.display = 'inline-block';
-            btnCreate.addEventListener('click', () => {
-              window.location.href = '/spreadsheet/admin/index.html?action=create';
-            });
-          }
-        }
-
-        const supabase = window.supabaseClient;
-
-        // 1. My Spreadsheets
-        const { data: mySheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', window.currentUser.id);
-        const mySheetsList = document.getElementById('my-spreadsheets-list');
-        if (mySheets && mySheets.length > 0) {
-          mySheetsList.innerHTML = mySheets.map(s => `
-            <a href="/spreadsheet/${s.slug}" class="spread-card">
-              <span class="badge-visibility">${s.visibility}</span>
-              <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${s.title}</h3>
-              <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${s.description || 'Aucune description'}</p>
-            </a>
-          `).join('');
-          bindCardHover();
-        } else {
-          mySheetsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez pas encore créé ou copié de spreadsheet.</p>';
-        }
-
-        // 2. My Favorites
-        const { data: myFavs } = await supabase.from('favorites').select('*, spreadsheets(*)').eq('user_id', window.currentUser.id);
-        const myFavsList = document.getElementById('my-favorites-list');
-        if (myFavs && myFavs.length > 0) {
-          const validFavs = myFavs.filter(f => f.spreadsheets);
-          if (validFavs.length > 0) {
-            myFavsList.innerHTML = validFavs.map(f => `
-              <a href="/spreadsheet/${f.spreadsheets.slug}" class="spread-card">
-                <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${f.spreadsheets.title}</h3>
-                <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${f.spreadsheets.description || 'Aucune description'}</p>
-              </a>
-            `).join('');
-            bindCardHover();
-          } else {
-            myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Aucun favori valide.</p>';
-          }
-        } else {
-          myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez ajouté aucune spreadsheet à vos favoris.</p>';
-        }
-
-        // 3. My Suggestions
-        const { data: mySuggs } = await supabase.from('suggestions').select('*, spreadsheets(title)').eq('user_id', window.currentUser.id).order('created_at', { ascending: false });
-        const mySuggsList = document.getElementById('my-suggestions-list');
-        if (mySuggs && mySuggs.length > 0) {
-          mySuggsList.innerHTML = mySuggs.map(s => {
-            const statusClass = s.status === 'pending' ? 'status-pending' : s.status === 'approved' ? 'status-approved' : 'status-rejected';
-            const statusText = s.status === 'pending' ? 'En attente' : s.status === 'approved' ? 'Approuvé' : 'Rejeté';
-            return `
-              <div class="list-item">
-                <div>
-                  <h4 style="margin-bottom:8px; font-size:1.1rem;">${s.title}</h4>
-                  <p style="font-size:0.9rem; color:rgba(255,255,255,0.5);">Pour : <strong style="color:#fff;">${s.spreadsheets?.title || 'Base inconnue'}</strong> — le ${new Date(s.created_at).toLocaleDateString()}</p>
-                </div>
-                <span class="status-badge ${statusClass}">${statusText}</span>
-              </div>
-            `;
-          }).join('');
-        } else {
-          mySuggsList.innerHTML = '<p style="color:var(--text-muted);">Vous n\'avez fait aucune suggestion pour le moment.</p>';
-        }
-
-      }, 800);
+      initProfile();
     });
   </script>
 </body>

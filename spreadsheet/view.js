@@ -15,15 +15,26 @@
   try {
     const { data: spreadsheet, error } = await supabaseClient
       .from('spreadsheets')
-      .select('*, profiles(email, display_name)')
+      .select('*')
       .eq('slug', slug)
       .single();
 
     if (error || !spreadsheet) {
-      // Show normal page (index or 404)
+      console.error("Erreur de chargement de la spreadsheet:", error);
       const mainContent = document.getElementById('main-content');
       if (mainContent) mainContent.style.display = 'block';
       return;
+    }
+    
+    // Fetch author profile separately to avoid relation errors
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('email, display_name')
+      .eq('id', spreadsheet.owner_id)
+      .single();
+      
+    if (profile) {
+      spreadsheet.profiles = profile;
     }
     
     try {

@@ -319,22 +319,33 @@
 
       container.innerHTML = '';
       filtered.forEach(s => {
+        let itemCount = 0;
+        if (s.items) {
+          try {
+            itemCount = typeof s.items === 'string' ? JSON.parse(s.items).length : s.items.length;
+          } catch(e) {}
+        }
+        
         container.innerHTML += `
           <a href="/spreadsheet/${s.slug}" class="spread-card" style="height: 100%; min-height: 250px;">
             <h2 class="spread-card-title">${s.title}</h2>
             <p class="spread-card-desc">${s.description || 'Une sélection au meilleur prix.'}</p>
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
-              <div style="max-width: 60%;">
+              <div style="max-width: 50%;">
                 <p style="font-size:0.75rem; opacity:0.5; margin: 0; text-transform: uppercase; letter-spacing: 0.05em;">Créateur</p>
                 <p style="font-size:0.95rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--white); font-weight: 500;">${s.authorName}</p>
               </div>
-              <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 20px;" title="Nombre d'articles">
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--sneaker-accent)" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                  <span style="font-size:0.85rem; font-weight: 600; color: white;">${itemCount}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 20px;" title="Nombre de likes">
                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="#ff4b4b" stroke-width="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                   <span style="font-size:0.85rem; font-weight: 600; color: white;">${s.likes_count || 0}</span>
                 </div>
-                <div class="spread-card-arrow" style="margin: 0;">
+                <div class="spread-card-arrow" style="margin: 0; margin-left: 4px;">
                   <svg viewBox="0 0 24 24" fill="none">
                     <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>

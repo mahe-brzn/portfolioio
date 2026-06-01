@@ -842,12 +842,20 @@ function renderSpreadsheet(spreadsheet) {
         alert("Suggestion envoyée ! Le créateur devra l'approuver.");
         // Send notification to owner
         const displayName = window.currentProfile?.display_name || window.currentUser.email.split('@')[0];
+        const msg = `${displayName} a fait une suggestion pour la spreadsheet "${spreadsheet.title}".`;
         await supabaseClient.from('notifications').insert({
           user_id: spreadsheet.owner_id,
           type: 'suggestion',
           title: 'Nouvelle Suggestion',
-          message: `${displayName} a fait une suggestion pour la spreadsheet "${spreadsheet.title}".`
+          message: msg
         });
+
+        if (window.sendEmailNotification) {
+          const { data: p } = await supabaseClient.from('profiles').select('email').eq('id', spreadsheet.owner_id).single();
+          if (p && p.email) {
+            window.sendEmailNotification(p.email, msg);
+          }
+        }
       }
     });
   });

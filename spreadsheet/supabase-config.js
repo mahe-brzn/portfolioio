@@ -8,3 +8,24 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // NE PAS MODIFIER LA LIGNE CI-DESSOUS
 window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Initialisation de EmailJS
+const emailJsScript = document.createElement('script');
+emailJsScript.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
+emailJsScript.onload = () => {
+  emailjs.init({ publicKey: "nMn9CuLhNna1TVr5X" });
+};
+document.head.appendChild(emailJsScript);
+
+window.sendEmailNotification = async function(toEmail, message) {
+  if (typeof emailjs === 'undefined') return;
+  try {
+    await emailjs.send("service_dnlu5k2", "template_joclqm4", {
+      to_email: toEmail,
+      message: message
+    });
+    console.log("Email envoyé à", toEmail);
+  } catch (err) {
+    console.error("Erreur EmailJS:", err);
+  }
+};

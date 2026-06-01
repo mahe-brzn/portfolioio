@@ -1345,12 +1345,20 @@ async function addCollaborator(userId, role) {
     // Send Notification
     const displayName = currentProfile?.display_name || currentUser.email.split('@')[0];
     const roleStr = role === 'editor' ? 'Éditeur' : 'Lecteur';
+    const msg = `${displayName} vous a ajouté en tant que ${roleStr} sur la spreadsheet "${spreadsheet.title}".`;
     await supabaseClient.from('notifications').insert({
       user_id: userId,
       type: 'collab_add',
       title: 'Nouvelle Collaboration',
-      message: `${displayName} vous a ajouté en tant que ${roleStr} sur la spreadsheet "${spreadsheet.title}".`
+      message: msg
     });
+
+    if (window.sendEmailNotification) {
+      const { data: p } = await supabaseClient.from('profiles').select('email').eq('id', userId).single();
+      if (p && p.email) {
+        window.sendEmailNotification(p.email, msg);
+      }
+    }
 
     spreadsheet.editors = editors;
     spreadsheet.viewers = viewers;

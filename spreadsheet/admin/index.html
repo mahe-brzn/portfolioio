@@ -172,12 +172,15 @@
       <div class="admin-grid">
         <div class="admin-card glass-panel">
           <h3>Utilisateurs en attente</h3>
-          <div id="pending-users-list" class="list-container"></div>
+          <div id="pending-users-list" class="list-container" style="max-height: 400px; overflow-y: auto;"></div>
         </div>
         
         <div class="admin-card glass-panel">
-          <h3>Utilisateurs autorisés</h3>
-          <div id="approved-users-list" class="list-container"></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+            <h3 style="margin: 0;">Utilisateurs autorisés</h3>
+            <input type="text" id="search-users" placeholder="Rechercher par nom ou email..." style="padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 6px; font-size: 0.9rem; min-width: 200px;" />
+          </div>
+          <div id="approved-users-list" class="list-container" style="max-height: 400px; overflow-y: auto; padding-right: 5px;"></div>
         </div>
       </div>
       
@@ -209,6 +212,41 @@
           <button type="submit" class="btn-magnetic" style="margin-top: 10px;">Créer le compte</button>
           <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;">Note : La création va vous déconnecter temporairement pour des raisons de sécurité Supabase.</p>
         </form>
+      </div>
+    </div>
+
+    <!-- USER DETAIL MODAL -->
+    <div id="modal-user-detail" class="modal">
+      <div class="modal-content glass-panel" style="max-width: 500px;">
+        <button class="modal-close" id="btn-close-user-detail">&times;</button>
+        <h2 class="admin-title" style="font-size: 1.8rem; margin-bottom: 20px;">Détails <span class="accent">Utilisateur</span></h2>
+        
+        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Informations</div>
+          <div id="detail-user-email" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 5px;"></div>
+          <div id="detail-user-name" style="color: rgba(255,255,255,0.7); font-size: 0.9rem;"></div>
+        </div>
+
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px;">Modifier le rôle</label>
+          <div style="display: flex; gap: 10px;">
+            <select id="detail-user-role" style="flex: 1; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 6px; outline: none; font-family: var(--font-body);">
+              <option value="admin">Admin</option>
+              <option value="creator">Créateur (Creator)</option>
+              <option value="user">Utilisateur (User)</option>
+              <option value="pending">En attente (Pending)</option>
+            </select>
+            <button id="btn-save-user-role" class="btn-magnetic" style="padding: 10px 15px;">Sauvegarder</button>
+          </div>
+          <p id="detail-role-status" style="font-size: 0.8rem; margin-top: 8px; color: var(--sneaker-accent);"></p>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom: 10px; font-size: 1.1rem;">Ses Spreadsheets</h3>
+          <div id="detail-user-spreadsheets" class="list-container" style="max-height: 200px; overflow-y: auto;">
+            <p style="color:var(--text-muted); font-size:0.9rem;">Chargement...</p>
+          </div>
+        </div>
       </div>
     </div>
 

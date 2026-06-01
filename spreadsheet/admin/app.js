@@ -409,7 +409,7 @@ async function loadAdminData() {
       
       if (p.role === 'pending') {
         el.innerHTML = `
-          <div><div class="list-item-title">${displayNameStr}</div><div class="badge pending">En attente</div></div>
+          <div onclick="openUserDetail('${p.id}')" style="cursor: pointer; flex: 1;"><div class="list-item-title">${displayNameStr}</div><div class="badge pending">En attente</div></div>
           <div style="display:flex; gap:8px;">
             <button class="btn-icon" onclick="approveUser('${p.id}')" title="Approuver"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
             <button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
@@ -418,7 +418,7 @@ async function loadAdminData() {
         pendingList.appendChild(el);
       } else {
         el.innerHTML = `
-          <div><div class="list-item-title">${displayNameStr}</div><div class="badge ${p.role}">${p.role}</div></div>
+          <div onclick="openUserDetail('${p.id}')" style="cursor: pointer; flex: 1;"><div class="list-item-title">${displayNameStr}</div><div class="badge ${p.role}">${p.role}</div></div>
           <div style="display:flex; gap:8px;">
             ${p.role === 'user' ? `<button class="btn-icon" onclick="promoteToCreator('${p.id}')" title="Promouvoir Créateur" style="color:#c8ff57; border-color:#c8ff57;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg></button>` : ''}
             ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Rétrograder / Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
@@ -470,6 +470,77 @@ window.revokeUser = async (userId) => {
   await supabaseClient.from('profiles').update({ role: 'pending' }).eq('id', userId);
   loadAdminData();
 };
+
+let currentUserDetailId = null;
+
+window.openUserDetail = async (userId) => {
+  currentUserDetailId = userId;
+  const modal = document.getElementById('modal-user-detail');
+  
+  // Find user data
+  const { data: userProfile } = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
+  if (!userProfile) return;
+
+  document.getElementById('detail-user-email').textContent = userProfile.email;
+  document.getElementById('detail-user-name').textContent = userProfile.display_name || 'Aucun pseudo';
+  document.getElementById('detail-user-role').value = userProfile.role;
+  document.getElementById('detail-role-status').textContent = '';
+
+  // Find user spreadsheets
+  const { data: userSheets } = await supabaseClient.from('spreadsheets').select('*').eq('owner_id', userId);
+  const sheetsContainer = document.getElementById('detail-user-spreadsheets');
+  
+  if (userSheets && userSheets.length > 0) {
+    sheetsContainer.innerHTML = userSheets.map(s => `
+      <div class="list-item" style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; margin-bottom: 8px;">
+        <div style="font-weight: 600;">${s.title}</div>
+        <div style="font-size: 0.8rem; opacity: 0.6;">/spreadsheet/${s.slug}</div>
+      </div>
+    `).join('');
+  } else {
+    sheetsContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Aucune spreadsheet.</p>';
+  }
+
+  modal.classList.add('active');
+};
+
+document.getElementById('btn-close-user-detail')?.addEventListener('click', () => {
+  document.getElementById('modal-user-detail').classList.remove('active');
+});
+
+document.getElementById('btn-save-user-role')?.addEventListener('click', async () => {
+  if (!currentUserDetailId) return;
+  const newRole = document.getElementById('detail-user-role').value;
+  const statusEl = document.getElementById('detail-role-status');
+  statusEl.textContent = 'Enregistrement...';
+  
+  const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', currentUserDetailId);
+  if (error) {
+    statusEl.textContent = "Erreur: " + error.message;
+    alert("Erreur détaillée : " + error.message + "\nSi c'est une erreur de type (enum ou contrainte), exécutez le script SQL fourni.");
+  } else {
+    statusEl.textContent = "Rôle mis à jour avec succès.";
+    setTimeout(() => {
+      document.getElementById('modal-user-detail').classList.remove('active');
+      loadAdminData();
+    }, 1000);
+  }
+});
+
+document.getElementById('search-users')?.addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase();
+  const lists = [document.getElementById('approved-users-list'), document.getElementById('pending-users-list')];
+  
+  lists.forEach(list => {
+    if(!list) return;
+    const items = list.querySelectorAll('.list-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(term) ? 'flex' : 'none';
+    });
+  });
+});
+
 window.deleteUser = async (userId) => {
   if (confirm("⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ?\n\nToutes ses spreadsheets seront également supprimées de façon irréversible.")) {
     const { error } = await supabaseClient.rpc('delete_user_admin', { target_user_id: userId });

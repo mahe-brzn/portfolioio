@@ -1,4 +1,11 @@
 (async function() {
+  // Inject auth-modal.js dynamically to ensure it's available on all spreadsheet pages
+  if (!document.querySelector('script[src="/spreadsheet/auth-modal.js"]')) {
+    const authScript = document.createElement('script');
+    authScript.src = '/spreadsheet/auth-modal.js';
+    document.head.appendChild(authScript);
+  }
+
   try {
     const supabaseClient = window.supabaseClient;
     if (!supabaseClient) {

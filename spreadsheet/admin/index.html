@@ -280,7 +280,10 @@
           <label>Badge / Surtitre</label>
           <input type="text" id="create-badge" placeholder="ex: 1. LA SÉLECTION DU CHEF" style="width:100%; margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;" />
 
-          <label>Description courte</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label style="margin: 0;">Description courte</label>
+            <button type="button" id="btn-generate-desc" class="btn-outline" style="padding: 4px 10px; font-size: 0.75rem; border-color: var(--sneaker-accent); color: var(--sneaker-accent); display: none;">✨ Générer par IA</button>
+          </div>
           <textarea id="create-desc" placeholder="Une sélection exclusive..." rows="3" style="width:100%; margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; resize: vertical;"></textarea>
 
           <label>Couleur d'accentuation</label>

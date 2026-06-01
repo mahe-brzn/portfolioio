@@ -611,6 +611,57 @@ async function loadUserData() {
 // ----------------------------------------------------
 document.getElementById('btn-show-create')?.addEventListener('click', () => {
   document.getElementById('modal-create').classList.add('active');
+  const btnGenDesc = document.getElementById('btn-generate-desc');
+  if (btnGenDesc) {
+    btnGenDesc.style.display = currentProfile?.gemini_api_key ? 'inline-block' : 'none';
+  }
+});
+
+document.getElementById('btn-show-create-admin')?.addEventListener('click', () => {
+  document.getElementById('modal-create').classList.add('active');
+  const btnGenDesc = document.getElementById('btn-generate-desc');
+  if (btnGenDesc) {
+    btnGenDesc.style.display = currentProfile?.gemini_api_key ? 'inline-block' : 'none';
+  }
+});
+
+document.getElementById('btn-generate-desc')?.addEventListener('click', async () => {
+  const title = document.getElementById('create-title').value.trim();
+  if (!title) {
+    alert("Veuillez d'abord entrer un Titre pour la spreadsheet !");
+    return;
+  }
+  
+  const apiKey = currentProfile?.gemini_api_key;
+  if (!apiKey) return;
+  
+  const btn = document.getElementById('btn-generate-desc');
+  btn.textContent = 'Génération...';
+  
+  try {
+    const prompt = `Génère une très courte description marketing (1 ou 2 phrases max) pour une collection de produits intitulée "${title}". Le ton doit être vendeur, moderne et stylé, en français. Ne mets pas de guillemets autour.`;
+    
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7 }
+      })
+    });
+    
+    const data = await response.json();
+    if (data.candidates && data.candidates.length > 0) {
+      let desc = data.candidates[0].content.parts[0].text.trim();
+      document.getElementById('create-desc').value = desc;
+    } else {
+      alert("Erreur lors de la génération avec l'IA.");
+    }
+  } catch (err) {
+    console.error("Gemini API Error", err);
+    alert("Erreur de connexion à l'API Gemini.");
+  }
+  btn.textContent = '✨ Générer par IA';
 });
 document.getElementById('btn-close-create')?.addEventListener('click', () => {
   document.getElementById('modal-create').classList.remove('active');

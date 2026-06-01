@@ -778,8 +778,16 @@ function renderSpreadsheet(spreadsheet) {
   setTimeout(checkInteractions, 1000);
 
   // Like Action
-  btnLike.addEventListener('click', async () => {
-    if (!window.currentUser) return window.openAuthModal();
+  btnLike.addEventListener('click', async (e) => {
+    e.preventDefault();
+    console.log("Like clicked! Current user:", window.currentUser);
+    if (!window.currentUser) {
+      if (typeof window.openAuthModal !== 'function') {
+        alert("Erreur de chargement du module de connexion. Rafraîchissez la page.");
+        return;
+      }
+      return window.openAuthModal();
+    }
     
     if (btnLike.classList.contains('active-like')) {
       await supabaseClient.from('likes').delete().eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id);
@@ -795,8 +803,13 @@ function renderSpreadsheet(spreadsheet) {
   });
 
   // Fav Action
-  btnFav.addEventListener('click', async () => {
-    if (!window.currentUser) return window.openAuthModal();
+  btnFav.addEventListener('click', async (e) => {
+    e.preventDefault();
+    console.log("Fav clicked!");
+    if (!window.currentUser) {
+      if (typeof window.openAuthModal !== 'function') return alert("Erreur de module.");
+      return window.openAuthModal();
+    }
     
     if (btnFav.classList.contains('active-fav')) {
       await supabaseClient.from('favorites').delete().eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id);

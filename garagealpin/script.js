@@ -101,6 +101,10 @@
     document.addEventListener('mouseup',   () => ring.classList.remove('click'));
     document.addEventListener('mouseleave', () => { dot.style.opacity = '0'; ring.style.opacity = '0'; });
     document.addEventListener('mouseenter', () => { dot.style.opacity = '1'; ring.style.opacity = '1'; });
+    window.addEventListener('blur', () => ring.classList.remove('click'));
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) ring.classList.remove('click');
+    });
   }
 
   /* ──────────────────────────────────────────────

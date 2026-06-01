@@ -541,10 +541,18 @@ function renderSpreadsheet(spreadsheet) {
   `;
 
   document.body.appendChild(mainWrapper);
-
   // Remove the old main-content
   const oldMain = document.getElementById('main-content');
   if (oldMain) oldMain.remove();
+
+
+  // Ensure cursor elements are always on top by moving them to the end of the DOM
+  const cursorDot = document.getElementById('cursor-dot');
+  const cursorRing = document.getElementById('cursor-ring');
+  const grain = document.getElementById('grain');
+  if (grain) document.body.appendChild(grain);
+  if (cursorRing) document.body.appendChild(cursorRing);
+  if (cursorDot) document.body.appendChild(cursorDot);
 
   // Agent Logic
   window.extractOriginalLink = (url) => {

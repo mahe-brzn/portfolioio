@@ -152,6 +152,10 @@
       // Click effects
       document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
       document.addEventListener('mouseup', () => document.body.classList.remove('cursor-click'));
+      window.addEventListener('blur', () => document.body.classList.remove('cursor-click'));
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) document.body.classList.remove('cursor-click');
+      });
     }
   }
   </script>

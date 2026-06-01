@@ -15,7 +15,7 @@
   try {
     const { data: spreadsheet, error } = await supabaseClient
       .from('spreadsheets')
-      .select('*')
+      .select('*, profiles(email, display_name)')
       .eq('slug', slug)
       .single();
 
@@ -208,8 +208,16 @@ function renderSpreadsheet(spreadsheet) {
       background: radial-gradient(circle, var(--sneaker-dim) 0%, transparent 70%);
     }
 
-    /* Extreme Mobile Optimization */
-    @media (max-width: 600px) {
+    /* Mobile Optimization */
+    @media (max-width: 900px) {
+      .shoes-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 16px 60px; }
+      .sneaker-card { padding: 24px 20px; min-height: auto; }
+      .sneaker-title { font-size: 1.4rem; }
+      .sneaker-price { font-size: 1.2rem; }
+      .spreadsheet-hero { padding: 80px 20px 40px; }
+      .spreadsheet-title { font-size: clamp(2.5rem, 7vw, 4rem); }
+    }
+    @media (max-width: 500px) {
       .spreadsheet-hero { padding: 60px 20px 40px; min-height: 25vh; }
       .spreadsheet-title { font-size: clamp(2rem, 9vw, 2.8rem) !important; }
       .spreadsheet-subtitle { font-size: 1rem; }
@@ -417,7 +425,7 @@ function renderSpreadsheet(spreadsheet) {
         <p class="s-label reveal active" data-num="01" aria-hidden="true">${spreadsheet.badge_text || 'La sélection du chef'}</p>
         <h1 class="spreadsheet-title reveal active reveal-d1">${spreadsheet.title.includes(' ') ? spreadsheet.title.replace(' ', '<br><span class="accent">') + '</span>' : spreadsheet.title}</h1>
         <p class="spreadsheet-subtitle reveal active reveal-d2">${spreadsheet.description || 'Une sélection exclusive de sneakers, claquettes et sacs à dos au meilleur prix.'}</p>
-        <p class="spreadsheet-subtitle reveal active reveal-d2" style="font-size:0.85rem; opacity:0.6; margin-top:10px;">Par ${spreadsheet.profiles?.email || 'Admin'} • Mis à jour le ${new Date(spreadsheet.created_at).toLocaleDateString('fr-FR')}</p>
+        <p class="spreadsheet-subtitle reveal active reveal-d2" style="font-size:0.85rem; opacity:0.6; margin-top:10px;">Par ${spreadsheet.profiles?.display_name || spreadsheet.profiles?.email?.split('@')[0] || 'Communauté'} • Mis à jour le ${new Date(spreadsheet.created_at).toLocaleDateString('fr-FR')}</p>
         
         <div class="social-actions reveal active" style="transition-delay: 0.3s; position: relative; z-index: 9999; pointer-events: auto !important;">
           <button class="action-btn" id="btn-like" style="pointer-events: auto !important;">

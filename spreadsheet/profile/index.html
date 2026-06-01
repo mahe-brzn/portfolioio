@@ -152,8 +152,9 @@
     <aside class="account-sidebar">
       <div class="user-avatar" id="avatar-initial">?</div>
       <div class="user-info">
-        <div class="user-email" id="sidebar-email">Chargement...</div>
-        <div class="user-role" id="sidebar-role">...</div>
+        <div class="user-email" id="sidebar-name" style="font-size: 1.1rem; font-weight: 600; color: white;">Chargement...</div>
+        <div class="user-email" id="sidebar-email" style="font-size: 0.8rem; opacity: 0.6; margin-top: 2px;"></div>
+        <div class="user-role" id="sidebar-role" style="margin-top: 8px;">...</div>
       </div>
       
       <div class="profile-nav">
@@ -228,7 +229,16 @@
         </div>
         
         <div class="settings-panel">
-          <h3 style="margin-bottom: 25px; font-size: 1.4rem;">Agent d'achat favori</h3>
+          <h3 style="margin-bottom: 25px; font-size: 1.4rem;">Nom d'affichage</h3>
+          <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">
+            C'est le nom qui sera visible par les autres utilisateurs sur vos spreadsheets.
+          </p>
+          <div class="input-group">
+            <label class="input-label">Pseudo / Nom</label>
+            <input type="text" id="pref-display-name" class="form-input" placeholder="Votre pseudo" />
+          </div>
+
+          <h3 style="margin-top: 35px; margin-bottom: 25px; font-size: 1.4rem;">Agent d'achat favori</h3>
           <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">
             Sélectionnez l'agent d'achat vers lequel le bouton "Achat rapide" vous redirigera par défaut.
           </p>
@@ -360,6 +370,7 @@
       }
 
       // Preferences Logic
+      const prefDisplayName = document.getElementById('pref-display-name');
       const prefSelect = document.getElementById('pref-favorite-agent');
       const currSelect = document.getElementById('pref-currency');
       const btnSavePref = document.getElementById('btn-save-preferences');
@@ -376,10 +387,19 @@
       }
 
       if (btnSavePref && prefSelect && currSelect) {
-        btnSavePref.addEventListener('click', () => {
+        btnSavePref.addEventListener('click', async () => {
           localStorage.setItem('favorite_agent', prefSelect.value);
           localStorage.setItem('pref_currency_choice', currSelect.value);
           
+          // Save display name to Supabase
+          if (prefDisplayName && window.currentUser) {
+            const newName = prefDisplayName.value.trim();
+            const { error } = await window.supabaseClient.from('profiles').update({ display_name: newName }).eq('id', window.currentUser.id);
+            if (!error) {
+              document.getElementById('sidebar-name').textContent = newName || window.currentUser.email.split('@')[0];
+            }
+          }
+
           // Compute actual currency if AUTO
           let actualCurrency = currSelect.value;
           if (actualCurrency === 'AUTO') {
@@ -404,9 +424,15 @@
         }
 
         // Fill user info
+        const displayName = window.currentProfile?.display_name || window.currentUser.email.split('@')[0];
+        document.getElementById('sidebar-name').textContent = displayName;
         document.getElementById('sidebar-email').textContent = window.currentUser.email;
         document.getElementById('sidebar-role').textContent = window.currentProfile?.role || 'user';
-        document.getElementById('avatar-initial').textContent = window.currentUser.email.charAt(0).toUpperCase();
+        document.getElementById('avatar-initial').textContent = displayName.charAt(0).toUpperCase();
+        
+        if (document.getElementById('pref-display-name')) {
+          document.getElementById('pref-display-name').value = window.currentProfile?.display_name || '';
+        }
         
         // Show create button if admin or creator
         const role = window.currentProfile?.role;

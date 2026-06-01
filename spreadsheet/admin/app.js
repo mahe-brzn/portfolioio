@@ -389,7 +389,7 @@ async function loadAdminData() {
   if (spreadsheets && profiles) {
     spreadsheets.forEach(s => {
       const ownerProfile = profiles.find(p => p.id === s.owner_id);
-      s.profiles = ownerProfile ? { email: ownerProfile.email } : null;
+      s.profiles = ownerProfile ? { email: ownerProfile.email, display_name: ownerProfile.display_name } : null;
     });
   }
   const pendingList = document.getElementById('pending-users-list');
@@ -405,9 +405,11 @@ async function loadAdminData() {
       const el = document.createElement('div');
       el.className = 'list-item stagger-item';
       el.style.animationDelay = `${i * 0.05}s`;
+      const displayNameStr = p.display_name ? `${p.display_name} <span style="opacity:0.5;font-size:0.8em">(${p.email})</span>` : p.email;
+      
       if (p.role === 'pending') {
         el.innerHTML = `
-          <div><div class="list-item-title">${p.email}</div><div class="badge pending">En attente</div></div>
+          <div><div class="list-item-title">${displayNameStr}</div><div class="badge pending">En attente</div></div>
           <div style="display:flex; gap:8px;">
             <button class="btn-icon" onclick="approveUser('${p.id}')" title="Approuver"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg></button>
             <button class="btn-icon danger" onclick="deleteUser('${p.id}')" title="Supprimer définitivement"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
@@ -416,7 +418,7 @@ async function loadAdminData() {
         pendingList.appendChild(el);
       } else {
         el.innerHTML = `
-          <div><div class="list-item-title">${p.email}</div><div class="badge ${p.role}">${p.role}</div></div>
+          <div><div class="list-item-title">${displayNameStr}</div><div class="badge ${p.role}">${p.role}</div></div>
           <div style="display:flex; gap:8px;">
             ${p.role === 'user' ? `<button class="btn-icon" onclick="promoteToCreator('${p.id}')" title="Promouvoir Créateur" style="color:#c8ff57; border-color:#c8ff57;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg></button>` : ''}
             ${p.role !== 'admin' ? `<button class="btn-icon danger" onclick="revokeUser('${p.id}')" title="Rétrograder / Révoquer"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
@@ -439,7 +441,7 @@ async function loadAdminData() {
       el.innerHTML = `
         <div>
           <div class="list-item-title">${s.title}</div>
-          <div class="list-item-sub">/spreadsheet/${s.slug} — par ${s.profiles?.email}</div>
+          <div class="list-item-sub">/spreadsheet/${s.slug} — par ${s.profiles?.display_name || s.profiles?.email}</div>
         </div>
         <div style="display:flex; gap:8px;">
           <a href="/spreadsheet/${s.slug}" target="_blank" class="btn-icon" title="Voir"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
@@ -457,7 +459,11 @@ window.approveUser = async (userId) => {
   loadAdminData();
 };
 window.promoteToCreator = async (userId) => {
-  await supabaseClient.from('profiles').update({ role: 'creator' }).eq('id', userId);
+  const { error } = await supabaseClient.from('profiles').update({ role: 'creator' }).eq('id', userId);
+  if (error) {
+    alert("Erreur lors de la promotion : " + error.message + "\n\nSi vous voyez une erreur de type (enum), vous devez exécuter le script SQL fourni dans Supabase.");
+    console.error(error);
+  }
   loadAdminData();
 };
 window.revokeUser = async (userId) => {

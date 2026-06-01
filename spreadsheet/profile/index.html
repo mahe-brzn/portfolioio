@@ -527,7 +527,7 @@
             ctx.drawImage(img, 0, 0, width, height);
             
             canvas.toBlob(async (blob) => {
-              const fileName = `\${window.currentUser.id}-\${Date.now()}.jpg`;
+              const fileName = `${window.currentUser.id}-${Date.now()}.jpg`;
               const { data, error } = await window.supabaseClient.storage.from('avatars').upload(fileName, blob, { contentType: 'image/jpeg', upsert: true });
               
               if (error) {

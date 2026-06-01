@@ -51,9 +51,11 @@ function renderSpreadsheet(spreadsheet) {
   const style = document.createElement('style');
   style.innerHTML = `
     :root {
-      --sneaker-accent: #00e5ff;
-      --sneaker-dim: rgba(0, 229, 255, 0.15);
-      --sneaker-glow: rgba(0, 229, 255, 0.4);
+      --sneaker-accent: ${spreadsheet.accent_color || '#c8ff57'};
+      --sneaker-dim: color-mix(in srgb, var(--sneaker-accent) 15%, transparent);
+      --sneaker-glow: color-mix(in srgb, var(--sneaker-accent) 40%, transparent);
+      --sneaker-border: color-mix(in srgb, var(--sneaker-accent) 30%, transparent);
+      --sneaker-text-dim: color-mix(in srgb, var(--sneaker-accent) 5%, transparent);
     }
     body { overflow-y: auto !important; }
     .nav-logo span, .link-num, .s-label::before { color: var(--sneaker-accent) !important; }
@@ -117,8 +119,8 @@ function renderSpreadsheet(spreadsheet) {
     }
     .sneaker-card:hover {
       transform: translateY(-12px);
-      border-color: rgba(0, 229, 255, 0.3);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 229, 255, 0.05);
+      border-color: var(--sneaker-border);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--sneaker-text-dim);
       background: rgba(255, 255, 255, 0.04);
     }
     .sneaker-card:hover::before { opacity: 1; }
@@ -136,7 +138,7 @@ function renderSpreadsheet(spreadsheet) {
       transition: color 0.5s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .sneaker-card:hover .sneaker-watermark {
-      color: rgba(0, 229, 255, 0.05);
+      color: var(--sneaker-text-dim);
       transform: scale(1.05) translate(-10px, -5px);
     }
     .sneaker-content {
@@ -335,6 +337,21 @@ function renderSpreadsheet(spreadsheet) {
     document.documentElement.style.setProperty('--accent', '#c8ff57');
   }
 
+  // --- Currency Logic ---
+  let prefCurrency = localStorage.getItem('pref_currency');
+  if (!prefCurrency) {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if (tz.includes('Europe')) prefCurrency = 'EUR';
+    else if (tz.includes('America')) prefCurrency = 'USD';
+    else if (tz.includes('London')) prefCurrency = 'GBP';
+    else prefCurrency = 'EUR';
+    localStorage.setItem('pref_currency', prefCurrency);
+  }
+  const cSym = prefCurrency === 'EUR' ? '€' : prefCurrency === 'USD' ? '$' : prefCurrency === 'GBP' ? '£' : '¥';
+  // Optional multiplier if prices in DB are in Yuan and we want automatic conversion
+  // We'll just display the symbol for now since the user didn't specify a conversion rate
+  // If the user entered "40", it will show "40€". If they entered "40€", it stays "40€".
+
   // Build the DOM
   const mainWrapper = document.createElement('div');
   
@@ -351,12 +368,17 @@ function renderSpreadsheet(spreadsheet) {
       const rawPrice = priceStr.replace(/[^0-9.,]/g, '').replace(',', '.');
       const numPrice = parseFloat(rawPrice) || 0;
       
+      let displayPrice = priceStr || 'Prix inconnu';
+      if (numPrice > 0 && !priceStr.match(/[€$£¥]/)) {
+        displayPrice = numPrice + cSym;
+      }
+      
       itemsHtml += `
         <article class="sneaker-card reveal active" data-index="${index}" data-price="${numPrice}" data-title="${titleStr.replace(/"/g, '&quot;').toLowerCase()}" data-keywords="${keywordsStr.replace(/"/g, '&quot;').toLowerCase()}" style="cursor:pointer;" onclick="window.openAgentModal(${index})">
           <div class="sneaker-watermark">${String(index+1).padStart(2, '0')}</div>
           <div class="sneaker-content">
             <h2 class="sneaker-title">${titleStr || 'Produit inconnu'}</h2>
-            <span class="sneaker-price">${priceStr || 'Prix inconnu'}</span>
+            <span class="sneaker-price">${displayPrice} <span style="font-size:0.7rem; color:var(--text-muted); font-weight:normal; margin-left:4px;">HT</span></span>
 
             <button onclick="window.fastBuy(event, ${index})" class="sneaker-btn">
               Achat Rapide ⚡️
@@ -412,12 +434,12 @@ function renderSpreadsheet(spreadsheet) {
       <div class="search-container" style="max-width: 800px; margin: -20px auto 40px auto; padding: 0 clamp(24px, 5vw, 80px); position: relative; z-index: 5; display: flex; gap: 15px; flex-wrap: wrap;">
         <input type="text" id="sneaker-search" placeholder="Rechercher (ex: Jordan, Nike...)" style="flex: 1; min-width: 200px; padding: 16px 24px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: white; font-family: var(--font-body); font-size: 1rem; outline: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.3s;" />
         
-        <select id="sneaker-sort" style="padding: 16px 24px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.8); color: white; font-family: var(--font-body); font-size: 1rem; outline: none; backdrop-filter: blur(10px); cursor: pointer;">
-          <option value="default">Tri par défaut</option>
-          <option value="price-asc">Prix Croissant</option>
-          <option value="price-desc">Prix Décroissant</option>
-          <option value="name-asc">Nom (A-Z)</option>
-          <option value="name-desc">Nom (Z-A)</option>
+        <select id="sneaker-sort" style="padding: 12px 20px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: 0.9rem; outline: none; backdrop-filter: blur(10px); cursor: pointer; transition: all 0.3s;">
+          <option value="default" style="background: #111;">Tri par défaut</option>
+          <option value="price-asc" style="background: #111;">Prix Croissant</option>
+          <option value="price-desc" style="background: #111;">Prix Décroissant</option>
+          <option value="name-asc" style="background: #111;">Nom (A-Z)</option>
+          <option value="name-desc" style="background: #111;">Nom (Z-A)</option>
         </select>
       </div>
       
@@ -589,8 +611,13 @@ function renderSpreadsheet(spreadsheet) {
 
   window.openAgentModal = (index) => {
     const item = spreadsheet.items[index];
+    const priceStr = String(item.price || '');
+    const numPrice = parseFloat(priceStr.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+    let displayPrice = priceStr || 'Prix inconnu';
+    if (numPrice > 0 && !priceStr.match(/[€$£¥]/)) displayPrice = numPrice + cSym;
+
     document.getElementById('am-title').textContent = item.title;
-    document.getElementById('am-price').textContent = item.price;
+    document.getElementById('am-price').innerHTML = displayPrice + ' <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal; margin-left:4px;">HT</span>';
     document.getElementById('am-weight').textContent = item.weight || '~N/A estimé';
     document.getElementById('am-shipping').textContent = item.shipping_cost || '~N/A livraison';
     
@@ -674,6 +701,12 @@ function renderSpreadsheet(spreadsheet) {
 
   // Load initial states (if logged in)
   const checkInteractions = async () => {
+    // Fetch the real like count directly from DB
+    const { count, error } = await supabaseClient.from('likes').select('*', { count: 'exact', head: true }).eq('spreadsheet_id', spreadsheet.id);
+    if (!error && count !== null) {
+      likeCountSpan.textContent = count;
+    }
+
     if (!window.currentUser) return;
     
     // Check like
@@ -694,11 +727,13 @@ function renderSpreadsheet(spreadsheet) {
     if (btnLike.classList.contains('active-like')) {
       await supabaseClient.from('likes').delete().eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id);
       btnLike.classList.remove('active-like');
-      likeCountSpan.textContent = parseInt(likeCountSpan.textContent) - 1;
+      let currentCount = parseInt(likeCountSpan.textContent) || 1;
+      likeCountSpan.textContent = currentCount - 1;
     } else {
       await supabaseClient.from('likes').insert({ user_id: window.currentUser.id, spreadsheet_id: spreadsheet.id });
       btnLike.classList.add('active-like');
-      likeCountSpan.textContent = parseInt(likeCountSpan.textContent) + 1;
+      let currentCount = parseInt(likeCountSpan.textContent) || 0;
+      likeCountSpan.textContent = currentCount + 1;
     }
   });
 

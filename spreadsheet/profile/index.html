@@ -245,6 +245,22 @@
               <option value="litbuy">LitBuy</option>
             </select>
           </div>
+          
+          <h3 style="margin-top: 35px; margin-bottom: 25px; font-size: 1.4rem;">Devise d'affichage</h3>
+          <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">
+            Sélectionnez la monnaie dans laquelle vous souhaitez afficher les prix.
+          </p>
+          <div class="input-group">
+            <label class="input-label">Devise préférée</label>
+            <select id="pref-currency" class="form-input" style="cursor: pointer;">
+              <option value="AUTO">Automatique (Détection locale)</option>
+              <option value="EUR">Euros (€)</option>
+              <option value="USD">Dollars ($)</option>
+              <option value="GBP">Livres (£)</option>
+              <option value="CNY">Yuans (¥)</option>
+            </select>
+          </div>
+
           <button id="btn-save-preferences" class="btn-submit">Sauvegarder les préférences</button>
           <p id="preferences-status" style="margin-top: 15px; font-size: 0.95rem; text-align: center; color: var(--sneaker-accent);"></p>
         </div>
@@ -342,6 +358,7 @@
 
       // Preferences Logic
       const prefSelect = document.getElementById('pref-favorite-agent');
+      const currSelect = document.getElementById('pref-currency');
       const btnSavePref = document.getElementById('btn-save-preferences');
       const prefStatus = document.getElementById('preferences-status');
       
@@ -350,10 +367,27 @@
       if (prefSelect) {
         prefSelect.value = savedPref;
       }
+      const savedCurr = localStorage.getItem('pref_currency_choice') || 'AUTO';
+      if (currSelect) {
+        currSelect.value = savedCurr;
+      }
 
-      if (btnSavePref && prefSelect) {
+      if (btnSavePref && prefSelect && currSelect) {
         btnSavePref.addEventListener('click', () => {
           localStorage.setItem('favorite_agent', prefSelect.value);
+          localStorage.setItem('pref_currency_choice', currSelect.value);
+          
+          // Compute actual currency if AUTO
+          let actualCurrency = currSelect.value;
+          if (actualCurrency === 'AUTO') {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            if (tz.includes('Europe')) actualCurrency = 'EUR';
+            else if (tz.includes('America')) actualCurrency = 'USD';
+            else if (tz.includes('London')) actualCurrency = 'GBP';
+            else actualCurrency = 'EUR'; // Fallback
+          }
+          localStorage.setItem('pref_currency', actualCurrency);
+          
           prefStatus.textContent = 'Préférences sauvegardées !';
           setTimeout(() => { prefStatus.textContent = ''; }, 3000);
         });

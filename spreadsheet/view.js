@@ -62,6 +62,13 @@
 })();
 
 function renderSpreadsheet(spreadsheet) {
+  // Ensure auth-modal is loaded
+  if (!document.querySelector('script[src^="/spreadsheet/auth-modal.js"]')) {
+    const script = document.createElement('script');
+    script.src = '/spreadsheet/auth-modal.js?v=' + Date.now();
+    document.head.appendChild(script);
+  }
+
   // Add Garage Alpin styles if not present
   if (!document.querySelector('link[href="/garagealpin/style.css"]')) {
     const link = document.createElement('link');
@@ -753,11 +760,11 @@ function renderSpreadsheet(spreadsheet) {
     if (!window.currentUser) return;
     
     // Check like
-    const { data: like } = await supabaseClient.from('likes').select('*').eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id).single();
+    const { data: like } = await supabaseClient.from('likes').select('*').eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id).maybeSingle();
     if (like) btnLike.classList.add('active-like');
     
     // Check fav
-    const { data: fav } = await supabaseClient.from('favorites').select('*').eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id).single();
+    const { data: fav } = await supabaseClient.from('favorites').select('*').eq('user_id', window.currentUser.id).eq('spreadsheet_id', spreadsheet.id).maybeSingle();
     if (fav) btnFav.classList.add('active-fav');
   };
   // We need to wait for auth-modal to init

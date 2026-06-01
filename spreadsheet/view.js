@@ -233,22 +233,23 @@ function renderSpreadsheet(spreadsheet) {
 
     /* Mobile Optimization */
     @media (max-width: 900px) {
-      .shoes-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 16px 60px; }
-      .sneaker-card { padding: 24px 20px; min-height: auto; }
-      .sneaker-title { font-size: 1.4rem; }
-      .sneaker-price { font-size: 1.2rem; }
-      .spreadsheet-hero { padding: 80px 20px 40px; }
-      .spreadsheet-title { font-size: clamp(2.5rem, 7vw, 4rem); }
+      .shoes-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 12px 60px; }
+      .sneaker-card { padding: 16px 12px; min-height: auto; }
+      .sneaker-title { font-size: 1.1rem !important; }
+      .sneaker-price { font-size: 1.2rem !important; margin-bottom: 12px !important; padding-bottom: 20px; }
+      .sneaker-btn { padding: 12px 20px; font-size: 0.75rem; width: 100%; justify-content: center; }
+      .spreadsheet-hero { padding: 80px 16px 40px; }
+      .spreadsheet-title { font-size: clamp(2.2rem, 7vw, 4rem) !important; }
     }
-    @media (max-width: 500px) {
-      .spreadsheet-hero { padding: 60px 20px 40px; min-height: 25vh; }
-      .spreadsheet-title { font-size: clamp(2rem, 9vw, 2.8rem) !important; }
-      .spreadsheet-subtitle { font-size: 1rem; }
-      .shoes-grid { grid-template-columns: 1fr; gap: 20px; padding: 0 16px 60px; }
-      .sneaker-card { padding: 20px 16px; min-height: auto; }
+    @media (max-width: 360px) {
+      .shoes-grid { grid-template-columns: 1fr; gap: 16px; padding: 0 16px 60px; }
+      .sneaker-card { padding: 20px 16px; }
       .sneaker-title { font-size: 1.3rem !important; }
-      .sneaker-price { font-size: 1rem !important; margin-bottom: 20px !important; }
-      .sneaker-btn { width: 100%; justify-content: center; }
+      .sneaker-price { font-size: 1.4rem !important; margin-bottom: 20px !important; padding-bottom: 30px; }
+      .sneaker-btn { width: auto; justify-content: flex-start; }
+      .spreadsheet-hero { min-height: 25vh; }
+      .spreadsheet-title { font-size: clamp(1.8rem, 9vw, 2.8rem) !important; }
+      .spreadsheet-subtitle { font-size: 0.95rem; }
       .cyan-orb-1 { top: -200px; right: -300px; }
       #grain { display: none !important; }
     }

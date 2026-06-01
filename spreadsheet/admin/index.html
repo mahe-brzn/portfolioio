@@ -40,9 +40,12 @@
   <div class="hero-grid" aria-hidden="true"></div>
 
   <header role="banner" class="scrolled">
-    <nav id="nav" aria-label="Navigation principale">
+    <nav id="nav" aria-label="Navigation principale" class="visible">
       <div class="wrap nav-row">
-        <a href="/spreadsheet" class="nav-logo" aria-label="Retour aux Spreadsheets">MB<span>.</span> Admin</a>
+        <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB</a>
+        <ul class="nav-links" role="list">
+          <li role="listitem"><a href="/spreadsheet" class="on">Spreadsheets</a></li>
+        </ul>
         <div class="nav-right" id="auth-nav-controls" style="display: none;">
           <span id="user-email" style="font-size: 0.8rem; color: var(--text-muted); margin-right: 15px;"></span>
           <button id="btn-security" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem; border-color: var(--sneaker-accent); color: var(--sneaker-accent); margin-right: 10px;">Sécurité (2FA)</button>

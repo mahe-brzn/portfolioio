@@ -149,12 +149,11 @@
   </div>
 
   <header role="banner">
-    <nav id="nav" class="visible">
+    <nav id="nav" aria-label="Navigation principale" class="visible">
       <div class="wrap nav-row">
-        <a href="/" class="nav-logo">MB</a>
-        <ul class="nav-links">
-          <li><a href="/">Accueil</a></li>
-          <li><a href="/spreadsheet">Spreadsheets</a></li>
+        <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB</a>
+        <ul class="nav-links" role="list">
+          <li role="listitem"><a href="/spreadsheet" class="on">Spreadsheets</a></li>
         </ul>
         <div class="nav-right">
           <!-- Injecté par auth-modal.js -->

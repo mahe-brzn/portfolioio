@@ -147,6 +147,68 @@
   // 3. Check Session and update Nav
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
+    const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aalData && aalData.nextLevel === 'aal2' && aalData.currentLevel === 'aal1') {
+      // Force 2FA Verification
+      overlay.classList.add('active');
+      document.getElementById('auth-close').style.display = 'none'; // Prevent closing
+      document.querySelector('.auth-modal').innerHTML = `
+        <h2 style="font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 25px; text-align: center;">Double Authentification</h2>
+        <p style="text-align:center; font-size:0.9rem; color:rgba(255,255,255,0.6); margin-bottom:20px;">Veuillez entrer le code à 6 chiffres de votre application d'authentification pour continuer.</p>
+        <form id="form-global-2fa">
+          <input type="text" id="global-2fa-code" class="auth-input" placeholder="Code à 6 chiffres" required />
+          <button type="submit" class="auth-btn" id="btn-global-2fa">Vérifier le code</button>
+          <p id="global-2fa-error" style="color: #ff5252; font-size: 0.85rem; margin-top: 15px; text-align: center;"></p>
+          <button type="button" id="btn-global-logout" style="background:none; border:none; color:rgba(255,255,255,0.4); text-decoration:underline; cursor:pointer; width:100%; margin-top:15px;">Se déconnecter</button>
+        </form>
+      `;
+      
+      document.getElementById('btn-global-logout').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.reload();
+      });
+
+      document.getElementById('form-global-2fa').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const code = document.getElementById('global-2fa-code').value.trim();
+        const err = document.getElementById('global-2fa-error');
+        const btn = document.getElementById('btn-global-2fa');
+        btn.textContent = 'Vérification...';
+        err.textContent = '';
+
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const totpFactor = factors?.all?.find(f => f.status === 'verified');
+        
+        if (!totpFactor) {
+          err.textContent = "Aucun facteur 2FA valide trouvé.";
+          btn.textContent = 'Vérifier le code';
+          return;
+        }
+
+        const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: totpFactor.id });
+        if (challengeError) {
+          err.textContent = challengeError.message;
+          btn.textContent = 'Vérifier le code';
+          return;
+        }
+
+        const { error: verifyError } = await supabase.auth.mfa.verify({
+          factorId: totpFactor.id,
+          challengeId: challengeData.id,
+          code: code
+        });
+
+        if (verifyError) {
+          err.textContent = "Code invalide.";
+          btn.textContent = 'Vérifier le code';
+        } else {
+          window.location.reload();
+        }
+      });
+      return; // Stop execution, don't load the rest of the app for this user until AAL2
+    }
+
+    // Normal AAL2 or AAL1 (without 2FA enabled) flow
     currentUser = session.user;
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
     currentProfile = profile;
@@ -162,7 +224,7 @@
         navRight.innerHTML = `
           <div class="nav-user-menu" id="nav-user-menu">
             <button class="nav-login-btn" style="display:flex; align-items:center; gap:8px;">
-              ${currentProfile?.email?.split('@')[0] || 'Utilisateur'}
+              ${currentProfile?.display_name || currentProfile?.email?.split('@')[0] || 'Utilisateur'}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="nav-user-dropdown">

@@ -11,6 +11,8 @@
   if (slug === 'index.html' || slug === 'index.htm') {
     slug = pathParts[pathParts.length - 2];
   }
+  // Strip any accidental .html extension from the slug itself
+  slug = slug.replace('.html', '').replace('.htm', '');
 
   try {
     const { data: spreadsheet, error } = await supabaseClient
@@ -22,7 +24,11 @@
     if (error || !spreadsheet) {
       console.error("Erreur de chargement de la spreadsheet:", error);
       const mainContent = document.getElementById('main-content');
-      if (mainContent) mainContent.style.display = 'block';
+      if (mainContent) {
+        mainContent.style.display = 'flex';
+        const errDetails = error ? (error.message || JSON.stringify(error)) : 'Introuvable dans la base de données.';
+        mainContent.innerHTML += `<div style="margin-top:40px; padding:20px; background:rgba(255,0,0,0.1); border:1px solid red; border-radius:8px; color:red; max-width:80%; word-break:break-all; font-family:monospace; font-size:0.85rem;"><strong>Détails techniques :</strong><br>Slug cherché: "${slug}"<br>Erreur: ${errDetails}</div>`;
+      }
       return;
     }
     

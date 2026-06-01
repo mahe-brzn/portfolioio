@@ -3,3 +3,12 @@
 .cta-submit-btn .arrow{color:var(--accent);font-size:1.4rem;transition:transform .3s var(--ease-out);line-height:1}
 .cta-submit-btn:hover{color:var(--white)}
 .cta-submit-btn:hover .arrow{transform:translate(4px,-4px)}
+/* Centrage parfait de la barre de navigation */
+.nav-row { position: relative; }
+@media (min-width: 901px) {
+  .nav-links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

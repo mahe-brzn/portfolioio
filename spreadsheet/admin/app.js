@@ -1120,6 +1120,36 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
   }
 });
 
+document.getElementById('btn-delete-spreadsheet')?.addEventListener('click', async () => {
+  if (!editingSpreadsheetId) return;
+  const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer définitivement cette spreadsheet ? Cette action est irréversible.");
+  if (!confirmDelete) return;
+
+  const btn = document.getElementById('btn-delete-spreadsheet');
+  const originalText = btn.textContent;
+  btn.textContent = 'Suppression...';
+
+  const { error } = await supabaseClient
+    .from('spreadsheets')
+    .delete()
+    .eq('id', editingSpreadsheetId);
+
+  if (error) {
+    alert("Erreur lors de la suppression: " + error.message + "\n\n(Vérifiez que vous avez bien une politique RLS pour DELETE dans Supabase)");
+    btn.textContent = originalText;
+  } else {
+    alert("Spreadsheet supprimée avec succès.");
+    btn.textContent = originalText;
+    if (currentProfile.role === 'admin') {
+      showView('admin');
+      loadAdminData();
+    } else {
+      showView('user');
+      loadUserData();
+    }
+  }
+});
+
 // Start the app
 document.addEventListener('DOMContentLoaded', init);
 

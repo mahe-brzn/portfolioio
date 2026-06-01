@@ -31,10 +31,10 @@ function showView(viewId) {
 
 function updateNav() {
   if (currentUser) {
-    authNavControls.style.display = 'flex';
-    userEmailDisplay.textContent = currentUser.email;
+    if (authNavControls) authNavControls.style.display = 'flex';
+    if (userEmailDisplay) userEmailDisplay.textContent = currentUser.email;
   } else {
-    authNavControls.style.display = 'none';
+    if (authNavControls) authNavControls.style.display = 'none';
   }
 }
 
@@ -197,9 +197,12 @@ if (formReq) {
   });
 }
 
-document.getElementById('btn-logout').addEventListener('click', async () => {
-  await supabaseClient.auth.signOut();
-});
+const btnLogout = document.getElementById('btn-logout');
+if (btnLogout) {
+  btnLogout.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+  });
+}
 
 // ----------------------------------------------------
 // 2FA LOGIC (MFA)

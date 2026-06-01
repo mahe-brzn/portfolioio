@@ -304,6 +304,45 @@
       </div>
     </div>
 
+    <!-- COLLABORATORS MODAL -->
+    <div id="modal-collaborators" class="modal">
+      <div class="modal-content glass-panel" style="max-width: 500px;">
+        <button class="modal-close" id="btn-close-collabs">&times;</button>
+        <h2 class="admin-title" style="font-size: 1.5rem;">Collaborateurs</h2>
+        
+        <!-- Add new collaborator section -->
+        <div style="margin-top: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <h4 style="margin-bottom: 10px; color: var(--white);">Ajouter par e-mail</h4>
+          <div style="display: flex; gap: 10px;">
+            <input type="email" id="collab-email-input" placeholder="adresse@email.com" class="glass-input" style="flex: 1;" />
+            <select id="collab-role-select" class="glass-input" style="width: 110px;">
+              <option value="editor">Éditeur</option>
+              <option value="viewer">Lecteur</option>
+            </select>
+            <button id="btn-add-collab" class="btn-magnetic" style="padding: 0 15px;">Ajouter</button>
+          </div>
+          <p id="collab-error" style="color: #ff4b4b; font-size: 0.8rem; margin-top: 5px; display: none;"></p>
+        </div>
+
+        <!-- Friends section -->
+        <div style="margin-top: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <h4 style="margin-bottom: 10px; color: var(--accent);">Vos Amis</h4>
+          <div id="friends-list" style="max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Chargement...</p>
+          </div>
+        </div>
+
+        <!-- Current Collaborators section -->
+        <div style="margin-top: 20px;">
+          <h4 style="margin-bottom: 10px; color: var(--white);">Accès actuels</h4>
+          <div id="current-collabs-list" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- JS populated -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- EDIT SPREADSHEET VIEW -->
     <section id="view-edit" class="admin-section wrap">
       <div class="admin-header">
@@ -351,9 +390,12 @@
         </div>
         
         <div>
-          <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Éditeurs (peuvent modifier les articles) :</label>
-          <div id="edit-editors-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); max-height: 150px; overflow-y: auto;">
-            <!-- Rempli par le JS -->
+          <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Collaborateurs :</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <div id="collab-summary">
+              <span id="collab-count" style="color: var(--white); font-weight: bold;">0</span> <span style="color: var(--text-muted); font-size: 0.9rem;">collaborateur(s) actif(s)</span>
+            </div>
+            <button id="btn-manage-collabs" class="btn-outline" style="padding: 6px 12px; font-size: 0.85rem;">Gérer</button>
           </div>
         </div>
       </div>

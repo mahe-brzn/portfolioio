@@ -600,7 +600,7 @@ window.deleteUser = async (userId) => {
 // USER DASHBOARD
 // ----------------------------------------------------
 async function loadUserData() {
-  const { data: spreadsheets } = await supabaseClient.from('spreadsheets').select('*').eq('owner_id', currentUser.id).is('deleted_at', null);
+  const { data: spreadsheets } = await supabaseClient.from('spreadsheets').select('*').or(`owner_id.eq.${currentUser.id},editors.cs.{${currentUser.id}}`).is('deleted_at', null);
   const list = document.getElementById('my-spreadsheets-list');
   if(!list) return;
   list.innerHTML = '';
@@ -741,41 +741,55 @@ window.openEditSpreadsheet = async (id) => {
     
     // Permissions logic
     const permPanel = document.getElementById('edit-owner')?.closest('.admin-card');
-    if (currentProfile.role === 'admin') {
+    const isOwnerOrAdmin = (currentProfile.role === 'admin' || spreadsheet.owner_id === currentUser.id);
+    
+    if (isOwnerOrAdmin) {
       if (permPanel) permPanel.style.display = 'block';
-      const { data: profiles } = await supabaseClient.from('profiles').select('*').in('role', ['user', 'admin']);
-      const ownerSelect = document.getElementById('edit-owner');
-      const editorsList = document.getElementById('edit-editors-list');
       
-      if (ownerSelect && editorsList && profiles) {
-        ownerSelect.innerHTML = '';
-        editorsList.innerHTML = '';
-        
-        profiles.forEach(p => {
-          // Owner option
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = p.email;
-          if (p.id === spreadsheet.owner_id) opt.selected = true;
-          ownerSelect.appendChild(opt);
-          
-          // Editor checkbox
-          if (p.id !== spreadsheet.owner_id) {
-            const isEditor = (spreadsheet.editors || []).includes(p.id);
-            const div = document.createElement('div');
-            div.innerHTML = `
-              <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                <input type="checkbox" value="${p.id}" class="editor-checkbox" ${isEditor ? 'checked' : ''} />
-                <span style="color:var(--white); font-size:0.9rem;">${p.email}</span>
-              </label>
-            `;
-            editorsList.appendChild(div);
-          }
-        });
+      const ownerContainer = document.getElementById('edit-owner')?.closest('div');
+      if (currentProfile.role !== 'admin' && ownerContainer) {
+        ownerContainer.style.display = 'none';
+      } else if (ownerContainer) {
+        ownerContainer.style.display = 'block';
+        // Populate owner dropdown if admin
+        const { data: profiles } = await supabaseClient.from('profiles').select('*').in('role', ['user', 'admin', 'creator']);
+        const ownerSelect = document.getElementById('edit-owner');
+        if (ownerSelect && profiles) {
+          ownerSelect.innerHTML = '';
+          profiles.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.email || p.display_name;
+            if (p.id === spreadsheet.owner_id) opt.selected = true;
+            ownerSelect.appendChild(opt);
+          });
+        }
       }
+
+      // Populate collab count
+      const editorsCount = (spreadsheet.editors || []).length;
+      const viewersCount = (spreadsheet.viewers || []).length;
+      document.getElementById('collab-count').textContent = editorsCount + viewersCount;
+
+      // Store globally for modal
+      window.currentEditingSpreadsheet = spreadsheet;
+
     } else {
       if (permPanel) permPanel.style.display = 'none';
     }
+
+    // Hide edit controls if the user is only a viewer (not owner, admin, or editor)
+    const isEditor = (spreadsheet.editors || []).includes(currentUser.id);
+    const btnSave = document.getElementById('btn-save-spreadsheet');
+    const btnAdd = document.getElementById('btn-add-item');
+    if (!isOwnerOrAdmin && !isEditor) {
+      if (btnSave) btnSave.style.display = 'none';
+      if (btnAdd) btnAdd.style.display = 'none';
+    } else {
+      if (btnSave) btnSave.style.display = 'inline-block';
+      if (btnAdd) btnAdd.style.display = 'inline-block';
+    }
+
     renderEditItems();
     loadSuggestions(id);
     showView('edit');
@@ -1097,10 +1111,6 @@ document.getElementById('btn-save-spreadsheet')?.addEventListener('click', async
     if (ownerSelect && ownerSelect.value) {
       updateData.owner_id = ownerSelect.value;
     }
-    
-    const editorCheckboxes = document.querySelectorAll('.editor-checkbox:checked');
-    const editors = Array.from(editorCheckboxes).map(cb => cb.value);
-    updateData.editors = editors;
   }
 
   const { error } = await supabaseClient
@@ -1189,3 +1199,163 @@ document.getElementById('form-create-user')?.addEventListener('submit', async (e
     window.location.reload();
   }
 });
+// ----------------------------------------------------
+// COLLABORATORS & FRIENDS LOGIC
+// ----------------------------------------------------
+
+document.getElementById('btn-manage-collabs')?.addEventListener('click', () => {
+  document.getElementById('modal-collaborators').classList.add('active');
+  renderCollaboratorsModal();
+});
+
+document.getElementById('btn-close-collabs')?.addEventListener('click', () => {
+  document.getElementById('modal-collaborators').classList.remove('active');
+});
+
+async function renderCollaboratorsModal() {
+  const spreadsheet = window.currentEditingSpreadsheet;
+  if (!spreadsheet) return;
+
+  // 1. Render Current Collaborators
+  const collabsList = document.getElementById('current-collabs-list');
+  collabsList.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">Chargement...</p>';
+
+  let allCollabIds = [...(spreadsheet.editors || []), ...(spreadsheet.viewers || [])];
+  
+  if (allCollabIds.length === 0) {
+    collabsList.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">Aucun collaborateur.</p>';
+  } else {
+    const { data: profiles } = await supabaseClient.from('profiles').select('id, email, display_name').in('id', allCollabIds);
+    if (profiles) {
+      collabsList.innerHTML = '';
+      profiles.forEach(p => {
+        const isEditor = (spreadsheet.editors || []).includes(p.id);
+        const roleText = isEditor ? 'Éditeur' : 'Lecteur';
+        const roleColor = isEditor ? 'var(--accent)' : '#aaa';
+        
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2); padding:8px 12px; border-radius:6px;';
+        div.innerHTML = `
+          <div>
+            <span style="color:var(--white); font-size:0.9rem;">${p.email || p.display_name}</span>
+            <span style="color:${roleColor}; font-size:0.75rem; margin-left:8px; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">${roleText}</span>
+          </div>
+          <button class="btn-remove-collab" data-id="${p.id}" style="background:transparent; border:none; color:#ff4b4b; cursor:pointer; font-size:1.1rem;">&times;</button>
+        `;
+        collabsList.appendChild(div);
+      });
+
+      // Add remove listeners
+      document.querySelectorAll('.btn-remove-collab').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const userId = e.target.getAttribute('data-id');
+          await removeCollaborator(userId);
+        });
+      });
+    }
+  }
+
+  // 2. Render Friends
+  const friendsList = document.getElementById('friends-list');
+  const { data: friendsData } = await supabaseClient
+    .from('friends')
+    .select('friend_id, profiles!friends_friend_id_fkey(id, email, display_name)')
+    .eq('user_id', window.currentUser.id);
+
+  if (!friendsData || friendsData.length === 0) {
+    friendsList.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">Vous n\'avez pas encore d\'amis enregistrés.</p>';
+  } else {
+    friendsList.innerHTML = '';
+    friendsData.forEach(f => {
+      const p = f.profiles;
+      if (!p) return;
+      // Skip if already a collab
+      if (allCollabIds.includes(p.id)) return;
+
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2); padding:8px 12px; border-radius:6px;';
+      div.innerHTML = `
+        <span style="color:var(--white); font-size:0.9rem;">${p.email || p.display_name}</span>
+        <div style="display:flex; gap:5px;">
+          <button class="btn-outline btn-friend-add" data-id="${p.id}" data-role="editor" style="padding:2px 8px; font-size:0.75rem;">+ Éditeur</button>
+          <button class="btn-outline btn-friend-add" data-id="${p.id}" data-role="viewer" style="padding:2px 8px; font-size:0.75rem;">+ Lecteur</button>
+        </div>
+      `;
+      friendsList.appendChild(div);
+    });
+
+    if (friendsList.innerHTML === '') {
+       friendsList.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">Tous vos amis ont déjà accès !</p>';
+    }
+
+    document.querySelectorAll('.btn-friend-add').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const userId = e.target.getAttribute('data-id');
+        const role = e.target.getAttribute('data-role');
+        await addCollaborator(userId, role);
+      });
+    });
+  }
+}
+
+// Add by email
+document.getElementById('btn-add-collab')?.addEventListener('click', async () => {
+  const emailInput = document.getElementById('collab-email-input');
+  const roleSelect = document.getElementById('collab-role-select');
+  const errText = document.getElementById('collab-error');
+  const email = emailInput.value.trim();
+  
+  if (!email) return;
+  errText.style.display = 'none';
+  
+  // Find user by email
+  const { data: profiles } = await supabaseClient.from('profiles').select('id').eq('email', email);
+  if (!profiles || profiles.length === 0) {
+    errText.textContent = "Aucun utilisateur trouvé avec cet e-mail.";
+    errText.style.display = 'block';
+    return;
+  }
+  
+  const userId = profiles[0].id;
+  await addCollaborator(userId, roleSelect.value);
+  
+  // Add to friends automatically
+  await supabaseClient.from('friends').insert({ user_id: window.currentUser.id, friend_id: userId });
+  
+  emailInput.value = '';
+});
+
+async function addCollaborator(userId, role) {
+  const spreadsheet = window.currentEditingSpreadsheet;
+  let editors = spreadsheet.editors || [];
+  let viewers = spreadsheet.viewers || [];
+
+  // Remove from both first to avoid duplicates
+  editors = editors.filter(id => id !== userId);
+  viewers = viewers.filter(id => id !== userId);
+
+  if (role === 'editor') editors.push(userId);
+  else viewers.push(userId);
+
+  const { error } = await supabaseClient.from('spreadsheets').update({ editors, viewers }).eq('id', spreadsheet.id);
+  if (!error) {
+    spreadsheet.editors = editors;
+    spreadsheet.viewers = viewers;
+    document.getElementById('collab-count').textContent = editors.length + viewers.length;
+    renderCollaboratorsModal();
+  }
+}
+
+async function removeCollaborator(userId) {
+  const spreadsheet = window.currentEditingSpreadsheet;
+  let editors = (spreadsheet.editors || []).filter(id => id !== userId);
+  let viewers = (spreadsheet.viewers || []).filter(id => id !== userId);
+
+  const { error } = await supabaseClient.from('spreadsheets').update({ editors, viewers }).eq('id', spreadsheet.id);
+  if (!error) {
+    spreadsheet.editors = editors;
+    spreadsheet.viewers = viewers;
+    document.getElementById('collab-count').textContent = editors.length + viewers.length;
+    renderCollaboratorsModal();
+  }
+}

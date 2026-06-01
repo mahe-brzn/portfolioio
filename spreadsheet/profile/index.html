@@ -199,6 +199,10 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
           Préférences
         </div>
+        <div class="profile-tab" data-tab="sec-friends">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Mes Amis
+        </div>
         <div class="profile-tab" data-tab="sec-settings">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           Sécurité
@@ -242,6 +246,27 @@
         </div>
         <div id="my-suggestions-list">
           <p style="color:var(--text-muted);">Chargement en cours...</p>
+        </div>
+      </section>
+
+      <!-- FRIENDS -->
+      <section class="profile-section" id="sec-friends">
+        <div class="section-header">
+          <h1 class="section-title">Mes Amis</h1>
+          <p class="section-desc">Gérez vos contacts et collaborateurs fréquents.</p>
+        </div>
+        <div class="settings-panel">
+          <h3 style="margin-bottom: 25px; font-size: 1.2rem;">Ajouter un ami</h3>
+          <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+            <input type="email" id="friend-email-input" class="form-input" placeholder="Adresse e-mail de l'ami" style="flex:1; margin-bottom:0;" />
+            <button id="btn-add-friend" class="btn-magnetic" style="padding: 0 20px;">Ajouter</button>
+          </div>
+          <p id="friend-error" style="color: #ff4b4b; font-size: 0.85rem; margin-top: -20px; margin-bottom: 20px; display: none;"></p>
+
+          <h3 style="margin-bottom: 15px; font-size: 1.2rem;">Ma liste de contacts</h3>
+          <div id="my-friends-list" style="display: flex; flex-direction: column; gap: 10px;">
+            <p style="color:var(--text-muted);">Chargement en cours...</p>
+          </div>
         </div>
       </section>
 
@@ -609,8 +634,8 @@
 
         const supabase = window.supabaseClient;
 
-        // 1. My Spreadsheets
-        const { data: mySheets } = await supabase.from('spreadsheets').select('*').eq('owner_id', window.currentUser.id).is('deleted_at', null);
+        // 1. My Spreadsheets (and those I have access to)
+        const { data: mySheets } = await supabase.from('spreadsheets').select('*').or(`owner_id.eq.${window.currentUser.id},editors.cs.{${window.currentUser.id}},viewers.cs.{${window.currentUser.id}}`).is('deleted_at', null);
         const mySheetsList = document.getElementById('my-spreadsheets-list');
         if (mySheets && mySheets.length > 0) {
           mySheetsList.innerHTML = mySheets.map(s => `
@@ -670,6 +695,72 @@
           mySuggsList.innerHTML = '<p style="color:var(--text-muted);">Vous n\'avez fait aucune suggestion pour le moment.</p>';
         }
       }
+      
+      // 4. Load Friends
+      async function loadFriends() {
+        const { data: friendsData, error } = await supabase.from('friends').select('friend_id, profiles!friends_friend_id_fkey(id, email, display_name)').eq('user_id', window.currentUser.id);
+        const friendsList = document.getElementById('my-friends-list');
+        if (friendsData && friendsData.length > 0) {
+          friendsList.innerHTML = friendsData.map(f => {
+            const p = f.profiles;
+            if (!p) return '';
+            return `
+              <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                <div>
+                  <div style="color:var(--white); font-weight:bold;">${p.display_name || p.email.split('@')[0]}</div>
+                  <div style="color:var(--text-muted); font-size:0.85rem;">${p.email}</div>
+                </div>
+                <button class="btn-remove-friend" data-id="${p.id}" style="background:transparent; border:none; color:#ff4b4b; cursor:pointer; font-size:1.2rem;">&times;</button>
+              </div>
+            `;
+          }).join('');
+
+          document.querySelectorAll('.btn-remove-friend').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const friendId = e.target.getAttribute('data-id');
+              await supabase.from('friends').delete().eq('user_id', window.currentUser.id).eq('friend_id', friendId);
+              loadFriends();
+            });
+          });
+        } else {
+          friendsList.innerHTML = '<p style="color:var(--text-muted);">Vous n\'avez pas encore ajouté de contacts.</p>';
+        }
+      }
+      loadFriends();
+
+      document.getElementById('btn-add-friend')?.addEventListener('click', async () => {
+        const emailInput = document.getElementById('friend-email-input');
+        const errText = document.getElementById('friend-error');
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        errText.style.display = 'none';
+        
+        if (email === window.currentUser.email) {
+          errText.textContent = "Vous ne pouvez pas vous ajouter vous-même.";
+          errText.style.display = 'block';
+          return;
+        }
+
+        const { data: profiles } = await supabase.from('profiles').select('id').eq('email', email);
+        if (!profiles || profiles.length === 0) {
+          errText.textContent = "Aucun utilisateur trouvé avec cet e-mail.";
+          errText.style.display = 'block';
+          return;
+        }
+
+        const friendId = profiles[0].id;
+        const { error } = await supabase.from('friends').insert({ user_id: window.currentUser.id, friend_id: friendId });
+        
+        if (error) {
+          if (error.code === '23505') errText.textContent = "Cet utilisateur est déjà dans vos amis.";
+          else errText.textContent = "Erreur: " + error.message;
+          errText.style.display = 'block';
+        } else {
+          emailInput.value = '';
+          loadFriends();
+        }
+      });
       
       let pendingFactorId = null;
       

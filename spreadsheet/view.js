@@ -98,12 +98,15 @@ function renderSpreadsheet(spreadsheet) {
     }
     .spreadsheet-title {
       font-family: var(--font-display);
-      font-size: clamp(3.5rem, 9vw, 6.5rem);
+      font-size: clamp(2.5rem, 8vw, 8rem);
       font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.04em;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -0.03em;
       margin-bottom: 24px;
-      color: var(--white);
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      hyphens: auto;
     }
     .spreadsheet-title .accent { color: var(--sneaker-accent); }
     .shoes-grid {

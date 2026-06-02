@@ -1,4 +1,11 @@
 (async function() {
+  // Inject agent-utils.js dynamically
+  if (!document.querySelector('script[src="/spreadsheet/agent-utils.js"]')) {
+    const utilsScript = document.createElement('script');
+    utilsScript.src = '/spreadsheet/agent-utils.js';
+    document.head.appendChild(utilsScript);
+  }
+
   // Inject auth-modal.js dynamically to ensure it's available on all spreadsheet pages
   if (!document.querySelector('script[src="/spreadsheet/auth-modal.js"]')) {
     const authScript = document.createElement('script');
@@ -561,108 +568,7 @@ function renderSpreadsheet(spreadsheet) {
   if (cursorRing) document.body.appendChild(cursorRing);
   if (cursorDot) document.body.appendChild(cursorDot);
 
-  // Agent Logic
-  window.extractOriginalLink = (url) => {
-    if (!url) return '';
-    try {
-      const urlObj = new URL(url);
-      const searchParams = urlObj.searchParams;
-      
-      const possibleParams = ['url', 'productLink', 'product_url', 'src'];
-      for (const param of possibleParams) {
-        if (searchParams.has(param)) {
-          let innerUrl = searchParams.get(param);
-          if (innerUrl.startsWith('http')) {
-            return window.extractOriginalLink(innerUrl); // extract recursively
-          }
-        }
-      }
-      return url; // Return original if no agent url param found
-    } catch (e) {
-      return url;
-    }
-  };
-
-  window.convertAgentLink = (agent, rawUrl) => {
-    // 1. Force extract the original Weidian/Taobao/1688 URL if hidden in an agent link
-    let url = window.extractOriginalLink(rawUrl);
-    const encoded = encodeURIComponent(url || '');
-
-    // 2. Parse platform and product ID from the raw URL
-    let platform = null;
-    let id = null;
-    if (url.includes('weidian.com')) {
-      platform = 'weidian';
-      const match = url.match(/itemID=(\d+)/);
-      if (match) id = match[1];
-    } else if (url.includes('taobao.com') || url.includes('tmall.com')) {
-      platform = 'taobao';
-      const match = url.match(/id=(\d+)/);
-      if (match) id = match[1];
-    } else if (url.includes('1688.com')) {
-      platform = '1688';
-      const match = url.match(/offer\/(\d+)/);
-      if (match) id = match[1];
-    }
-
-    // Normalize agent name
-    const a = agent.toLowerCase().replace(/\s+/g, '');
-
-    // 3. Generate agent link — platform+id routes first (optimized), ?url= fallback
-    switch(a) {
-      case 'hippobuy':
-      case 'hipobuy':
-        // Official format: /product/weidian/ID  (confirmed via Reddit + HipoBuy SPA)
-        if (platform && id) return `https://hipobuy.com/product/${platform}/${id}`;
-        return `https://hipobuy.com/product/details?url=${encoded}`;
-
-      case 'acbuy':
-      case 'allchinabuy':
-        return `https://www.allchinabuy.com/en/page/buy/?url=${encoded}`;
-
-      case 'cnfans':
-        return `https://cnfans.com/product/?url=${encoded}`;
-
-      case 'superbuy':
-        return `https://www.superbuy.com/en/page/buy/?nTag=Home-search&url=${encoded}`;
-
-      case 'wegobuy':
-        return `https://www.wegobuy.com/en/page/buy/?url=${encoded}`;
-
-      case 'cssbuy':
-        if (platform && id) {
-          const cssType = platform === 'weidian' ? 'micro' : platform;
-          return `https://www.cssbuy.com/item-${cssType}-${id}.html`;
-        }
-        return `https://www.cssbuy.com/item.html?url=${encoded}`;
-
-      case 'sugargoo':
-        return `https://www.sugargoo.com/#/home/productDetail?productLink=${encoded}`;
-
-      case 'oopbuy':
-        if (platform && id) return `https://www.oopbuy.com/product/${platform}/${id}`;
-        return `https://www.oopbuy.com/product/?url=${encoded}`;
-
-      case 'lovegobuy':
-        return `https://lovegobuy.com/product/?url=${encoded}`;
-
-      case 'mulebuy':
-        if (platform && id) return `https://mulebuy.com/product/?shop_type=${platform}&id=${id}`;
-        return `https://mulebuy.com/product/?url=${encoded}`;
-
-      case 'litbuy':
-        return `https://litbuy.com/product/?url=${encoded}`;
-
-      case 'joyabuy':
-        if (platform && id) return `https://joyabuy.com/product/?shop_type=${platform}&id=${id}`;
-        return `https://joyabuy.com/product/?url=${encoded}`;
-
-      default:
-        // Default: HipoBuy with platform route
-        if (platform && id) return `https://hipobuy.com/product/${platform}/${id}`;
-        return `https://hipobuy.com/product/details?url=${encoded}`;
-    }
-  };
+  // Agent Logic (Now handled by agent-utils.js)
 
   const agentsList = ['AllChinaBuy', 'HipoBuy', 'CNFans', 'Superbuy', 'WeGoBuy', 'CSSBuy', 'Sugargoo', 'OopBuy', 'LoveGoBuy', 'Mulebuy', 'LitBuy'];
 

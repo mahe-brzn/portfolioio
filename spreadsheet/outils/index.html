@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outils - Convertisseur de Liens</title>
+
+  <link rel="icon" href="/assets/img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/garagealpin/style.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+
+  <style>
+    /* Premium Tools Layout */
+    .tools-hero {
+      padding: clamp(120px, 15vw, 150px) 20px clamp(40px, 8vw, 60px);
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    .tools-title {
+      font-family: var(--font-d);
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .tools-subtitle {
+      color: var(--grey-4);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 50px;
+      line-height: 1.6;
+    }
+
+    /* Converter Box */
+    .converter-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(15, 15, 17, 0.6);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 30px;
+      padding: 40px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 600px) {
+      .input-group { flex-direction: column; }
+    }
+
+    .url-input {
+      flex: 1;
+      padding: 20px 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.4);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .url-input:focus {
+      border-color: var(--sneaker-accent);
+      box-shadow: 0 0 0 4px rgba(200, 255, 87, 0.1);
+    }
+
+    .btn-convert {
+      padding: 0 40px;
+      border-radius: 16px;
+      border: none;
+      background: var(--sneaker-accent);
+      color: #000;
+      font-family: var(--font-d);
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-convert:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(200, 255, 87, 0.2);
+    }
+    .btn-convert:active {
+      transform: translateY(1px);
+    }
+
+    /* Results Area */
+    .results-area {
+      display: none;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .original-link-box {
+      background: rgba(255,255,255,0.03);
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.05);
+      gap: 15px;
+    }
+    .original-link-box p {
+      margin: 0;
+      color: var(--grey-4);
+      font-size: 0.95rem;
+      word-break: break-all;
+    }
+    .original-platform {
+      color: var(--white);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-family: var(--font-d);
+    }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .agent-btn {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 16px;
+      color: white;
+      font-family: var(--font-d);
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .agent-btn:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: var(--sneaker-accent);
+      transform: translateY(-4px);
+    }
+    .agent-btn::after {
+      content: 'Copier le lien';
+      position: absolute;
+      bottom: -40px;
+      left: 0; right: 0;
+      background: var(--sneaker-accent);
+      color: #000;
+      padding: 8px;
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      transition: 0.3s;
+    }
+    .agent-btn:hover::after {
+      bottom: 0;
+    }
+    .agent-btn.copied::after {
+      content: '✅ Copié !';
+      background: #4caf50;
+      color: white;
+      bottom: 0;
+    }
+
+    /* Ambient */
+    .tools-ambient {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    }
+    .tools-orb-1 {
+      position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw;
+      background: radial-gradient(circle, rgba(200, 255, 87, 0.08) 0, transparent 60%);
+      filter: blur(80px); border-radius: 50%;
+    }
+  </style>
+</head>
+<body data-barba="wrapper">
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <div class="tools-ambient">
+    <div class="tools-orb-1"></div>
+  </div>
+
+  <header role="banner">
+    <nav id="nav" aria-label="Navigation principale" class="visible">
+      <div class="wrap nav-row">
+        <a href="/" class="nav-logo" aria-label="Retour à l'accueil">MB</a>
+        <ul class="nav-links" role="list">
+          <li role="listitem"><a href="/spreadsheet">Spreadsheets</a></li>
+          <li role="listitem"><a href="/spreadsheet/outils" class="on">Outils</a></li>
+        </ul>
+        <div class="nav-right">
+          <a href="/spreadsheet/profile" class="btn" style="background: rgba(255,255,255,0.1); border:none; color:white;">Profil</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="tools-hero">
+      <h1 class="tools-title">Convertisseur<br><span class="accent">Universel</span></h1>
+      <p class="tools-subtitle">Collez n'importe quel lien d'agent (HipoBuy, CNFans...) ou un lien original Weidian/Taobao/1688, et générez instantanément vos liens d'affiliation pour tous les autres agents.</p>
+
+      <div class="converter-container">
+        <div class="input-group">
+          <input type="text" id="link-input" class="url-input" placeholder="Collez votre lien ici (ex: https://hipobuy.com/...)" />
+          <button id="btn-convert" class="btn-convert">Convertir 🚀</button>
+        </div>
+
+        <div id="results-area" class="results-area">
+          <div class="original-link-box">
+            <div>
+              <span class="original-platform" id="orig-platform">Original</span>
+              <p id="orig-url">https://...</p>
+            </div>
+            <button class="btn-magnetic" id="btn-copy-orig" style="padding: 12px 24px; font-size: 0.9rem;">Copier</button>
+          </div>
+
+          <h3 style="color: white; font-family: var(--font-d); margin-bottom: 20px; text-align: left;">Générés (Affiliés)</h3>
+          <div class="agents-grid" id="agents-grid">
+            <!-- Agents injected via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- IMPORTANT: Load the agent-utils script to make window.extractOriginalLink and convertAgentLink available -->
+  <script src="/spreadsheet/agent-utils.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById('link-input');
+      const btnConvert = document.getElementById('btn-convert');
+      const resultsArea = document.getElementById('results-area');
+      const origPlatform = document.getElementById('orig-platform');
+      const origUrl = document.getElementById('orig-url');
+      const btnCopyOrig = document.getElementById('btn-copy-orig');
+      const agentsGrid = document.getElementById('agents-grid');
+
+      const agentsList = ['AllChinaBuy', 'HipoBuy', 'CNFans', 'Superbuy', 'WeGoBuy', 'CSSBuy', 'Sugargoo', 'OopBuy', 'LoveGoBuy', 'Mulebuy', 'LitBuy', 'JoyaBuy'];
+
+      btnConvert.addEventListener('click', () => {
+        const rawUrl = input.value.trim();
+        if (!rawUrl) return alert("Veuillez coller un lien d'abord.");
+
+        // 1. Extraire le lien original Weidian/Taobao/1688
+        const originalLink = window.extractOriginalLink(rawUrl);
+        
+        let platform = "Lien Direct";
+        if (originalLink.includes('weidian.com')) platform = "Weidian";
+        else if (originalLink.includes('taobao.com') || originalLink.includes('tmall.com')) platform = "Taobao";
+        else if (originalLink.includes('1688.com')) platform = "1688";
+
+        origPlatform.textContent = platform;
+        origUrl.textContent = originalLink;
+        
+        // Setup original copy
+        btnCopyOrig.onclick = () => {
+          navigator.clipboard.writeText(originalLink);
+          const old = btnCopyOrig.textContent;
+          btnCopyOrig.textContent = "✅";
+          setTimeout(() => btnCopyOrig.textContent = old, 2000);
+        };
+
+        // 2. Générer les liens pour chaque agent avec affiliation
+        agentsGrid.innerHTML = agentsList.map(agent => {
+          const affLink = window.convertAgentLink(agent, originalLink);
+          return `
+            <button class="agent-btn" onclick="copyAgentLink(this, '${affLink}')">
+              ${agent}
+            </button>
+          `;
+        }).join('');
+
+        resultsArea.style.display = 'block';
+      });
+
+      window.copyAgentLink = (btn, link) => {
+        navigator.clipboard.writeText(link);
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 2000);
+      };
+    });
+  </script>
+  <script src="/garagealpin/script.js" defer></script>
+</body>
+</html>

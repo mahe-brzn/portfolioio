@@ -2,10 +2,10 @@
 // Utility functions for extracting and converting agent links with affiliate support.
 
 window.AGENT_AFFILIATES = {
-  hipobuy: '', // Exemple: '12345' ou 'MAHE'
-  acbuy: '',
-  allchinabuy: '',
-  cnfans: '',
+  hipobuy: 'XB5G397OD',
+  acbuy: 'KU9MXM',
+  allchinabuy: 'KU9MXM',
+  cnfans: '17517702',
   superbuy: '',
   wegobuy: '',
   cssbuy: '',
@@ -79,7 +79,7 @@ window.convertAgentLink = (agent, rawUrl) => {
     case 'hipobuy':
       if (platform && id) finalUrl = `https://hipobuy.com/product/${platform}/${id}`;
       else finalUrl = `https://hipobuy.com/product/details?url=${encoded}`;
-      return appendAffiliate(finalUrl, 'hipobuy', 'invite_code');
+      return appendAffiliate(finalUrl, 'hipobuy', 'inviteCode');
 
     case 'acbuy':
     case 'allchinabuy':
@@ -137,6 +137,6 @@ window.convertAgentLink = (agent, rawUrl) => {
     default:
       if (platform && id) finalUrl = `https://hipobuy.com/product/${platform}/${id}`;
       else finalUrl = `https://hipobuy.com/product/details?url=${encoded}`;
-      return appendAffiliate(finalUrl, 'hipobuy', 'invite_code');
+      return appendAffiliate(finalUrl, 'hipobuy', 'inviteCode');
   }
 };

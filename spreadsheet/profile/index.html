@@ -456,11 +456,9 @@
           <form id="form-test-email">
             <div class="input-group">
               <label class="input-label">Adresse e-mail de destination</label>
-              <input type="email" id="debug-email-to" class="form-input" placeholder="destinataire@exemple.com" required />
-            </div>
-            <div class="input-group">
-              <label class="input-label">Message</label>
-              <textarea id="debug-email-msg" class="form-input" style="min-height: 80px;" required>Ceci est un test envoyé depuis la section de débogage du site ! 🚀</textarea>
+              <input type="email" id="debug-email-to" class="form-input" placeholder="destinataire@exemple.com" required style="margin-bottom: 15px;" />
+              <input type="text" id="debug-email-subject" class="form-input" placeholder="Sujet de l'e-mail" required style="margin-bottom: 15px;" value="Test de debug MB Spreadsheets" />
+              <textarea id="debug-email-msg" class="form-input" style="min-height: 80px; margin-bottom: 15px;" required>Ceci est un test envoyé depuis la section de débogage du site ! 🚀</textarea>
             </div>
             <button type="submit" class="btn-submit" id="btn-debug-email">Envoyer l'e-mail</button>
             <p id="debug-email-status" style="margin-top: 15px; font-size: 0.95rem; text-align: center; font-weight: 600;"></p>
@@ -938,7 +936,7 @@
             message: msg
           });
           if (window.sendEmailNotification) {
-            window.sendEmailNotification(email, msg);
+            window.sendEmailNotification(email, "MB Spreadsheets - Partage", msg);
           }
 
           emailInput.value = '';
@@ -1127,19 +1125,22 @@
       document.getElementById('form-test-email')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const toEmail = document.getElementById('debug-email-to').value.trim();
+        const subject = document.getElementById('debug-email-subject')?.value.trim() || 'Test MB Spreadsheets';
         const msg = document.getElementById('debug-email-msg').value.trim();
         const statusEl = document.getElementById('debug-email-status');
         
-        if (!toEmail || !msg) return;
-
+        if (!toEmail || !msg || !subject) return;
+        
         const btn = document.getElementById('btn-debug-email');
-        btn.textContent = "Envoi en cours...";
+        const oldText = btn.textContent;
+        btn.textContent = 'Envoi en cours...';
         btn.disabled = true;
-        statusEl.textContent = "";
+        statusEl.textContent = '';
+        statusEl.style.color = 'inherit';
 
         try {
           if (window.sendEmailNotification) {
-            await window.sendEmailNotification(toEmail, msg);
+            await window.sendEmailNotification(toEmail, subject, msg);
             statusEl.textContent = "✅ E-mail envoyé avec succès !";
             statusEl.style.color = "var(--sneaker-accent)";
           } else {

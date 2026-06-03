@@ -1356,7 +1356,7 @@ async function addCollaborator(userId, role) {
     if (window.sendEmailNotification) {
       const { data: p } = await supabaseClient.from('profiles').select('email').eq('id', userId).single();
       if (p && p.email) {
-        window.sendEmailNotification(p.email, msg);
+        window.sendEmailNotification(p.email, 'Nouvelle Collaboration MB Spreadsheets', msg);
       }
     }
 
@@ -1385,10 +1385,11 @@ async function removeCollaborator(userId) {
 document.getElementById('form-test-email')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const toEmail = document.getElementById('debug-email-to').value.trim();
+  const subject = document.getElementById('debug-email-subject')?.value.trim() || 'Test MB Spreadsheets';
   const msg = document.getElementById('debug-email-msg').value.trim();
   const statusEl = document.getElementById('debug-email-status');
   
-  if (!toEmail || !msg) return;
+  if (!toEmail || !msg || !subject) return;
   
   const btn = document.getElementById('btn-debug-email');
   const oldText = btn.textContent;
@@ -1399,7 +1400,7 @@ document.getElementById('form-test-email')?.addEventListener('submit', async (e)
 
   try {
     if (window.sendEmailNotification) {
-      await window.sendEmailNotification(toEmail, msg);
+      await window.sendEmailNotification(toEmail, subject, msg);
       statusEl.textContent = "✅ E-mail de test envoyé avec succès !";
       statusEl.style.color = "#10b981";
     } else {

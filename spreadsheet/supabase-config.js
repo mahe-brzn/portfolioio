@@ -17,13 +17,14 @@ emailJsScript.onload = () => {
 };
 document.head.appendChild(emailJsScript);
 
-window.sendEmailNotification = async function(toEmail, message) {
+window.sendEmailNotification = async function(toEmail, subject, message) {
   if (typeof emailjs === 'undefined') return;
   try {
     const serviceID = 'service_8oljxz7'; // OVH SMTP
     const templateID = 'template_joclqm4';
     await emailjs.send(serviceID, templateID, {
       to_email: toEmail,
+      subject: subject,
       message: message
     });
     console.log("Email envoyé à", toEmail);

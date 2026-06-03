@@ -766,7 +766,7 @@ function renderSpreadsheet(spreadsheet) {
         if (window.sendEmailNotification) {
           const { data: p } = await supabaseClient.from('profiles').select('email').eq('id', spreadsheet.owner_id).single();
           if (p && p.email) {
-            window.sendEmailNotification(p.email, msg);
+            window.sendEmailNotification(p.email, "Nouvelle suggestion - MB Spreadsheets", msg);
           }
         }
       }

@@ -833,11 +833,37 @@
   ══════════════════════════════════════════════════ -->
   <div id="salome-easter-egg" aria-hidden="true" style="cursor: pointer;" aria-label="Fermer (Cliquer n'importe où)">
     <div class="salome-content">
-      <img id="salome-img" alt="Salomé Easter Egg" />
+      <img id="salome-img" alt="Salomé Easter Egg" width="400" height="400" style="aspect-ratio:1;" />
     </div>
   </div>
 
-  <script src="assets/js/salome.js" defer></script>
+  <!-- salome.js est chargé uniquement si l'easter egg est déclenché (lazy load) -->
+  <script>
+    (function() {
+      var salomeLoaded = false;
+      function loadSalome() {
+        if (salomeLoaded) return;
+        salomeLoaded = true;
+        var s = document.createElement('script');
+        s.src = 'assets/js/salome.js';
+        document.body.appendChild(s);
+      }
+      // Déclencher uniquement sur interaction clavier connue (ex: Konami Code)
+      // ou lorsqu'un élément spécifique est cliqué
+      var eggEl = document.getElementById('salome-easter-egg');
+      // On pré-charge quand l'utilisateur est idle, pas au chargement
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(function() {
+          // On attend que le JS principal soit chargé avant de pré-charger
+          setTimeout(loadSalome, 3000);
+        });
+      } else {
+        window.addEventListener('load', function() {
+          setTimeout(loadSalome, 5000);
+        });
+      }
+    })();
+  </script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>

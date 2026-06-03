@@ -8,8 +8,14 @@
   </url>
     <url>
     <loc>https://mahebrizion.fr/spreadsheet/</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mahebrizion.fr/spreadsheet/outils/</loc>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
 </urlset>

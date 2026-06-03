@@ -739,65 +739,80 @@
         const supabase = window.supabaseClient;
 
         // 1. My Spreadsheets (and those I have access to)
-        const { data: mySheets } = await supabase.from('spreadsheets').select('*').or(`owner_id.eq.${window.currentUser.id},editors.cs.{${window.currentUser.id}},viewers.cs.{${window.currentUser.id}}`).is('deleted_at', null);
-        const mySheetsList = document.getElementById('my-spreadsheets-list');
-        if (mySheets && mySheets.length > 0) {
-          mySheetsList.innerHTML = mySheets.map(s => `
-            <div class="spread-card">
-              <span class="badge-visibility">${s.visibility}</span>
-              <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${s.title}</h3>
-              <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5; margin-bottom: 20px; flex: 1;">${s.description || 'Aucune description'}</p>
-              <div style="display: flex; gap: 10px; z-index: 10;">
-                <a href="/spreadsheet/${s.slug}" class="btn-outline" style="flex:1; text-align:center; padding: 10px; font-size: 0.9rem; border-radius: 8px;">Voir</a>
-                <a href="/spreadsheet/admin/index.html?action=edit&id=${s.id}" class="btn-magnetic" style="flex:1; text-align:center; padding: 10px; font-size: 0.9rem; border-radius: 8px;">Éditer</a>
+        try {
+          const { data: mySheets, error: mySheetsErr } = await supabase.from('spreadsheets').select('*').or(`owner_id.eq.${window.currentUser.id},editors.cs.{${window.currentUser.id}},viewers.cs.{${window.currentUser.id}}`).is('deleted_at', null);
+          const mySheetsList = document.getElementById('my-spreadsheets-list');
+          if (mySheetsErr) {
+            console.error('mySheets error:', mySheetsErr);
+            mySheetsList.innerHTML = `<p style="color:#ff4b4b;">Erreur de chargement: ${mySheetsErr.message}</p>`;
+          } else if (mySheets && mySheets.length > 0) {
+            mySheetsList.innerHTML = mySheets.map(s => `
+              <div class="spread-card">
+                <span class="badge-visibility">${s.visibility}</span>
+                <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${s.title}</h3>
+                <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5; margin-bottom: 20px; flex: 1;">${s.description || 'Aucune description'}</p>
+                <div style="display: flex; gap: 10px; z-index: 10;">
+                  <a href="/spreadsheet/${s.slug}" class="btn-outline" style="flex:1; text-align:center; padding: 10px; font-size: 0.9rem; border-radius: 8px;">Voir</a>
+                  <a href="/spreadsheet/admin/index.html?action=edit&id=${s.id}" class="btn-magnetic" style="flex:1; text-align:center; padding: 10px; font-size: 0.9rem; border-radius: 8px;">Éditer</a>
+                </div>
               </div>
-            </div>
-          `).join('');
-          bindCardHover();
-        } else {
-          mySheetsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez pas encore créé ou copié de spreadsheet.</p>';
-        }
-
-        // 2. My Favorites
-        const { data: myFavs } = await supabase.from('favorites').select('*, spreadsheets(*)').eq('user_id', window.currentUser.id);
-        const myFavsList = document.getElementById('my-favorites-list');
-        if (myFavs && myFavs.length > 0) {
-          const validFavs = myFavs.filter(f => f.spreadsheets);
-          if (validFavs.length > 0) {
-            myFavsList.innerHTML = validFavs.map(f => `
-              <a href="/spreadsheet/${f.spreadsheets.slug}" class="spread-card">
-                <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${f.spreadsheets.title}</h3>
-                <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${f.spreadsheets.description || 'Aucune description'}</p>
-              </a>
             `).join('');
             bindCardHover();
           } else {
-            myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Aucun favori valide.</p>';
+            mySheetsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez pas encore créé ou copié de spreadsheet.</p>';
           }
-        } else {
-          myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez ajouté aucune spreadsheet à vos favoris.</p>';
-        }
+        } catch(e) { console.error(e); }
+
+        // 2. My Favorites
+        try {
+          const { data: myFavs, error: myFavsErr } = await supabase.from('favorites').select('*, spreadsheets(*)').eq('user_id', window.currentUser.id);
+          const myFavsList = document.getElementById('my-favorites-list');
+          if (myFavsErr) {
+            console.error('myFavs error:', myFavsErr);
+            myFavsList.innerHTML = `<p style="color:#ff4b4b;">Erreur de chargement: ${myFavsErr.message}</p>`;
+          } else if (myFavs && myFavs.length > 0) {
+            const validFavs = myFavs.filter(f => f.spreadsheets);
+            if (validFavs.length > 0) {
+              myFavsList.innerHTML = validFavs.map(f => `
+                <a href="/spreadsheet/${f.spreadsheets.slug}" class="spread-card">
+                  <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:12px;">${f.spreadsheets.title}</h3>
+                  <p style="opacity:0.6; font-size:0.95rem; line-height: 1.5;">${f.spreadsheets.description || 'Aucune description'}</p>
+                </a>
+              `).join('');
+              bindCardHover();
+            } else {
+              myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Aucun favori valide.</p>';
+            }
+          } else {
+            myFavsList.innerHTML = '<p style="color:var(--text-muted); grid-column:1/-1;">Vous n\'avez ajouté aucune spreadsheet à vos favoris.</p>';
+          }
+        } catch(e) { console.error(e); }
 
         // 3. My Suggestions
-        const { data: mySuggs } = await supabase.from('suggestions').select('*, spreadsheets(title)').eq('user_id', window.currentUser.id).order('created_at', { ascending: false });
-        const mySuggsList = document.getElementById('my-suggestions-list');
-        if (mySuggs && mySuggs.length > 0) {
-          mySuggsList.innerHTML = mySuggs.map(s => {
-            const statusClass = s.status === 'pending' ? 'status-pending' : s.status === 'approved' ? 'status-approved' : 'status-rejected';
-            const statusText = s.status === 'pending' ? 'En attente' : s.status === 'approved' ? 'Approuvé' : 'Rejeté';
-            return `
-              <div class="list-item">
-                <div>
-                  <h4 style="margin-bottom:8px; font-size:1.1rem;">${s.title}</h4>
-                  <p style="font-size:0.9rem; color:rgba(255,255,255,0.5);">Pour : <strong style="color:#fff;">${s.spreadsheets?.title || 'Base inconnue'}</strong> — le ${new Date(s.created_at).toLocaleDateString()}</p>
+        try {
+          const { data: mySuggs, error: mySuggsErr } = await supabase.from('suggestions').select('*, spreadsheets(title)').eq('user_id', window.currentUser.id).order('created_at', { ascending: false });
+          const mySuggsList = document.getElementById('my-suggestions-list');
+          if (mySuggsErr) {
+            console.error('mySuggs error:', mySuggsErr);
+            mySuggsList.innerHTML = `<p style="color:#ff4b4b;">Erreur de chargement: ${mySuggsErr.message}</p>`;
+          } else if (mySuggs && mySuggs.length > 0) {
+            mySuggsList.innerHTML = mySuggs.map(s => {
+              const statusClass = s.status === 'pending' ? 'status-pending' : s.status === 'approved' ? 'status-approved' : 'status-rejected';
+              const statusText = s.status === 'pending' ? 'En attente' : s.status === 'approved' ? 'Approuvé' : 'Rejeté';
+              return `
+                <div class="list-item">
+                  <div>
+                    <h4 style="margin-bottom:8px; font-size:1.1rem;">${s.title}</h4>
+                    <p style="font-size:0.9rem; color:rgba(255,255,255,0.5);">Pour : <strong style="color:#fff;">${s.spreadsheets?.title || 'Base inconnue'}</strong> — le ${new Date(s.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <span class="status-badge ${statusClass}">${statusText}</span>
                 </div>
-                <span class="status-badge ${statusClass}">${statusText}</span>
-              </div>
-            `;
-          }).join('');
-        } else {
-          mySuggsList.innerHTML = '<p style="color:var(--text-muted);">Vous n\'avez fait aucune suggestion pour le moment.</p>';
-        }
+              `;
+            }).join('');
+          } else {
+            mySuggsList.innerHTML = '<p style="color:var(--text-muted);">Vous n\'avez fait aucune suggestion pour le moment.</p>';
+          }
+        } catch(e) { console.error(e); }
       }
       
       // 4. Load Friends
@@ -846,13 +861,21 @@
 
       // 5. Load Inbox (Notifications)
       async function loadInbox() {
-        const { data: notifications } = await supabase.from('notifications')
+        const inboxList = document.getElementById('my-inbox-list');
+        const badge = document.getElementById('inbox-badge');
+        if (!inboxList || !badge) return;
+
+        const { data: notifications, error } = await supabase.from('notifications')
           .select('*')
           .eq('user_id', window.currentUser.id)
           .order('created_at', { ascending: false });
 
-        const inboxList = document.getElementById('my-inbox-list');
-        const badge = document.getElementById('inbox-badge');
+        if (error) {
+          console.error('loadInbox error:', error);
+          badge.style.display = 'none';
+          inboxList.innerHTML = `<p style="color:#ff4b4b; font-size:0.85rem;">Erreur: ${error.message}</p>`;
+          return;
+        }
 
         if (notifications && notifications.length > 0) {
           const unreadCount = notifications.filter(n => !n.is_read).length;

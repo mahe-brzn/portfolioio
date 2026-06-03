@@ -802,8 +802,20 @@
       
       // 4. Load Friends
       async function loadFriends() {
-        const { data: friendsData, error } = await supabase.from('friends').select('friend_id, profiles!friends_friend_id_fkey(id, email, display_name)').eq('user_id', window.currentUser.id);
         const friendsList = document.getElementById('my-friends-list');
+        if (!friendsList) return;
+
+        const { data: friendsData, error } = await supabase
+          .from('friends')
+          .select('friend_id, profiles!friends_friend_id_fkey(id, email, display_name)')
+          .eq('user_id', window.currentUser.id);
+
+        if (error) {
+          console.error('loadFriends error:', error);
+          friendsList.innerHTML = `<p style="color:#ff4b4b; font-size:0.85rem;">Erreur: ${error.message}</p>`;
+          return;
+        }
+
         if (friendsData && friendsData.length > 0) {
           friendsList.innerHTML = friendsData.map(f => {
             const p = f.profiles;

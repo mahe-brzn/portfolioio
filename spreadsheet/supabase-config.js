@@ -20,7 +20,9 @@ document.head.appendChild(emailJsScript);
 window.sendEmailNotification = async function(toEmail, message) {
   if (typeof emailjs === 'undefined') return;
   try {
-    await emailjs.send("service_dnlu5k2", "template_joclqm4", {
+    const serviceID = 'service_8oljxz7'; // OVH SMTP
+    const templateID = 'template_joclqm4';
+    await emailjs.send(serviceID, templateID, {
       to_email: toEmail,
       message: message
     });

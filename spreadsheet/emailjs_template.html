@@ -1,336 +1,163 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<!--[if mso]>
-<noscript>
-  <xml>
-    <o:OfficeDocumentSettings>
-      <o:PixelsPerInch>96</o:PixelsPerInch>
-    </o:OfficeDocumentSettings>
-  </xml>
-</noscript>
-<![endif]-->
-<style>
-  /* Reset */
-  *, *::before, *::after { box-sizing: border-box; }
-  body, html { margin: 0; padding: 0; width: 100% !important; }
-  img { border: 0; display: block; }
-  a { text-decoration: none; }
-
-  body {
-    background-color: #08080a;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    color: #a1a1aa;
-  }
-
-  .email-wrapper {
-    width: 100%;
-    background-color: #08080a;
-    padding: 40px 20px;
-  }
-
-  /* Main container */
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-    background-color: #111113;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    overflow: hidden;
-    box-shadow: 0 0 0 1px rgba(200, 255, 87, 0.04), 0 32px 80px rgba(0, 0, 0, 0.6);
-  }
-
-  /* Header / Hero */
-  .header {
-    position: relative;
-    padding: 48px 48px 40px;
-    background: linear-gradient(145deg, #111113 0%, #0e0e10 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    overflow: hidden;
-    text-align: center;
-  }
-
-  /* Decorative orb — email safe fallback with inline SVG background */
-  .header-orb-1 {
-    position: absolute;
-    top: -60px;
-    right: -60px;
-    width: 260px;
-    height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200, 255, 87, 0.18) 0%, rgba(200, 255, 87, 0) 70%);
-    pointer-events: none;
-  }
-  .header-orb-2 {
-    position: absolute;
-    bottom: -80px;
-    left: -40px;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200, 255, 87, 0.08) 0%, rgba(200, 255, 87, 0) 70%);
-    pointer-events: none;
-  }
-
-  /* Logo badge */
-  .logo-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(200, 255, 87, 0.08);
-    border: 1px solid rgba(200, 255, 87, 0.2);
-    border-radius: 100px;
-    padding: 8px 20px;
-    margin-bottom: 28px;
-  }
-
-  .logo-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #c8ff57;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  .logo-text {
-    font-size: 13px;
-    font-weight: 700;
-    color: #c8ff57;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .header-title {
-    font-size: 30px;
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1.2;
-    letter-spacing: -0.5px;
-    margin: 0 0 12px 0;
-  }
-
-  .header-title .accent {
-    color: #c8ff57;
-  }
-
-  .header-subtitle {
-    font-size: 15px;
-    color: #71717a;
-    margin: 0;
-    line-height: 1.5;
-  }
-
-  /* Divider with gradient */
-  .divider {
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(200, 255, 87, 0.3), transparent);
-    margin: 0;
-    border: none;
-  }
-
-  /* Content body */
-  .content {
-    padding: 40px 48px;
-  }
-
-  .greeting {
-    font-size: 17px;
-    font-weight: 600;
-    color: #ffffff;
-    margin: 0 0 16px 0;
-  }
-
-  .text {
-    font-size: 15px;
-    color: #a1a1aa;
-    line-height: 1.7;
-    margin: 0 0 24px 0;
-  }
-
-  /* Highlighted message box */
-  .message-card {
-    background: rgba(200, 255, 87, 0.04);
-    border: 1px solid rgba(200, 255, 87, 0.15);
-    border-left: 3px solid #c8ff57;
-    border-radius: 12px;
-    padding: 24px 28px;
-    margin: 28px 0;
-  }
-
-  .message-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #c8ff57;
-    margin: 0 0 12px 0;
-  }
-
-  .message-body {
-    font-size: 16px;
-    color: #ffffff;
-    line-height: 1.6;
-    margin: 0;
-    white-space: pre-line;
-  }
-
-  /* CTA Button */
-  .cta-wrapper {
-    text-align: center;
-    margin: 32px 0 0 0;
-  }
-
-  .cta-btn {
-    display: inline-block;
-    background-color: #c8ff57;
-    color: #000000 !important;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    padding: 16px 36px;
-    border-radius: 100px;
-    text-decoration: none;
-    transition: opacity 0.2s;
-    box-shadow: 0 8px 32px rgba(200, 255, 87, 0.25);
-  }
-
-  /* Info grid */
-  .info-grid {
-    display: table;
-    width: 100%;
-    margin: 32px 0 0 0;
-    border-collapse: separate;
-    border-spacing: 12px 0;
-  }
-
-  .info-cell {
-    display: table-cell;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    padding: 16px;
-    width: 50%;
-    vertical-align: top;
-  }
-
-  .info-cell-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #52525b;
-    margin: 0 0 4px 0;
-  }
-
-  .info-cell-value {
-    font-size: 14px;
-    color: #d4d4d8;
-    font-weight: 500;
-    margin: 0;
-  }
-
-  /* Footer */
-  .footer {
-    padding: 24px 48px 32px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    text-align: center;
-  }
-
-  .footer-logo {
-    font-size: 14px;
-    font-weight: 800;
-    color: #3f3f46;
-    letter-spacing: -0.3px;
-    margin: 0 0 8px 0;
-  }
-
-  .footer-text {
-    font-size: 12px;
-    color: #3f3f46;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .footer-link {
-    color: #52525b;
-    text-decoration: underline;
-  }
-
-  /* Responsive */
-  @media only screen and (max-width: 620px) {
-    .email-wrapper { padding: 16px 12px; }
-    .header { padding: 36px 24px 32px; }
-    .content { padding: 28px 24px; }
-    .footer { padding: 20px 24px 24px; }
-    .header-title { font-size: 24px; }
-    .info-grid { display: block; }
-    .info-cell { display: block; width: 100%; margin-bottom: 10px; }
-    .cta-btn { display: block; text-align: center; }
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>MB Spreadsheets</title>
+  <!--[if mso]>
+  <noscript>
+    <xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
+  </noscript>
+  <![endif]-->
 </head>
-<body>
-  <div class="email-wrapper">
-    <div class="container">
+<body style="margin:0;padding:0;background-color:#08080a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#a1a1aa;width:100%!important;">
 
-      <!-- HEADER -->
-      <div class="header">
-        <div class="header-orb-1"></div>
-        <div class="header-orb-2"></div>
+  <!-- Email wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#08080a;padding:40px 20px;">
+    <tr>
+      <td align="center">
 
-        <div class="logo-badge">
-          <span class="logo-dot"></span>
-          <span class="logo-text">MB Spreadsheets</span>
-        </div>
+        <!-- Main container -->
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#111113;border-radius:20px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.7);">
 
-        <h1 class="header-title">Nouvelle <span class="accent">notification</span></h1>
-        <p class="header-subtitle">Vous avez reçu un message de la plateforme.</p>
-      </div>
+          <!-- ══ HEADER ══ -->
+          <tr>
+            <td style="background:linear-gradient(145deg,#131315 0%,#0e0e10 100%);padding:48px 48px 40px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);">
 
-      <div class="divider"></div>
+              <!-- Logo badge -->
+              <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom:28px;">
+                <tr>
+                  <td style="background:rgba(200,255,87,0.08);border:1px solid rgba(200,255,87,0.22);border-radius:100px;padding:8px 20px;">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <div style="width:8px;height:8px;background-color:#c8ff57;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle;"></div>
+                        </td>
+                        <td style="vertical-align:middle;">
+                          <span style="font-size:12px;font-weight:700;color:#c8ff57;letter-spacing:0.08em;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">MB Spreadsheets</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
 
-      <!-- CONTENT -->
-      <div class="content">
-        <p class="greeting">Bonjour 👋</p>
+              <!-- Title -->
+              <h1 style="margin:0 0 12px 0;font-size:30px;font-weight:800;color:#ffffff;line-height:1.2;letter-spacing:-0.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                Nouvelle <span style="color:#c8ff57;">notification</span>
+              </h1>
+              <p style="margin:0;font-size:15px;color:#71717a;line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                Vous avez reçu un message de la plateforme.
+              </p>
+            </td>
+          </tr>
 
-        <p class="text">
-          Vous avez reçu une notification sur votre espace <strong style="color:#ffffff;">MB Spreadsheets</strong>.
-          Voici le détail du message :
-        </p>
+          <!-- Gradient divider -->
+          <tr>
+            <td style="padding:0;line-height:0;font-size:0;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="33%" style="height:1px;background-color:transparent;font-size:0;line-height:0;">&nbsp;</td>
+                  <td width="34%" style="height:1px;background-color:rgba(200,255,87,0.35);font-size:0;line-height:0;">&nbsp;</td>
+                  <td width="33%" style="height:1px;background-color:transparent;font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-        <!-- Dynamic message from EmailJS -->
-        <div class="message-card">
-          <p class="message-label">📩 Message</p>
-          <p class="message-body">{{message}}</p>
-        </div>
+          <!-- ══ BODY ══ -->
+          <tr>
+            <td style="padding:40px 48px;background-color:#111113;">
 
-        <p class="text" style="margin-bottom: 0;">
-          Accédez dès maintenant à votre espace pour consulter vos spreadsheets et gérer vos données.
-        </p>
+              <!-- Greeting -->
+              <p style="margin:0 0 16px 0;font-size:18px;font-weight:600;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                Bonjour 👋
+              </p>
 
-        <div class="cta-wrapper">
-          <a href="https://mahebrizion.fr/spreadsheet" class="cta-btn">
-            Accéder à la plateforme →
-          </a>
-        </div>
-      </div>
+              <!-- Intro text -->
+              <p style="margin:0 0 28px 0;font-size:15px;color:#a1a1aa;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                Vous avez reçu une notification sur votre espace <strong style="color:#ffffff;">MB Spreadsheets</strong>. Voici le détail du message :
+              </p>
 
-      <div class="divider"></div>
+              <!-- Message card -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                <tr>
+                  <td style="background:rgba(200,255,87,0.04);border:1px solid rgba(200,255,87,0.15);border-left:3px solid #c8ff57;border-radius:12px;padding:24px 28px;">
 
-      <!-- FOOTER -->
-      <div class="footer">
-        <p class="footer-logo">MB</p>
-        <p class="footer-text">
-          Cet e-mail a été envoyé automatiquement, merci de ne pas y répondre.<br>
-          © 2026 Mahé Brizion · <a href="https://mahebrizion.fr" class="footer-link">mahebrizion.fr</a>
-        </p>
-      </div>
+                    <!-- Label -->
+                    <p style="margin:0 0 10px 0;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#c8ff57;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                      📩 Message
+                    </p>
 
-    </div>
-  </div>
+                    <!-- Dynamic content -->
+                    <p style="margin:0;font-size:16px;color:#ffffff;line-height:1.6;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                      {{message}}
+                    </p>
+
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Outro text -->
+              <p style="margin:0 0 32px 0;font-size:15px;color:#a1a1aa;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                Accédez dès maintenant à votre espace pour consulter vos spreadsheets et gérer vos données.
+              </p>
+
+              <!-- CTA Button -->
+              <table cellpadding="0" cellspacing="0" border="0" align="center">
+                <tr>
+                  <td align="center" style="border-radius:100px;background-color:#c8ff57;box-shadow:0 8px 32px rgba(200,255,87,0.3);">
+                    <a href="https://mahebrizion.fr/spreadsheet"
+                       style="display:inline-block;padding:16px 40px;font-size:15px;font-weight:700;color:#000000;text-decoration:none;letter-spacing:0.01em;border-radius:100px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                      Accéder à la plateforme →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Gradient divider -->
+          <tr>
+            <td style="padding:0;line-height:0;font-size:0;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="33%" style="height:1px;background-color:transparent;font-size:0;line-height:0;">&nbsp;</td>
+                  <td width="34%" style="height:1px;background-color:rgba(200,255,87,0.2);font-size:0;line-height:0;">&nbsp;</td>
+                  <td width="33%" style="height:1px;background-color:transparent;font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ══ FOOTER ══ -->
+          <tr>
+            <td style="padding:24px 48px 32px;background-color:#0e0e10;text-align:center;">
+
+              <!-- Logo -->
+              <p style="margin:0 0 8px 0;font-size:18px;font-weight:900;color:#3f3f46;letter-spacing:-0.3px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                MB
+              </p>
+
+              <!-- Footer text -->
+              <p style="margin:0;font-size:12px;color:#3f3f46;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+                Cet e-mail a été envoyé automatiquement, merci de ne pas y répondre.<br>
+                © 2026 Mahé Brizion ·
+                <a href="https://mahebrizion.fr" style="color:#52525b;text-decoration:underline;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">mahebrizion.fr</a>
+              </p>
+
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Main container -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- /Email wrapper -->
+
 </body>
 </html>

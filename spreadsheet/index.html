@@ -43,7 +43,11 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <!-- Non-blocking font load: load as print then swap to all -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" /></noscript>
 
   <link rel="stylesheet" href="/assets/css/main.css" />
   
@@ -215,6 +219,10 @@
         font-size: 0.95rem;
       }
     }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
   </style>
 </head>
 <body data-barba="wrapper">
@@ -258,7 +266,7 @@
         <svg style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4);" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         <input type="text" id="search-spreadsheets" placeholder="Rechercher une spreadsheet..." style="width: 100%; padding: 16px 20px 16px 48px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; font-size: 1rem; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.background='rgba(0,0,0,0.5)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(0,0,0,0.3)';" />
       </div>
-      <select id="sort-spreadsheets" style="padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; font-size: 1rem; outline: none; cursor: pointer; transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+      <select id="sort-spreadsheets" aria-label="Trier les spreadsheets" style="padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: white; font-size: 1rem; outline: none; cursor: pointer; transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
         <option value="recent" style="color: black;">Modifié récemment</option>
         <option value="oldest" style="color: black;">Les plus anciens</option>
         <option value="likes" style="color: black;">Les plus populaires</option>
@@ -266,13 +274,15 @@
       </select>
     </div>
 
-    <div class="shoes-grid reveal on reveal-d2" id="public-spreadsheets-list">
-      <!-- Rempli dynamiquement par JS -->
-      <p style="color:var(--text-muted); text-align:center;">Chargement des spreadsheets...</p>
+    <div class="shoes-grid reveal on reveal-d2" id="public-spreadsheets-list" style="min-height: 400px;">
+      <!-- Skeleton placeholders to prevent CLS -->
+      <div style="background: rgba(255,255,255,0.03); border-radius: 20px; height: 250px; animation: pulse 1.5s ease infinite;"></div>
+      <div style="background: rgba(255,255,255,0.03); border-radius: 20px; height: 250px; animation: pulse 1.5s ease infinite 0.2s;"></div>
+      <div style="background: rgba(255,255,255,0.03); border-radius: 20px; height: 250px; animation: pulse 1.5s ease infinite 0.4s;"></div>
     </div>
   </main>
 
-  <footer role="contentinfo" style="position: relative; z-index: 2;">
+  <footer role="contentinfo" style="position: relative; z-index: 2; min-height: 80px;">
     <div class="wrap footer-row" style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 28px;">
       <p class="footer-copy">
         &copy; 2026 <span>Mahé Brizion</span>
@@ -283,8 +293,8 @@
   <script src="/assets/js/main.js" defer></script>
   
   <!-- Supabase & Auth -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/spreadsheet/supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="/spreadsheet/supabase-config.js" defer></script>
   <script src="/spreadsheet/auth-modal.js" defer></script>
 
   <!-- Load Public Spreadsheets -->

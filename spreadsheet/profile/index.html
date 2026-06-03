@@ -269,6 +269,10 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           Sécurité
         </div>
+        <div class="profile-tab" data-tab="sec-debug">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          Débogage & Tests
+        </div>
       </div>
     </aside>
 
@@ -433,6 +437,34 @@
             <button id="btn-setup-2fa-profile" class="btn-outline" style="border-color: var(--sneaker-accent); color: var(--sneaker-accent); display: none;">Activer la 2FA</button>
             <button id="btn-disable-2fa-profile" class="btn-outline danger" style="border-color: #ff5252; color: #ff5252; display: none;">Désactiver la 2FA</button>
           </div>
+        </div>
+    </div>
+      </section>
+
+      <!-- DEBUGGING -->
+      <section class="profile-section" id="sec-debug" style="display:none;">
+        <div class="section-header">
+          <h1 class="section-title">Débogage & Tests</h1>
+          <p class="section-desc">Testez les fonctionnalités de la plateforme (envois d'e-mails, requêtes).</p>
+        </div>
+        
+        <div class="settings-panel">
+          <h3 style="margin-bottom: 25px; font-size: 1.4rem;">Envoi d'e-mail de test</h3>
+          <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">
+            Testez la configuration EmailJS en envoyant un e-mail à une adresse précise.
+          </p>
+          <form id="form-test-email">
+            <div class="input-group">
+              <label class="input-label">Adresse e-mail de destination</label>
+              <input type="email" id="debug-email-to" class="form-input" placeholder="destinataire@exemple.com" required />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Message</label>
+              <textarea id="debug-email-msg" class="form-input" style="min-height: 80px;" required>Ceci est un test envoyé depuis la section de débogage du site ! 🚀</textarea>
+            </div>
+            <button type="submit" class="btn-submit" id="btn-debug-email">Envoyer l'e-mail</button>
+            <p id="debug-email-status" style="margin-top: 15px; font-size: 0.95rem; text-align: center; font-weight: 600;"></p>
+          </form>
         </div>
       </section>
 
@@ -1089,6 +1121,38 @@
         btn.textContent = 'Désactiver la 2FA';
         check2FAStatus();
         alert("2FA désactivée avec succès.");
+      });
+
+      // Debugging
+      document.getElementById('form-test-email')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const toEmail = document.getElementById('debug-email-to').value.trim();
+        const msg = document.getElementById('debug-email-msg').value.trim();
+        const statusEl = document.getElementById('debug-email-status');
+        
+        if (!toEmail || !msg) return;
+
+        const btn = document.getElementById('btn-debug-email');
+        btn.textContent = "Envoi en cours...";
+        btn.disabled = true;
+        statusEl.textContent = "";
+
+        try {
+          if (window.sendEmailNotification) {
+            await window.sendEmailNotification(toEmail, msg);
+            statusEl.textContent = "✅ E-mail envoyé avec succès !";
+            statusEl.style.color = "var(--sneaker-accent)";
+          } else {
+            statusEl.textContent = "❌ sendEmailNotification non défini.";
+            statusEl.style.color = "#ff5252";
+          }
+        } catch (err) {
+          statusEl.textContent = "❌ Erreur lors de l'envoi.";
+          statusEl.style.color = "#ff5252";
+        } finally {
+          btn.textContent = "Envoyer l'e-mail";
+          btn.disabled = false;
+        }
       });
 
       initProfile();

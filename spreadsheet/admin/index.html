@@ -448,6 +448,23 @@
         <p id="api-key-status" style="font-size: 0.8rem; color: #10b981; margin-top: 10px; display: none;">✓ Clé sauvegardée dans votre navigateur</p>
       </div>
 
+      <!-- EMAIL TESTING CARD -->
+      <div class="admin-card glass-panel" style="margin-top: 40px; border-color: rgba(200, 255, 87, 0.3);">
+        <h3 style="display: flex; align-items: center; gap: 8px; color: var(--accent);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          Test d'envoi d'e-mail (EmailJS)
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px; margin-bottom: 20px; line-height: 1.6;">
+          Testez la configuration d'envoi d'e-mails (via EmailJS et OVH) pour vous assurer que les notifications fonctionnent correctement.
+        </p>
+        <form id="form-test-email">
+          <input type="email" id="debug-email-to" class="glass-input" placeholder="destinataire@exemple.com" required style="width:100%; margin-bottom:15px;" />
+          <textarea id="debug-email-msg" class="glass-input" style="min-height: 80px; width:100%; margin-bottom:15px; resize:vertical;" required>Ceci est un test envoyé depuis le panneau admin ! 🚀</textarea>
+          <button type="submit" class="btn-magnetic" id="btn-debug-email">Envoyer l'e-mail de test</button>
+          <p id="debug-email-status" style="margin-top: 15px; font-size: 0.9rem; font-weight: 600;"></p>
+        </form>
+      </div>
+
     </section>
 
   </main>

@@ -1380,3 +1380,38 @@ async function removeCollaborator(userId) {
     renderCollaboratorsModal();
   }
 }
+
+// === EMAIL TESTING ===
+document.getElementById('form-test-email')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const toEmail = document.getElementById('debug-email-to').value.trim();
+  const msg = document.getElementById('debug-email-msg').value.trim();
+  const statusEl = document.getElementById('debug-email-status');
+  
+  if (!toEmail || !msg) return;
+  
+  const btn = document.getElementById('btn-debug-email');
+  const oldText = btn.textContent;
+  btn.textContent = 'Envoi en cours...';
+  btn.disabled = true;
+  statusEl.textContent = '';
+  statusEl.style.color = 'inherit';
+
+  try {
+    if (window.sendEmailNotification) {
+      await window.sendEmailNotification(toEmail, msg);
+      statusEl.textContent = "✅ E-mail de test envoyé avec succès !";
+      statusEl.style.color = "#10b981";
+    } else {
+      statusEl.textContent = "❌ sendEmailNotification non défini. Assurez-vous qu'EmailJS est bien chargé.";
+      statusEl.style.color = "#ff4b4b";
+    }
+  } catch (error) {
+    console.error(error);
+    statusEl.textContent = "❌ Erreur: " + error.message;
+    statusEl.style.color = "#ff4b4b";
+  } finally {
+    btn.textContent = oldText;
+    btn.disabled = false;
+  }
+});

@@ -176,34 +176,46 @@
         </div>
       </div>
 
-      <div class="admin-grid">
-        <div class="admin-card glass-panel" style="padding-top: 30px; padding-bottom: 30px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-            <h3 style="margin-top: 0; margin-bottom: 0;">Créateurs / Admins</h3>
-            <div style="position: relative; flex: 1; max-width: 250px;">
-              <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4);" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input type="text" id="search-admins" placeholder="Rechercher..." style="width: 100%; padding: 10px 10px 10px 36px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; font-size: 0.9rem; font-family: var(--font-body); outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='var(--sneaker-accent)'; this.style.background='rgba(0,0,0,0.4)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(0,0,0,0.2)';" />
-            </div>
-          </div>
-          <div id="admins-list" class="list-container" style="max-height: 400px; overflow-y: auto; padding-right: 5px; padding-bottom: 10px;"></div>
-        </div>
-        
-        <div class="admin-card glass-panel" style="padding-top: 30px; padding-bottom: 30px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-            <h3 style="margin-top: 0; margin-bottom: 0;">Viewers / Users</h3>
-            <div style="position: relative; flex: 1; max-width: 250px;">
-              <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4);" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input type="text" id="search-users" placeholder="Rechercher..." style="width: 100%; padding: 10px 10px 10px 36px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; font-size: 0.9rem; font-family: var(--font-body); outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='var(--sneaker-accent)'; this.style.background='rgba(0,0,0,0.4)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(0,0,0,0.2)';" />
-            </div>
-          </div>
-          <div id="users-list" class="list-container" style="max-height: 400px; overflow-y: auto; padding-right: 5px; padding-bottom: 10px;"></div>
+      <div class="admin-tabs" style="display: flex; gap: 15px; margin-top: 20px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; overflow-x: auto;">
+        <button class="admin-tab" data-tab="admin-tab-accueil" style="background:none; border:none; color:var(--white); font-size:1.1rem; cursor:pointer; padding:5px 10px; border-bottom: 2px solid var(--sneaker-accent); transition:0.3s; font-family:var(--font-body); font-weight:500;">Accueil</button>
+        <button class="admin-tab" data-tab="admin-tab-admin" style="background:none; border:none; color:rgba(255,255,255,0.5); font-size:1.1rem; cursor:pointer; padding:5px 10px; border-bottom: 2px solid transparent; transition:0.3s; font-family:var(--font-body); font-weight:500;">Admin</button>
+        <button class="admin-tab" data-tab="admin-tab-tools" style="background:none; border:none; color:rgba(255,255,255,0.5); font-size:1.1rem; cursor:pointer; padding:5px 10px; border-bottom: 2px solid transparent; transition:0.3s; font-family:var(--font-body); font-weight:500;">Tools</button>
+      </div>
+
+      <div id="admin-tab-accueil" class="admin-tab-content" style="display: block;">
+        <div class="admin-card glass-panel">
+          <h3>Toutes les Spreadsheets</h3>
+          <div id="all-spreadsheets-list" class="list-container"></div>
         </div>
       </div>
-      
-      <div class="admin-card glass-panel" style="margin-top: 40px;">
-        <h3>Toutes les Spreadsheets</h3>
-        <div id="all-spreadsheets-list" class="list-container"></div>
+
+      <div id="admin-tab-admin" class="admin-tab-content" style="display: none;">
+        <div class="admin-grid">
+          <div class="admin-card glass-panel" style="padding-top: 30px; padding-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+              <h3 style="margin-top: 0; margin-bottom: 0;">Créateurs / Admins</h3>
+              <div style="position: relative; flex: 1; max-width: 250px;">
+                <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4);" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="search-admins" placeholder="Rechercher..." style="width: 100%; padding: 10px 10px 10px 36px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; font-size: 0.9rem; font-family: var(--font-body); outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='var(--sneaker-accent)'; this.style.background='rgba(0,0,0,0.4)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(0,0,0,0.2)';" />
+              </div>
+            </div>
+            <div id="admins-list" class="list-container" style="max-height: 400px; overflow-y: auto; padding-right: 5px; padding-bottom: 10px;"></div>
+          </div>
+          
+          <div class="admin-card glass-panel" style="padding-top: 30px; padding-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+              <h3 style="margin-top: 0; margin-bottom: 0;">Viewers / Users</h3>
+              <div style="position: relative; flex: 1; max-width: 250px;">
+                <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4);" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="search-users" placeholder="Rechercher..." style="width: 100%; padding: 10px 10px 10px 36px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; font-size: 0.9rem; font-family: var(--font-body); outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='var(--sneaker-accent)'; this.style.background='rgba(0,0,0,0.4)';" onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(0,0,0,0.2)';" />
+              </div>
+            </div>
+            <div id="users-list" class="list-container" style="max-height: 400px; overflow-y: auto; padding-right: 5px; padding-bottom: 10px;"></div>
+          </div>
+        </div>
       </div>
+
+      <div id="admin-tab-tools" class="admin-tab-content" style="display: none;">
     </section>
 
     <!-- USER VIEW -->
@@ -420,49 +432,51 @@
         </div>
       </div>
 
-      <!-- AI CONFIGURATION CARD -->
-      <div class="admin-card glass-panel" style="margin-top: 40px; border-color: rgba(200, 255, 87, 0.3);">
-        <h3 style="display: flex; align-items: center; gap: 8px; color: var(--accent);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M21 5c0 1.66-4 3-9 3S3 6.66 3 5s4-3 9-3 9 1.34 9 3z"></path></svg>
-          Générateur de Mots-Clés IA (Gemini)
-        </h3>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px; line-height: 1.6;">
-          Configurez votre propre clé API pour générer automatiquement jusqu'à 30 mots-clés optimisés pour la recherche, d'un simple clic. <strong style="color:var(--white);">100% gratuit</strong> via Google AI Studio.
-        </p>
+      <div id="admin-tab-tools" class="admin-tab-content" style="display: none;">
+        <!-- AI CONFIGURATION CARD -->
+        <div class="admin-card glass-panel" style="margin-top: 40px; border-color: rgba(200, 255, 87, 0.3);">
+          <h3 style="display: flex; align-items: center; gap: 8px; color: var(--accent);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M21 5c0 1.66-4 3-9 3S3 6.66 3 5s4-3 9-3 9 1.34 9 3z"></path></svg>
+            Générateur de Mots-Clés IA (Gemini)
+          </h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px; line-height: 1.6;">
+            Configurez votre propre clé API pour générer automatiquement jusqu'à 30 mots-clés optimisés pour la recherche, d'un simple clic. <strong style="color:var(--white);">100% gratuit</strong> via Google AI Studio.
+          </p>
 
-        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin: 20px 0;">
-          <h4 style="font-size: 0.9rem; margin-bottom: 10px;">Comment obtenir votre clé API :</h4>
-          <ol style="font-size: 0.85rem; color: var(--text-muted); margin-left: 20px; line-height: 1.8;">
-            <li>Allez sur <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent); text-decoration: underline;">Google AI Studio</a>.</li>
-            <li>Connectez-vous avec votre compte Google (même sans abonnement Pro, c'est gratuit !).</li>
-            <li>Cliquez sur le bouton bleu <strong>"Create API Key"</strong>.</li>
-            <li>Copiez la longue suite de caractères générée.</li>
-            <li>Collez-la ci-dessous et cliquez sur Sauvegarder.</li>
-          </ol>
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin: 20px 0;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 10px;">Comment obtenir votre clé API :</h4>
+            <ol style="font-size: 0.85rem; color: var(--text-muted); margin-left: 20px; line-height: 1.8;">
+              <li>Allez sur <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent); text-decoration: underline;">Google AI Studio</a>.</li>
+              <li>Connectez-vous avec votre compte Google (même sans abonnement Pro, c'est gratuit !).</li>
+              <li>Cliquez sur le bouton bleu <strong>"Create API Key"</strong>.</li>
+              <li>Copiez la longue suite de caractères générée.</li>
+              <li>Collez-la ci-dessous et cliquez sur Sauvegarder.</li>
+            </ol>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: stretch;">
+            <input type="password" id="gemini-api-key" placeholder="Collez votre clé API (AIzaSy...)" class="glass-input" style="flex: 1;" />
+            <button id="btn-save-api-key" class="btn-magnetic" style="padding: 10px 20px; font-size: 0.85rem;">Sauvegarder</button>
+          </div>
+          <p id="api-key-status" style="font-size: 0.8rem; color: #10b981; margin-top: 10px; display: none;">✓ Clé sauvegardée dans votre navigateur</p>
         </div>
 
-        <div style="display: flex; gap: 10px; align-items: stretch;">
-          <input type="password" id="gemini-api-key" placeholder="Collez votre clé API (AIzaSy...)" class="glass-input" style="flex: 1;" />
-          <button id="btn-save-api-key" class="btn-magnetic" style="padding: 10px 20px; font-size: 0.85rem;">Sauvegarder</button>
+        <!-- EMAIL TESTING CARD -->
+        <div class="admin-card glass-panel" style="margin-top: 40px; border-color: rgba(200, 255, 87, 0.3);">
+          <h3 style="display: flex; align-items: center; gap: 8px; color: var(--accent);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Test d'envoi d'e-mail (EmailJS)
+          </h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px; margin-bottom: 20px; line-height: 1.6;">
+            Testez la configuration d'envoi d'e-mails (via EmailJS et OVH) pour vous assurer que les notifications fonctionnent correctement.
+          </p>
+          <form id="form-test-email">
+            <input type="email" id="debug-email-to" class="glass-input" placeholder="destinataire@exemple.com" required style="width:100%; margin-bottom:15px;" />
+            <textarea id="debug-email-msg" class="glass-input" style="min-height: 80px; width:100%; margin-bottom:15px; resize:vertical;" required>Ceci est un test envoyé depuis le panneau admin ! 🚀</textarea>
+            <button type="submit" class="btn-magnetic" id="btn-debug-email">Envoyer l'e-mail de test</button>
+            <p id="debug-email-status" style="margin-top: 15px; font-size: 0.9rem; font-weight: 600;"></p>
+          </form>
         </div>
-        <p id="api-key-status" style="font-size: 0.8rem; color: #10b981; margin-top: 10px; display: none;">✓ Clé sauvegardée dans votre navigateur</p>
-      </div>
-
-      <!-- EMAIL TESTING CARD -->
-      <div class="admin-card glass-panel" style="margin-top: 40px; border-color: rgba(200, 255, 87, 0.3);">
-        <h3 style="display: flex; align-items: center; gap: 8px; color: var(--accent);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-          Test d'envoi d'e-mail (EmailJS)
-        </h3>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px; margin-bottom: 20px; line-height: 1.6;">
-          Testez la configuration d'envoi d'e-mails (via EmailJS et OVH) pour vous assurer que les notifications fonctionnent correctement.
-        </p>
-        <form id="form-test-email">
-          <input type="email" id="debug-email-to" class="glass-input" placeholder="destinataire@exemple.com" required style="width:100%; margin-bottom:15px;" />
-          <textarea id="debug-email-msg" class="glass-input" style="min-height: 80px; width:100%; margin-bottom:15px; resize:vertical;" required>Ceci est un test envoyé depuis le panneau admin ! 🚀</textarea>
-          <button type="submit" class="btn-magnetic" id="btn-debug-email">Envoyer l'e-mail de test</button>
-          <p id="debug-email-status" style="margin-top: 15px; font-size: 0.9rem; font-weight: 600;"></p>
-        </form>
       </div>
 
     </section>

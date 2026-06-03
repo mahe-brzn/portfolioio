@@ -1415,3 +1415,28 @@ document.getElementById('form-test-email')?.addEventListener('submit', async (e)
     btn.disabled = false;
   }
 });
+
+// === ADMIN TABS TOGGLE ===
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Retirer classe active des boutons
+    document.querySelectorAll('.admin-tab').forEach(t => {
+      t.style.borderBottomColor = 'transparent';
+      t.style.color = 'rgba(255,255,255,0.5)';
+    });
+    // Ajouter classe active au bouton cliqué
+    tab.style.borderBottomColor = 'var(--sneaker-accent)';
+    tab.style.color = 'var(--white)';
+    
+    // Cacher tous les contenus
+    document.querySelectorAll('.admin-tab-content').forEach(c => {
+      c.style.display = 'none';
+    });
+    // Afficher le contenu ciblé
+    const targetId = tab.getAttribute('data-tab');
+    const targetContent = document.getElementById(targetId);
+    if (targetContent) {
+      targetContent.style.display = 'block';
+    }
+  });
+});

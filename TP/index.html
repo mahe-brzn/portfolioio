@@ -146,24 +146,23 @@
       background-size:60px 60px;
     }
     .hero-name-wrap {
-      position:relative; z-index:2;
-      width:100%; text-align:center;
-      padding: 0 20px;
-      margin: auto auto 40px;
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-60%);
+      text-align:center; width:100%;
       pointer-events:none; user-select:none;
     }
-    .hero-name-line { display:block; overflow:hidden; padding-bottom:10px; margin-bottom:-10px; }
+    .hero-name-line { display:block; overflow:hidden; padding-bottom:30px; margin-bottom:-30px; }
     .hero-name-inner {
       display:block;
       font-family:var(--font-d);
-      font-size:clamp(3rem,11vw,10rem);
+      font-size:clamp(5rem,17vw,17rem);
       font-weight:800; letter-spacing:-.04em; line-height:1.1;
       animation:fadeUp .9s var(--ease-out) .2s both;
     }
     .solid   { color:var(--white); }
     .outline { color:transparent; -webkit-text-stroke:1.5px rgba(240,238,233,.16); }
 
-    .hero-line-wrap { position:relative; width:100%; overflow:hidden; margin-top: 40px; }
+    .hero-line-wrap { position:relative; width:100%; overflow:hidden; }
     .hero-line { height:1px; background:rgba(255,255,255,.08); position:relative; }
     .hero-line-orb {
       position:absolute; top:-2px; left:0;
@@ -406,10 +405,10 @@
     <div class="tp-grid" role="list">
 
       <!-- TP Cybersécurité — PUBLISHED -->
-      <a href="/TP/TP-11/" class="tp-card" role="listitem"
+      <a href="/TP/TP-Cybersecurite/" class="tp-card" role="listitem"
          aria-label="TP Cybersécurité — Failles de sécurité web">
         <div class="tp-card-top">
-          <span class="tp-num">TP 11</span>
+          <span class="tp-num">TP 01</span>
           <span class="tp-arrow" aria-hidden="true">↗</span>
         </div>
         <div class="tp-icon" style="background:rgba(200,255,87,.08);color:var(--accent);border-color:rgba(200,255,87,.2);">
@@ -436,37 +435,38 @@
         </div>
       </a>
 
-      <!-- TP 09 -->
-      <a href="/TP/TP-09/" class="tp-card" role="listitem">
+      
+      <!-- Synthèse Cybersécurité n°2 — PUBLISHED -->
+      <a href="/TP/Synthese-Cybersecurite-2/" class="tp-card" role="listitem"
+         aria-label="Synthèse Cybersécurité n°2 — Brute Force & mots de passe">
         <div class="tp-card-top">
-          <span class="tp-num">TP 09</span>
+          <span class="tp-num">Synthèse 02</span>
           <span class="tp-arrow" aria-hidden="true">↗</span>
         </div>
-        <div class="tp-icon" style="background:rgba(255,255,255,.04);color:var(--grey-3);">
-          🖥️
+        <div class="tp-icon" style="background:rgba(255,64,96,.08);color:var(--accent);border-color:rgba(255,64,96,.2);">
+          🔑
         </div>
         <div>
-          <div class="tp-title">Systèmes</div>
+          <div class="tp-title">Brute Force & Mots de passe</div>
           <div class="tp-desc" style="margin-top:8px;">
-            Installation et Utilisation d'Ubuntu en Dual Boot.
+            Définition du <strong>Brute Force</strong>, 6 techniques de piratage de mots de passe et analyse des temps de cassage sur 5 mots de passe.
           </div>
         </div>
         <ul class="tp-tags" aria-label="Technologies">
-          <li class="tp-tag">Ubuntu</li>
-          <li class="tp-tag">Dual Boot</li>
-          <li class="tp-tag">Système</li>
+          <li class="tp-tag">Brute Force</li>
+          <li class="tp-tag">Dictionnaire</li>
+          <li class="tp-tag">Phishing</li>
+          <li class="tp-tag">Rainbow Table</li>
         </ul>
         <div class="tp-status status-done">
           <span class="status-dot" aria-hidden="true"></span>
           Publié
         </div>
       </a>
-
-      <!-- TP 10 -->
-      <a href="/TP/TP-10/" class="tp-card" role="listitem">
+      <!-- Placeholder TP 02 -->
+      <div class="tp-card coming" aria-hidden="true">
         <div class="tp-card-top">
-          <span class="tp-num">TP 10</span>
-          <span class="tp-arrow" aria-hidden="true">↗</span>
+          <span class="tp-num">TP 02</span>
         </div>
         <div class="tp-icon" style="background:rgba(255,255,255,.04);color:var(--grey-3);">
           🌐
@@ -474,19 +474,34 @@
         <div>
           <div class="tp-title">Réseaux</div>
           <div class="tp-desc" style="margin-top:8px;">
-            VOIP sur Raspberry Pi.
+            Configuration réseau, protocoles, adressage IP et équipements actifs.
           </div>
         </div>
-        <ul class="tp-tags" aria-label="Technologies">
-          <li class="tp-tag">VOIP</li>
-          <li class="tp-tag">Raspberry</li>
-          <li class="tp-tag">Réseau</li>
-        </ul>
-        <div class="tp-status status-done">
+        <div class="tp-status status-wip">
           <span class="status-dot" aria-hidden="true"></span>
-          Publié
+          À venir
         </div>
-      </a>
+      </div>
+
+      <!-- Placeholder TP 03 -->
+      <div class="tp-card coming" aria-hidden="true">
+        <div class="tp-card-top">
+          <span class="tp-num">TP 03</span>
+        </div>
+        <div class="tp-icon" style="background:rgba(255,255,255,.04);color:var(--grey-3);">
+          🖥️
+        </div>
+        <div>
+          <div class="tp-title">Systèmes</div>
+          <div class="tp-desc" style="margin-top:8px;">
+            Administration système, virtualisation et gestion des services.
+          </div>
+        </div>
+        <div class="tp-status status-wip">
+          <span class="status-dot" aria-hidden="true"></span>
+          À venir
+        </div>
+      </div>
 
     </div>
   </div>

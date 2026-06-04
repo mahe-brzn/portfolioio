@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synthèse n°2 — Brute Force & Mots de Passe · Mahé Brizion</title>
+  <meta name="description" content="Synthèse Cybersécurité n°2 — Définition du Brute Force, techniques de piratage de mots de passe et analyse des temps de cassage." />
+  <link rel="canonical" href="https://mahebrizion.fr/TP/Synthese-Cybersecurite-2/" />
+
+  <style>
+    :root {
+      --black:  #060608;
+      --white:  #f0eee9;
+      --g1:     #111116;
+      --g2:     #1e1e26;
+      --g3:     #8c8ca0;
+      --g4:     #b8b8c8;
+      --accent: #c8ff57;
+      --red:    #ff4060;
+      --orange: #ff9040;
+      --yellow: #ffcc40;
+      --green:  #43d9ad;
+      --blue:   #57c8ff;
+      --fd: "Syne",  sans-serif;
+      --fb: "Inter", sans-serif;
+      --fm: "JetBrains Mono", monospace;
+      --eo: cubic-bezier(0.16,1,0.3,1);
+      --eb: cubic-bezier(0.34,1.56,0.64,1);
+      --pad: clamp(24px,5vw,80px);
+    }
+    *,::before,::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px;scroll-behavior:smooth;scroll-padding-top:80px}
+    body{background:var(--black);color:var(--white);font-family:var(--fb);font-weight:400;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none}
+    body.loading{overflow:hidden}
+    a{text-decoration:none;color:inherit}
+    ::selection{background:var(--accent);color:var(--black)}
+    ::-webkit-scrollbar{width:2px}
+    ::-webkit-scrollbar-thumb{background:var(--accent)}
+
+    /* Preloader */
+    #preloader{position:fixed;inset:0;background:var(--black);z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transition:opacity .7s var(--eo),visibility .7s}
+    #preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+    .pre-title{font-family:var(--fd);font-size:clamp(1.2rem,3vw,2rem);font-weight:800;letter-spacing:-.04em;color:var(--white)}
+    .pre-title span{color:var(--accent)}
+    .pre-bar-wrap{width:min(260px,55vw);height:1px;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden}
+    .pre-bar{height:100%;background:var(--accent);width:0;box-shadow:0 0 12px var(--accent);transition:width .04s linear}
+    .pre-counter{font-family:var(--fd);font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--g3)}
+  </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <style>
+    @keyframes grain{0%{transform:translate(0,0)}33%{transform:translate(-3%,6%)}66%{transform:translate(6%,-4%)}100%{transform:translate(-5%,3%)}}
+    @keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.55}}
+    @keyframes orbTravel{0%,100%{left:0}50%{left:calc(100% - 60px)}}
+    @keyframes orbFloat{0%,100%{transform:translate(0,0)}33%{transform:translate(32px,-26px)}66%{transform:translate(-20px,18px)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    @keyframes marquee{to{transform:translateX(-50%)}}
+    @keyframes scrollBar{0%{height:0%;top:0}50%{height:100%;top:0}51%{height:100%}100%{height:0%;top:100%}}
+    @keyframes countUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    @keyframes barGrow{from{width:0}to{width:var(--w)}}
+
+    /* Grain + Cursor */
+    #grain{position:fixed;width:300%;height:300%;top:-100%;left:-100%;z-index:9998;pointer-events:none;opacity:.038;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>");background-size:250px 250px;animation:grain .6s steps(3,end) infinite;will-change:transform}
+    #cursor-dot,#cursor-ring{position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .2s var(--eo),height .2s var(--eo),opacity .15s ease,border-color .2s}
+    #cursor-dot{width:8px;height:8px;background:var(--accent);border-radius:50%}
+    #cursor-ring{width:36px;height:36px;border:1px solid rgba(200,255,87,.5);border-radius:50%}
+    body.cur-hover #cursor-dot{width:14px;height:14px}
+    body.cur-hover #cursor-ring{width:58px;height:58px;border-color:var(--accent)}
+    body.cur-click #cursor-dot{width:5px;height:5px}
+    body.cur-click #cursor-ring{width:24px;height:24px}
+    @media(hover:none) and (pointer:coarse){#cursor-dot,#cursor-ring{display:none!important}body{cursor:auto}}
+
+    /* Layout */
+    .wrap{max-width:1360px;margin:0 auto;padding:0 var(--pad)}
+    .divider{height:1px;background:rgba(255,255,255,.06)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* Nav */
+    #nav{position:fixed;top:0;left:0;right:0;z-index:800;padding:24px 0;transition:transform .55s var(--eo),padding .5s var(--eo);opacity:0;transform:translateY(-24px)}
+    #nav.visible{opacity:1;transform:translateY(0)}
+    #nav.stuck{padding:14px 0}
+    .nav-row{display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid transparent;border-radius:100px;transition:all .5s var(--eo)}
+    #nav.stuck .nav-row{background:rgba(17,17,22,.6);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.08);box-shadow:0 16px 40px rgba(0,0,0,.4);padding:10px 24px 10px 20px}
+    .nav-logo{font-family:var(--fd);font-size:.8rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--white);transition:color .2s}
+    .nav-logo:hover{color:var(--accent)}
+    .nav-links{display:flex;list-style:none;gap:0}
+    .nav-links a{font-size:.7rem;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--g3);padding:7px 16px;transition:color .2s;position:relative}
+    .nav-links a::after{content:'';position:absolute;bottom:2px;left:16px;right:16px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--eo)}
+    .nav-links a:hover{color:var(--white)}
+    .nav-links a:hover::after{transform:scaleX(1)}
+    .nav-status{display:flex;align-items:center;gap:8px;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--g3)}
+    .nav-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulseDot 2s ease-in-out infinite}
+
+    /* Hero */
+    #hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;padding-bottom:clamp(60px,10vw,100px)}
+    .hero-orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;animation:orbFloat 12s ease-in-out infinite}
+    .orb-1{width:520px;height:520px;background:var(--accent);top:-160px;left:-120px;opacity:.12}
+    .orb-2{width:400px;height:400px;background:var(--red);bottom:-100px;right:-80px;opacity:.08;animation-delay:-6s}
+    .hero-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(200,255,87,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,255,87,.04) 1px,transparent 1px);background-size:60px 60px}
+    .hero-name-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-62%);text-align:center;width:100%;pointer-events:none;user-select:none}
+    .hero-name-line{display:block;overflow:hidden;padding-bottom:30px;margin-bottom:-30px}
+    .hero-name-inner{display:block;font-family:var(--fd);font-size:clamp(4.5rem,14vw,15rem);font-weight:800;letter-spacing:-.04em;line-height:1.1;animation:fadeUp .9s var(--eo) .3s both}
+    .hn-s{color:var(--white)}
+    .hn-o{color:transparent;-webkit-text-stroke:1.5px rgba(240,238,233,.14)}
+    .hero-line-wrap{position:relative;width:100%;overflow:hidden}
+    .hero-line{height:1px;background:rgba(255,255,255,.08);position:relative}
+    .hero-line-orb{position:absolute;top:-2px;left:0;width:60px;height:5px;background:var(--accent);border-radius:3px;box-shadow:0 0 20px var(--accent);animation:orbTravel 3.5s ease-in-out infinite}
+    .hero-bottom{position:relative;z-index:2}
+    .hero-bottom .wrap{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding-top:40px}
+    .eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .eyebrow-line{width:32px;height:1px;background:var(--accent)}
+    .eyebrow-text{font-size:.7rem;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--g3)}
+    .hero-desc{font-size:clamp(.95rem,1.5vw,1.1rem);font-weight:300;color:var(--g4);max-width:540px;line-height:1.75}
+    .hero-desc strong{color:var(--white);font-weight:500}
+    .hero-stats{display:flex;flex-direction:column;align-items:flex-end;gap:20px;flex-shrink:0}
+    .hero-stat{text-align:right}
+    .stat-label{display:block;font-size:.62rem;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--g3);margin-bottom:2px}
+    .stat-num{font-family:var(--fd);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;letter-spacing:-.04em}
+    .a-num{color:var(--accent)}
+    .hero-scroll{position:absolute;bottom:clamp(24px,4vw,40px);right:clamp(24px,5vw,80px);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:2}
+    .scroll-label{font-family:var(--fd);font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--g3);writing-mode:vertical-rl}
+    .scroll-bar{width:1px;height:60px;background:rgba(255,255,255,.1);position:relative;overflow:hidden;border-radius:1px}
+    .scroll-progress{position:absolute;top:0;left:0;width:100%;background:var(--accent);box-shadow:0 0 8px var(--accent);border-radius:1px;animation:scrollBar 2s var(--eo) infinite}
+
+    /* Marquee */
+    .marquee-section{border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:18px 0;overflow:hidden}
+    .marquee-track{display:flex;width:max-content;animation:marquee 22s linear infinite}
+    .marquee-copy{display:flex;align-items:center;white-space:nowrap}
+    .m-word{font-family:var(--fd);font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g3);padding:0 24px}
+    .m-sep{color:var(--accent);font-size:.9rem}
+
+    /* Section label */
+    .s-label{font-family:var(--fd);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--g3);margin-bottom:48px;display:flex;align-items:center;gap:14px}
+    .s-label::before{content:attr(data-num);color:var(--accent)}
+    .s-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+
+    /* Reveal */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s var(--eo),transform .8s var(--eo)}
+    .reveal.d1{transition-delay:.1s}
+    .reveal.d2{transition-delay:.2s}
+    .reveal.d3{transition-delay:.3s}
+    .reveal.visible{opacity:1;transform:none}
+
+    /* Content sections */
+    .content-section{padding:clamp(96px,14vw,160px) 0;border-bottom:1px solid rgba(255,255,255,.05)}
+
+    /* Section heading */
+    .sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:40px;margin-bottom:clamp(56px,8vw,96px)}
+    .sec-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid rgba(255,255,255,.08);flex-shrink:0}
+    .sec-title-block h2{font-family:var(--fd);font-size:clamp(2.2rem,5vw,4rem);font-weight:800;letter-spacing:-.04em;line-height:1}
+    .sec-title-block p{font-size:.78rem;color:var(--g3);margin-top:7px;letter-spacing:.04em}
+    .sec-big-num{font-family:var(--fd);font-size:clamp(4rem,8vw,7rem);font-weight:800;letter-spacing:-.06em;color:rgba(255,255,255,.04);line-height:1;flex-shrink:0}
+
+    /* Definition box */
+    .def-block{border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;margin-bottom:40px}
+    .def-header{padding:14px 22px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+    .def-label{font-family:var(--fd);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4)}
+    .def-body{padding:28px 28px}
+    .def-body p{font-size:clamp(1rem,1.6vw,1.15rem);font-weight:300;color:var(--g4);line-height:1.85;margin-bottom:0}
+    .def-body p strong{color:var(--white);font-weight:500}
+    .def-body code{font-family:var(--fm);font-size:.85em;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;color:var(--accent)}
+
+    /* Info row (explication / exemple / parade) */
+    .info-row{display:grid;grid-template-columns:180px 1fr;gap:56px;padding:clamp(32px,4vw,48px) 0;border-top:1px solid rgba(255,255,255,.05);transition:border-color .3s}
+    .info-row:hover{border-top-color:rgba(255,255,255,.12)}
+    .info-left{padding-top:4px}
+    .info-tag{display:inline-flex;align-items:center;gap:7px;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+    .tag-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+    .it-crit{color:var(--red)}.it-crit .tag-dot{background:var(--red)}
+    .it-high{color:var(--orange)}.it-high .tag-dot{background:var(--orange)}
+    .it-med{color:var(--yellow)}.it-med .tag-dot{background:var(--yellow)}
+    .it-safe{color:var(--green)}.it-safe .tag-dot{background:var(--green)}
+    .info-num{font-family:var(--fd);font-size:3rem;font-weight:800;color:rgba(255,255,255,.04);letter-spacing:-.06em;line-height:1}
+    .info-title{font-family:var(--fd);font-size:clamp(1.2rem,2vw,1.6rem);font-weight:700;letter-spacing:-.02em;color:var(--white);margin-bottom:16px}
+    .sub-block{margin-top:22px}
+    .sub-lbl{font-size:.58rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--g3);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .sub-lbl::before{content:attr(data-icon)}
+    .sub-text{font-size:.9rem;font-weight:300;color:var(--g4);line-height:1.85}
+    .sub-text strong{color:var(--white);font-weight:500}
+    .parade{border-left:2px solid var(--accent);padding:16px 20px;margin-top:12px;background:rgba(200,255,87,.04);border-radius:0 10px 10px 0}
+    .parade ul{list-style:none;padding:0}
+    .parade li{font-size:.87rem;font-weight:300;color:var(--g4);padding:6px 0;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid rgba(200,255,87,.07)}
+    .parade li:last-child{border-bottom:none}
+    .parade li::before{content:'→';color:var(--accent);flex-shrink:0;margin-top:1px}
+    .parade li strong{color:var(--white);font-weight:500}
+
+    /* Techniques grid */
+    .tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:18px;overflow:hidden;margin-top:40px}
+    .tech-card{background:var(--black);padding:28px;display:flex;flex-direction:column;gap:14px;transition:background .2s;position:relative;overflow:hidden}
+    .tech-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,255,87,.04),transparent);opacity:0;transition:opacity .3s}
+    .tech-card:hover{background:rgba(255,255,255,.018)}
+    .tech-card:hover::before{opacity:1}
+    .tc-top{display:flex;align-items:center;justify-content:space-between}
+    .tc-num{font-family:var(--fd);font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+    .tc-severity{font-size:.55rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:100px}
+    .sev-c-pill{background:rgba(255,64,96,.1);color:var(--red);border:1px solid rgba(255,64,96,.2)}
+    .sev-h-pill{background:rgba(255,144,64,.1);color:var(--orange);border:1px solid rgba(255,144,64,.2)}
+    .sev-m-pill{background:rgba(255,204,64,.1);color:var(--yellow);border:1px solid rgba(255,204,64,.2)}
+    .tc-icon{font-size:1.5rem}
+    .tc-name{font-family:var(--fd);font-size:1.05rem;font-weight:700;letter-spacing:-.01em;color:var(--white)}
+    .tc-desc{font-size:.85rem;font-weight:300;color:var(--g4);line-height:1.75}
+    .tc-desc strong{color:var(--white);font-weight:500}
+    code.inline{font-family:var(--fm);font-size:.82em;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;color:var(--accent)}
+
+    /* Password table section */
+    .pw-section{padding:clamp(96px,14vw,160px) 0}
+    .pw-table-wrap{margin-top:48px;border:1px solid rgba(255,255,255,.06);border-radius:18px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead tr{border-bottom:1px solid rgba(255,255,255,.08)}
+    th{padding:14px 20px;font-family:var(--fd);font-size:.58rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--g3);text-align:left;background:rgba(255,255,255,.02)}
+    td{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;font-size:.88rem;font-weight:300;color:var(--g4)}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr{transition:background .15s}
+    tbody tr:hover td{background:rgba(255,255,255,.018)}
+    .td-pw{font-family:var(--fm);font-size:.85rem;color:var(--white);font-weight:500}
+    .td-len{font-family:var(--fd);font-size:.85rem;font-weight:700;color:var(--g3)}
+    .td-type{font-size:.78rem;color:var(--g3)}
+
+    /* Time badge */
+    .time-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;font-family:var(--fd);font-size:.68rem;font-weight:700;letter-spacing:.04em}
+    .tb-instant{background:rgba(255,64,96,.1);color:var(--red);border:1px solid rgba(255,64,96,.2)}
+    .tb-weak{background:rgba(255,144,64,.1);color:var(--orange);border:1px solid rgba(255,144,64,.2)}
+    .tb-medium{background:rgba(255,204,64,.1);color:var(--yellow);border:1px solid rgba(255,204,64,.2)}
+    .tb-strong{background:rgba(67,217,173,.1);color:var(--green);border:1px solid rgba(67,217,173,.2)}
+    .tb-fort{background:rgba(87,200,255,.1);color:var(--blue);border:1px solid rgba(87,200,255,.2)}
+
+    /* Strength bar */
+    .str-wrap{display:flex;align-items:center;gap:10px;min-width:140px}
+    .str-bar{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+    .str-fill{height:100%;border-radius:2px;animation:barGrow .8s var(--eo) both}
+    .str-label{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+    .s1{--w:10%;background:var(--red)}.s2{--w:28%;background:var(--orange)}.s3{--w:50%;background:var(--yellow)}.s4{--w:78%;background:var(--green)}.s5{--w:97%;background:var(--blue)}
+    .c1{color:var(--red)}.c2{color:var(--orange)}.c3{color:var(--yellow)}.c4{color:var(--green)}.c5{color:var(--blue)}
+
+    /* Note */
+    .note{border-left:2px solid rgba(255,255,255,.12);padding:14px 20px;margin-top:24px;background:rgba(255,255,255,.02);border-radius:0 10px 10px 0}
+    .note p{font-size:.83rem;font-weight:300;color:var(--g3);line-height:1.75;margin:0}
+    .note p strong{color:var(--g4);font-weight:500}
+
+    /* Conclusion */
+    .conclusion-section{padding:clamp(96px,14vw,160px) 0;text-align:center;position:relative;overflow:hidden}
+    .cta-orb{position:absolute;width:500px;height:500px;background:var(--accent);border-radius:50%;filter:blur(100px);opacity:.06;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+    .cta-over{font-family:var(--fd);font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--g3);display:block;margin-bottom:32px}
+    .cta-title{font-family:var(--fd);font-size:clamp(3rem,8vw,7rem);font-weight:800;letter-spacing:-.05em;line-height:.95;margin-bottom:40px;position:relative}
+    .cta-title .a{color:var(--accent)}
+    .cta-text{font-size:clamp(.9rem,1.4vw,1.05rem);font-weight:300;color:var(--g4);max-width:680px;margin:0 auto 14px;line-height:1.8;position:relative}
+    .cta-text strong{color:var(--white);font-weight:500}
+
+    /* Footer */
+    footer{border-top:1px solid rgba(255,255,255,.06);padding:40px 0}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .footer-logo{font-family:var(--fd);font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--g3)}
+    .footer-logo a{transition:color .2s}.footer-logo a:hover{color:var(--accent)}
+    .footer-meta{font-size:.72rem;color:var(--g3);text-align:right;line-height:1.7}
+
+    @media(max-width:900px){
+      .info-row{grid-template-columns:1fr;gap:16px}
+      .info-num{display:none}
+      .sec-head{grid-template-columns:1fr;gap:16px}
+      .sec-big-num{display:none}
+    }
+    @media(max-width:640px){
+      .hero-bottom .wrap{flex-direction:column;align-items:flex-start}
+      .hero-stats{flex-direction:row;gap:28px}
+      #nav .nav-links{display:none}
+      .pw-table-wrap{overflow-x:auto}
+    }
+  </style>
+</head>
+<body class="loading">
+
+<div id="grain" aria-hidden="true"></div>
+<div id="cursor-dot"  aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+
+<!-- Preloader -->
+<div id="preloader" role="status" aria-label="Chargement" aria-live="polite">
+  <div class="pre-title">Synthèse <span>n°2</span></div>
+  <div class="pre-bar-wrap" aria-hidden="true"><div class="pre-bar" id="preBar"></div></div>
+  <span class="pre-counter" id="preCnt" aria-hidden="true">0%</span>
+</div>
+
+<!-- Nav -->
+<nav id="nav" aria-label="Navigation principale">
+  <div class="wrap nav-row">
+    <a href="/TP/" class="nav-logo" aria-label="Retour aux TPs">← TPs</a>
+    <ul class="nav-links" role="list">
+      <li><a href="#bruteforce">Brute Force</a></li>
+      <li><a href="#techniques">Techniques</a></li>
+      <li><a href="#passwords">Mots de passe</a></li>
+    </ul>
+    <div class="nav-status" role="status">
+      <span class="nav-dot" aria-hidden="true"></span>
+      <span>Synthèse Cyber n°2</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section id="hero" aria-labelledby="hero-h1">
+  <h1 id="hero-h1" class="sr-only">Synthèse Cybersécurité n°2 — Brute Force & Techniques de Piratage</h1>
+  <div class="hero-orb orb-1" aria-hidden="true"></div>
+  <div class="hero-orb orb-2" aria-hidden="true"></div>
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="hero-name-wrap" aria-hidden="true">
+    <span class="hero-name-line"><span class="hero-name-inner hn-s">Brute</span></span>
+    <span class="hero-name-line"><span class="hero-name-inner hn-o">Force</span></span>
+  </div>
+  <div class="hero-line-wrap" aria-hidden="true">
+    <div class="hero-line"><div class="hero-line-orb"></div></div>
+  </div>
+  <div class="hero-bottom">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow" aria-hidden="true">
+          <span class="eyebrow-line"></span>
+          <span class="eyebrow-text">Synthèse Cybersécurité n°2 · Bac Pro CIEL · 2025–2026</span>
+        </div>
+        <p class="hero-desc">
+          <strong>Brute Force</strong>, Dictionnaire, Phishing, Rainbow Table — les méthodes de piratage des mots de passe analysées avec <strong>évaluation des temps de cassage</strong>.
+        </p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="stat-label">Techniques</span><span class="stat-num">6</span></div>
+        <div class="hero-stat"><span class="stat-label">Mots de passe</span><span class="stat-num">5</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <span class="scroll-label">Scroll</span>
+    <div class="scroll-bar"><div class="scroll-progress"></div></div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-section" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-copy">
+      <span class="m-word">Brute Force</span><span class="m-sep">·</span>
+      <span class="m-word">Dictionnaire</span><span class="m-sep">·</span>
+      <span class="m-word">Rainbow Table</span><span class="m-sep">·</span>
+      <span class="m-word">Phishing</span><span class="m-sep">·</span>
+      <span class="m-word">Credential Stuffing</span><span class="m-sep">·</span>
+      <span class="m-word">Password Spraying</span><span class="m-sep">·</span>
+      <span class="m-word">Keylogger</span><span class="m-sep">·</span>
+    </div>
+    <div class="marquee-copy" aria-hidden="true">
+      <span class="m-word">Brute Force</span><span class="m-sep">·</span>
+      <span class="m-word">Dictionnaire</span><span class="m-sep">·</span>
+      <span class="m-word">Rainbow Table</span><span class="m-sep">·</span>
+      <span class="m-word">Phishing</span><span class="m-sep">·</span>
+      <span class="m-word">Credential Stuffing</span><span class="m-sep">·</span>
+      <span class="m-word">Password Spraying</span><span class="m-sep">·</span>
+      <span class="m-word">Keylogger</span><span class="m-sep">·</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════
+     SECTION 1 — BRUTE FORCE
+════════════════════════════ -->
+<section id="bruteforce" class="content-section">
+  <div class="wrap">
+    <p class="s-label reveal" data-num="01">Définition</p>
+    <div class="sec-head reveal">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="sec-icon" style="background:rgba(255,64,96,.08);border-color:rgba(255,64,96,.18);font-size:24px;">💥</div>
+        <div class="sec-title-block">
+          <h2>Brute Force</h2>
+          <p>Attaque par force brute · Méthode systématique</p>
+        </div>
+      </div>
+      <div class="sec-big-num" aria-hidden="true">01</div>
+    </div>
+
+    <div class="def-block reveal">
+      <div class="def-header">
+        <span>📖</span>
+        <span class="def-label">Définition</span>
+      </div>
+      <div class="def-body">
+        <p>
+          Une attaque par <strong>Brute Force</strong> (force brute) consiste à <strong>tester automatiquement et de manière exhaustive toutes les combinaisons possibles</strong> de caractères jusqu'à trouver le mot de passe correct. Il n'y a aucune intelligence dans la méthode — c'est la puissance de calcul brute du matériel qui fait le travail.
+        </p>
+      </div>
+    </div>
+
+    <div class="info-row reveal">
+      <div class="info-left">
+        <div class="info-tag it-crit"><span class="tag-dot"></span>Critique</div>
+        <div class="info-num">01</div>
+      </div>
+      <div>
+        <h3 class="info-title">Comment ça fonctionne ?</h3>
+        <div class="sub-block">
+          <div class="sub-lbl" data-icon="⚙️ ">Mécanisme</div>
+          <p class="sub-text">
+            L'attaquant utilise un logiciel (ex: <strong>Hashcat</strong>, <strong>John the Ripper</strong>) couplé à un GPU puissant. Il génère et teste des milliards de combinaisons par seconde contre un hash de mot de passe volé ou un formulaire de connexion. La durée dépend de <strong>deux facteurs clés</strong> :
+          </p>
+          <p class="sub-text" style="margin-top:14px;">
+            → <strong>La longueur</strong> : chaque caractère supplémentaire multiplie exponentiellement les possibilités.<br>
+            → <strong>Le jeu de caractères</strong> : minuscules seules (26 options) vs majuscules + minuscules + chiffres + symboles (95 options par position).
+          </p>
+        </div>
+        <div class="sub-block">
+          <div class="sub-lbl" data-icon="🧮 ">Calcul</div>
+          <p class="sub-text">
+            Le nombre de combinaisons totales = <strong>N<sup>L</sup></strong> (N = taille du jeu de caractères, L = longueur). Un GPU moderne type RTX 4090 teste ~200 milliards de hashes MD5 par seconde. Un mot de passe de <strong>8 lettres minuscules</strong> (26⁸ ≈ 200 milliards) est cassé en moins de <strong>1 seconde</strong>. Le même mot de passe avec les 4 types de caractères (95⁸ ≈ 6 600 milliards) résiste... <strong>7 minutes</strong>.
+          </p>
+        </div>
+        <div class="sub-block">
+          <div class="sub-lbl" data-icon="🛡️ ">Parade</div>
+          <div class="parade"><ul>
+            <li>Utiliser un mot de passe d'<strong>au minimum 14 caractères</strong> avec les 4 types (maj, min, chiffres, symboles)</li>
+            <li>Activer le <strong>verrouillage de compte</strong> après X tentatives échouées</li>
+            <li>Imposer un <strong>délai progressif</strong> entre les tentatives (rate limiting)</li>
+            <li>Activer la <strong>double authentification (2FA)</strong> — rend le brute force inutile même avec le bon mot de passe</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════
+     SECTION 2 — AUTRES TECHNIQUES
+════════════════════════════ -->
+<section id="techniques" class="content-section">
+  <div class="wrap">
+    <p class="s-label reveal" data-num="02">Autres méthodes</p>
+    <div class="sec-head reveal">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="sec-icon" style="background:rgba(255,144,64,.08);border-color:rgba(255,144,64,.18);font-size:24px;">🔓</div>
+        <div class="sec-title-block">
+          <h2>Techniques de piratage</h2>
+          <p>6 méthodes alternatives · Plus ciblées, souvent plus efficaces</p>
+        </div>
+      </div>
+      <div class="sec-big-num" aria-hidden="true">02</div>
+    </div>
+
+    <div class="tech-grid reveal">
+
+      <div class="tech-card">
+        <div class="tc-top">
+          <span class="tc-num">01</span>
+          <span class="tc-severity sev-c-pill">Critique</span>
+        </div>
+        <div class="tc-icon">📖</div>
+        <div class="tc-name">Attaque par Dictionnaire</div>
+        <p class="tc-desc">
+          Au lieu de tester <em>toutes</em> les combinaisons, l'attaquant utilise une <strong>liste pré-compilée</strong> des mots de passe les plus utilisés (ex: <code class="inline">rockyou.txt</code> — 14 millions d'entrées). Massivement plus rapide que le brute force classique. Exploite le fait que la majorité des utilisateurs choisissent des mots courants.
+        </p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tc-top">
+          <span class="tc-num">02</span>
+          <span class="tc-severity sev-c-pill">Critique</span>
+        </div>
+        <div class="tc-icon">🌈</div>
+        <div class="tc-name">Rainbow Table</div>
+        <p class="tc-desc">
+          Méthode utilisant une <strong>base de données de hashes pré-calculés</strong>. Si une base de données de mots de passe est volée (les mots de passe y sont stockés sous forme de hash), l'attaquant retrouve le mot de passe original en cherchant le hash dans sa table. Complètement inutile si un <strong>sel (salt) unique</strong> est appliqué lors du hachage.
+        </p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tc-top">
+          <span class="tc-num">03</span>
+          <span class="tc-severity sev-c-pill">Critique</span>
+        </div>
+        <div class="tc-icon">🎣</div>
+        <div class="tc-name">Phishing</div>
+        <p class="tc-desc">
+          Ingénierie sociale : <strong>piéger l'utilisateur</strong> pour qu'il saisisse lui-même ses identifiants sur un faux site imitant un service légitime (banque, réseau social, messagerie). L'attaquant reçoit les identifiants en temps réel. Aucun calcul nécessaire — la complexité du mot de passe est totalement inutile contre cette méthode.
+        </p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tc-top">
+          <span class="tc-num">04</span>
+          <span class="tc-severity sev-h-pill">Haute</span>
+        </div>
+        <div class="tc-icon">🔁</div>
+        <div class="tc-name">Credential Stuffing</div>
+        <p class="tc-desc">
+          Exploite la <strong>réutilisation des mots de passe</strong>. Après une fuite de données sur un site (ex: LinkedIn, Adobe), l'attaquant teste automatiquement les paires identifiant/mot de passe volées sur d'autres services populaires. Si tu uses le même mot de passe partout, <strong>une seule fuite compromet tout</strong>.
+        </p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tc-top">
+          <span class="tc-num">05</span>
+          <span class="tc-severity sev-h-pill">Haute</span>
+        </div>
+        <div class="tc-icon">🩺</div>
+        <div class="tc-name">Password Spraying</div>
+        <p class="tc-desc">
+          L'inverse du brute force : au lieu de tester tous les mots de passe sur <em>un</em> compte, l'attaquant teste <strong>un seul mot de passe très courant</strong> (ex: <code class="inline">Bienvenue1!</code>) sur des <em>milliers</em> de comptes différents. Permet de contourner les systèmes de verrouillage après X tentatives (car 1 seul essai par compte).
+        </p>
+      </div>
+
+      <div class="tech-card">
+        <div class="tc-top">
+          <span class="tc-num">06</span>
+          <span class="tc-severity sev-m-pill">Moyenne</span>
+        </div>
+        <div class="tc-icon">🕵️</div>
+        <div class="tc-name">Keylogger</div>
+        <p class="tc-desc">
+          Logiciel malveillant (malware) qui, une fois installé à l'insu de l'utilisateur, <strong>enregistre chaque frappe clavier</strong> et les transmet à l'attaquant. Capture les mots de passe directement lors de leur saisie — leur complexité devient totalement inutile. Appartient à la famille des <em>spywares</em>.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════
+     SECTION 3 — TEMPS DE CASSAGE
+════════════════════════════ -->
+<section id="passwords" class="pw-section">
+  <div class="wrap">
+    <p class="s-label reveal" data-num="03">Analyse</p>
+    <div class="sec-head reveal">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="sec-icon" style="background:rgba(200,255,87,.08);border-color:rgba(200,255,87,.18);font-size:24px;">🔑</div>
+        <div class="sec-title-block">
+          <h2>Temps de cassage</h2>
+          <p>5 mots de passe analysés · Référentiel Hive Systems 2024 · GPU RTX 4090</p>
+        </div>
+      </div>
+      <div class="sec-big-num" aria-hidden="true">03</div>
+    </div>
+
+    <div class="pw-table-wrap reveal">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Mot de passe</th>
+            <th>Longueur</th>
+            <th>Type de caractères</th>
+            <th>Temps de cassage</th>
+            <th>Force</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--g3);font-family:var(--fd);font-size:.7rem;">01</td>
+            <td class="td-pw">mahe</td>
+            <td class="td-len">4</td>
+            <td class="td-type">Minuscules uniquement</td>
+            <td><span class="time-badge tb-instant">⚡ Instantané</span></td>
+            <td>
+              <div class="str-wrap">
+                <div class="str-bar"><div class="str-fill s1"></div></div>
+                <span class="str-label c1">Très faible</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="color:var(--g3);font-family:var(--fd);font-size:.7rem;">02</td>
+            <td class="td-pw">password</td>
+            <td class="td-len">8</td>
+            <td class="td-type">Minuscules uniquement</td>
+            <td><span class="time-badge tb-instant">⚡ Instantané <span style="font-size:.6rem;opacity:.6;">(dico)</span></span></td>
+            <td>
+              <div class="str-wrap">
+                <div class="str-bar"><div class="str-fill s1"></div></div>
+                <span class="str-label c1">Très faible</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="color:var(--g3);font-family:var(--fd);font-size:.7rem;">03</td>
+            <td class="td-pw">Brizion2006</td>
+            <td class="td-len">11</td>
+            <td class="td-type">Maj + min + chiffres</td>
+            <td><span class="time-badge tb-weak">⏱ 3 semaines</span></td>
+            <td>
+              <div class="str-wrap">
+                <div class="str-bar"><div class="str-fill s2"></div></div>
+                <span class="str-label c2">Faible</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="color:var(--g3);font-family:var(--fd);font-size:.7rem;">04</td>
+            <td class="td-pw">M@h3_Br1z10n!</td>
+            <td class="td-len">13</td>
+            <td class="td-type">Maj + min + chiffres + symboles</td>
+            <td><span class="time-badge tb-strong">🛡 34 ans</span></td>
+            <td>
+              <div class="str-wrap">
+                <div class="str-bar"><div class="str-fill s4"></div></div>
+                <span class="str-label c4">Fort</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="color:var(--g3);font-family:var(--fd);font-size:.7rem;">05</td>
+            <td class="td-pw">xK#9!pLm@7vQ$2nR</td>
+            <td class="td-len">16</td>
+            <td class="td-type">Maj + min + chiffres + symboles</td>
+            <td><span class="time-badge tb-fort">🔒 34 milliards d'années</span></td>
+            <td>
+              <div class="str-wrap">
+                <div class="str-bar"><div class="str-fill s5"></div></div>
+                <span class="str-label c5">Excellent</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note reveal">
+      <p><strong>Méthode de calcul :</strong> Nombre de combinaisons = N<sup>L</sup>, où N est la taille du jeu de caractères et L la longueur. Ce chiffre est divisé par la vitesse de calcul du GPU (200 milliards de hashes MD5/s pour une RTX 4090). Les temps affichés correspondent au pire des cas (dernière combinaison testée).</p>
+    </div>
+  </div>
+</section>
+
+<!-- Conclusion -->
+<section class="conclusion-section">
+  <div class="cta-orb" aria-hidden="true"></div>
+  <div class="wrap">
+    <span class="cta-over reveal">Bonne pratique</span>
+    <div class="cta-title reveal">
+      Un bon mot<br>de <span class="a">passe</span>
+    </div>
+    <p class="cta-text reveal">
+      <strong>14+ caractères</strong>, les 4 types mélangés, <strong>unique pour chaque service</strong>, jamais de mot du dictionnaire. Associé à un <strong>gestionnaire de mots de passe</strong> et au <strong>2FA</strong>, aucune de ces 6 techniques ne peut le compromettre par force brute.
+    </p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span class="footer-logo">
+      <a href="https://mahebrizion.fr">mahebrizion.fr</a> / <a href="/TP/">TP</a> / Synthèse n°2
+    </span>
+    <div class="footer-meta">
+      Synthèse Cybersécurité n°2 · Bac Pro CIEL<br>
+      Mahé Brizion · 2025–2026
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Preloader
+  const bar = document.getElementById('preBar');
+  const cnt = document.getElementById('preCnt');
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 14;
+    if (p >= 100) { p = 100; clearInterval(iv); setTimeout(done, 120); }
+    bar.style.width = p + '%';
+    cnt.textContent = Math.floor(p) + '%';
+  }, 60);
+  function done() {
+    document.getElementById('preloader').classList.add('done');
+    document.body.classList.remove('loading');
+    document.getElementById('nav').classList.add('visible');
+  }
+
+  // Custom cursor
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx+'px'; dot.style.top = my+'px'; });
+  document.addEventListener('mousedown', () => document.body.classList.add('cur-click'));
+  document.addEventListener('mouseup',   () => document.body.classList.remove('cur-click'));
+  document.querySelectorAll('a,button,.tech-card').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cur-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cur-hover'));
+  });
+  (function lerp() {
+    rx += (mx - rx) * .12; ry += (my - ry) * .12;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(lerp);
+  })();
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('stuck', scrollY > 60));
+
+  // Reveal on scroll
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Animate strength bars when visible
+  const barObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.str-fill').forEach(f => {
+          f.style.animation = 'none';
+          f.offsetHeight;
+          f.style.animation = '';
+        });
+        barObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.pw-table-wrap').forEach(el => barObs.observe(el));
+</script>
+
+</body>
+</html>

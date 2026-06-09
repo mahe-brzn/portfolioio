@@ -110,13 +110,13 @@
       padding: 8px 16px; 
       border: 2px solid var(--brosti-orange); 
       border-radius: 50px; 
-      color: var(--brosti-orange); 
+      color: #C04000; 
       font-size: 0.85rem; 
-      font-weight: 700; 
+      font-weight: 800; 
       margin-bottom: 30px; 
       text-transform: uppercase; 
       letter-spacing: 1px; 
-      background: rgba(230, 81, 0, 0.05); 
+      background: rgba(230, 81, 0, 0.08); 
       position: relative;
       z-index: 10;
     }
@@ -236,7 +236,7 @@
     
     .microcopy {
       font-size: 0.9rem;
-      color: #888;
+      color: #555;
       margin-top: 15px;
       font-weight: 500;
       position: relative;
@@ -277,7 +277,7 @@
       margin-bottom: 20px;
       display: inline-block;
     }
-    .teaser-item h3 {
+    .teaser-item h2 {
       font-family: 'Syne', sans-serif;
       font-size: 1.4rem;
       color: var(--brosti-black);
@@ -367,7 +367,7 @@
     .links { display: flex; gap: 30px; margin-top: 20px; }
     .links a { color: #A0A0A0; text-decoration: none; font-size: 1rem; transition: color 0.2s; }
     .links a:hover { color: var(--brosti-orange); }
-    .copyright { margin-top: 40px; color: #666; font-size: 0.9rem; text-align: center; }
+    .copyright { margin-top: 40px; color: #999; font-size: 0.9rem; text-align: center; }
     
     @media (max-width: 768px) {
       h1 { font-size: clamp(2.8rem, 12vw, 4rem); margin-bottom: 20px; }
@@ -395,14 +395,15 @@
     <a href="#" class="logo">Brosti<span>Map</span></a>
   </nav>
   
+  <main>
   <section class="hero">
     <!-- Assets extraits de Brosti.com -->
-    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="Chips 1" class="chip chip-1">
-    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cd1e61a31979eff5d5f_chips2.png" alt="Chips 2" class="chip chip-2">
-    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0708507e6030e77610d2fd_eclat1.png" alt="Éclat 1" class="chip chip-3">
-    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0703642600803cbf1d1b60_eclat2.png" alt="Éclat 2" class="chip chip-4">
-    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a07094c267cc98b45c043b4_eclat3.png" alt="Éclat 3" class="chip chip-5">
-    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="Chips 3" class="chip chip-6">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="" width="377" height="392" class="chip chip-1" fetchpriority="high">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cd1e61a31979eff5d5f_chips2.png" alt="" width="362" height="326" class="chip chip-2">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0708507e6030e77610d2fd_eclat1.png" alt="" width="86" height="116" class="chip chip-3">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0703642600803cbf1d1b60_eclat2.png" alt="" width="74" height="125" class="chip chip-4">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a07094c267cc98b45c043b4_eclat3.png" alt="" width="200" height="200" class="chip chip-5">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="" width="377" height="392" class="chip chip-6">
     
     <div class="badge">Application iOS</div>
     <h1>Le Waze de<br>la <span>Brosti</span></h1>
@@ -466,17 +467,17 @@
     <div class="text-teaser">
       <div class="teaser-item">
         <span class="teaser-icon">📍</span>
-        <h3>Radar en Temps Réel</h3>
+        <h2>Radar en Temps Réel</h2>
         <p>Ne cherche plus à l'aveugle. Vois instantanément les rayons pleins et vides sur la carte.</p>
       </div>
       <div class="teaser-item">
         <span class="teaser-icon">🚨</span>
-        <h3>Rapports Terrain</h3>
+        <h2>Rapports Terrain</h2>
         <p>La commu signale les ruptures de stock. Fini les déplacements inutiles au supermarché.</p>
       </div>
       <div class="teaser-item">
         <span class="teaser-icon">🏆</span>
-        <h3>Top 50 Chasseurs</h3>
+        <h2>Top 50 Chasseurs</h2>
         <p>Gagne du Trust Score à chaque signalement vérifié et grimpe dans le classement mondial.</p>
       </div>
     </div>
@@ -484,6 +485,7 @@
     <!-- Vague Brosti.com convertie en mask -->
     <div class="wave-divider"></div>
   </section>
+  </main>
   
   <footer>
     <div class="footer-logo">Brosti<span>Map</span></div>

@@ -52,8 +52,8 @@
   <!-- Polices Officielles Brosti : Syne (Titres) & Inter (Corps) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=optional">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=optional" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=optional">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=optional" rel="stylesheet">
   
   <style>
     :root {
@@ -67,7 +67,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body { 
-      font-family: 'Inter', sans-serif; 
+      font-family: 'Syne', sans-serif; 
       background-color: var(--brosti-cream); 
       color: var(--brosti-black); 
       overflow-x: hidden; 
@@ -188,7 +188,7 @@
       padding: 18px 24px;
       border: 2px solid rgba(26, 26, 26, 0.1);
       border-radius: 50px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Syne', sans-serif;
       font-size: 1rem;
       outline: none;
       transition: all 0.3s;
@@ -204,7 +204,7 @@
       padding: 18px 28px;
       border: none;
       border-radius: 50px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Syne', sans-serif;
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
@@ -319,18 +319,19 @@
       pointer-events: none; 
       animation: float 6s ease-in-out infinite; 
       height: auto;
-      will-change: transform;
+      will-change: transform, margin;
+      transition: margin 0.1s ease-out;
     }
-    .chip-1 { top: 12%; left: 8%; width: 140px; aspect-ratio: 377/392; animation-delay: 0s; transform: rotate(15deg); }
-    .chip-2 { top: 25%; right: 5%; width: 180px; aspect-ratio: 362/326; animation-delay: 1s; transform: rotate(-10deg); }
-    .chip-3 { bottom: 20%; left: 10%; width: 86px; aspect-ratio: 86/116; animation-delay: 2s; transform: rotate(25deg); }
-    .chip-4 { bottom: 35%; right: 15%; width: 74px; aspect-ratio: 74/125; animation-delay: 0.5s; transform: rotate(-15deg); }
-    .chip-5 { top: 5%; left: 45%; width: 102px; aspect-ratio: 102/77; animation-delay: 1.5s; transform: rotate(5deg); opacity: 0.5; }
-    .chip-6 { bottom: 5%; right: 40%; width: 140px; aspect-ratio: 377/392; animation-delay: 2.5s; transform: rotate(-20deg); opacity: 0.6; }
+    .chip-1 { top: 12%; left: 8%; width: 140px; aspect-ratio: 377/392; animation-delay: 0s; rotate: 15deg; }
+    .chip-2 { top: 25%; right: 5%; width: 180px; aspect-ratio: 362/326; animation-delay: 1s; rotate: -10deg; }
+    .chip-3 { bottom: 20%; left: 10%; width: 86px; aspect-ratio: 86/116; animation-delay: 2s; rotate: 25deg; }
+    .chip-4 { bottom: 35%; right: 15%; width: 74px; aspect-ratio: 74/125; animation-delay: 0.5s; rotate: -15deg; }
+    .chip-5 { top: 5%; left: 45%; width: 102px; aspect-ratio: 102/77; animation-delay: 1.5s; rotate: 5deg; opacity: 0.5; }
+    .chip-6 { bottom: 5%; right: 40%; width: 140px; aspect-ratio: 377/392; animation-delay: 2.5s; rotate: -20deg; opacity: 0.6; }
     
     @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-25px) rotate(10deg); }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
     }
     
     /* Vague de séparation (Mask SVG) */
@@ -433,6 +434,17 @@
       </div>
 
       <script>
+        // Effet Parallaxe sur les chips
+        document.addEventListener('mousemove', (e) => {
+          const x = (e.clientX / window.innerWidth - 0.5) * 2;
+          const y = (e.clientY / window.innerHeight - 0.5) * 2;
+          document.querySelectorAll('.chip').forEach((chip, index) => {
+            const speed = (index % 3 + 1) * 15; // 15, 30, ou 45
+            chip.style.marginLeft = `${-x * speed}px`;
+            chip.style.marginTop = `${-y * speed}px`;
+          });
+        });
+
         async function submitForm(event) {
           event.preventDefault();
           const form = event.target;

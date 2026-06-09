@@ -311,14 +311,53 @@
     <div id="beta-container">
       <button id="show-form-btn" class="btn" onclick="document.getElementById('show-form-btn').style.display='none'; document.getElementById('beta-form').style.display='flex';">🥔 Bientôt sur l'App Store</button>
       
-      <form id="beta-form" action="#" method="POST" class="beta-form" style="display: none;" onsubmit="event.preventDefault(); document.getElementById('beta-form').style.display='none'; document.getElementById('success-message').style.display='inline-block';">
+      <form id="beta-form" action="https://formspree.io/f/xvznqopr" method="POST" class="beta-form" style="display: none;" onsubmit="submitForm(event)">
         <input type="email" name="email" placeholder="Ton adresse e-mail" required>
-        <button type="submit" class="btn-submit">Rejoindre la bêta</button>
+        <button type="submit" class="btn-submit" id="submit-btn">Rejoindre la bêta</button>
       </form>
 
       <div id="success-message" class="success-message" style="display: none;">
         ✅ Merci ! Ton e-mail est enregistré pour la bêta TestFlight.
       </div>
+      <div id="error-message" class="success-message" style="display: none; border-color: rgba(230, 81, 0, 0.4);">
+        ❌ Oups, une erreur est survenue.
+      </div>
+
+      <script>
+        async function submitForm(event) {
+          event.preventDefault();
+          const form = event.target;
+          const btn = document.getElementById('submit-btn');
+          const data = new FormData(form);
+          
+          btn.innerText = "Envoi en cours...";
+          btn.style.opacity = "0.7";
+          btn.disabled = true;
+
+          try {
+            const response = await fetch(form.action, {
+              method: form.method,
+              body: data,
+              headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+              document.getElementById('beta-form').style.display = 'none';
+              document.getElementById('error-message').style.display = 'none';
+              document.getElementById('success-message').style.display = 'inline-block';
+              form.reset();
+            } else {
+              document.getElementById('error-message').style.display = 'inline-block';
+            }
+          } catch (error) {
+            document.getElementById('error-message').style.display = 'inline-block';
+          } finally {
+            btn.innerText = "Rejoindre la bêta";
+            btn.style.opacity = "1";
+            btn.disabled = false;
+          }
+        }
+      </script>
     </div>
     
     <!-- Vague Brosti.com convertie en mask -->

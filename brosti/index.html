@@ -243,6 +243,26 @@
       z-index: 10;
     }
     
+    .mockup-container {
+      margin-top: 60px;
+      position: relative;
+      z-index: 10;
+      perspective: 1000px;
+    }
+    .app-mockup {
+      width: 100%;
+      max-width: 450px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      transform: rotateX(10deg) translateY(10px);
+      transition: transform 0.4s ease;
+      display: block;
+      margin: 0 auto;
+    }
+    .app-mockup:hover {
+      transform: rotateX(0deg) translateY(0);
+    }
+    
     .success-message {
       background: rgba(253, 248, 240, 0.1);
       border: 1px solid rgba(253, 248, 240, 0.2);
@@ -414,6 +434,10 @@
           }
         }
       </script>
+    </div>
+    
+    <div class="mockup-container">
+      <img src="assets/mockup.png" alt="Aperçu de l'interface BrostiMap" class="app-mockup">
     </div>
     
     <!-- Vague Brosti.com convertie en mask -->

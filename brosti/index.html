@@ -179,6 +179,24 @@
       }
     }
     
+    .success-message {
+      background: rgba(253, 248, 240, 0.1);
+      border: 1px solid rgba(253, 248, 240, 0.2);
+      color: var(--brosti-cream);
+      padding: 16px 24px;
+      border-radius: 50px;
+      font-weight: 500;
+      position: relative;
+      z-index: 10;
+      display: inline-block;
+      backdrop-filter: blur(4px);
+    }
+    
+    button.btn {
+      border: none;
+      cursor: pointer;
+    }
+    
     /* Chips Flottantes (Assets extraits) */
     .chip { 
       position: absolute; 
@@ -269,10 +287,18 @@
     <h1>Le Waze de<br>la <span>Brosti</span></h1>
     <p class="subtitle">Trouve les stocks, signale les ruptures, et aide la communauté en temps réel.</p>
     
-    <form action="#" method="POST" class="beta-form" onsubmit="event.preventDefault(); alert('Merci ! Ton e-mail a bien été enregistré. Tu recevras bientôt une invitation TestFlight 🥔.'); this.reset();">
-      <input type="email" name="email" placeholder="Ton adresse e-mail" required>
-      <button type="submit" class="btn-submit">Rejoindre la bêta TestFlight</button>
-    </form>
+    <div id="beta-container">
+      <button id="show-form-btn" class="btn" onclick="document.getElementById('show-form-btn').style.display='none'; document.getElementById('beta-form').style.display='flex';">🥔 Bientôt sur l'App Store</button>
+      
+      <form id="beta-form" action="#" method="POST" class="beta-form" style="display: none;" onsubmit="event.preventDefault(); document.getElementById('beta-form').style.display='none'; document.getElementById('success-message').style.display='inline-block';">
+        <input type="email" name="email" placeholder="Ton adresse e-mail" required>
+        <button type="submit" class="btn-submit">Rejoindre la bêta</button>
+      </form>
+
+      <div id="success-message" class="success-message" style="display: none;">
+        ✅ Merci ! Ton e-mail est enregistré pour la bêta TestFlight.
+      </div>
+    </div>
     
     <!-- Vague Brosti.com convertie en mask -->
     <div class="wave-divider"></div>

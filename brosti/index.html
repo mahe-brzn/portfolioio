@@ -3,31 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BrostiMap — Le Waze de la Brosti 🥔</title>
+  <title>BrostiMap — Le radar à chips 🥔</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background: #121212; color: #F0F0F0; line-height: 1.6; }
-    nav { padding: 20px 32px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    nav a { color: #FF6B00; text-decoration: none; font-weight: bold; font-size: 1.2rem; }
-    .hero { padding: 120px 24px; max-width: 800px; }
-    h1 { font-size: 4rem; font-weight: 900; line-height: 1.1; margin-bottom: 20px; color: #fff; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background-color: #0a0a0a; color: #ededed; overflow-x: hidden;
+           background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+           background-size: 30px 30px; }
+    nav { padding: 30px 5vw; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 900; font-size: 1.5rem; color: #fff; text-decoration: none; letter-spacing: -1px; }
+    .logo span { color: #FF6B00; }
+    main { padding: 10vh 5vw; max-width: 900px; }
+    .badge { display: inline-block; padding: 6px 12px; border: 1px solid rgba(255,107,0,0.4); border-radius: 50px; color: #FF6B00; font-size: 0.85rem; font-weight: 700; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; background: rgba(255,107,0,0.1); }
+    h1 { font-size: clamp(3.5rem, 8vw, 6.5rem); font-weight: 900; line-height: 0.95; letter-spacing: -0.04em; margin-bottom: 30px; }
     h1 span { color: #FF6B00; }
-    p { font-size: 1.2rem; color: #888; margin-bottom: 40px; }
-    .btn { display: inline-block; background: #FF6B00; color: #fff; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 1.1rem; }
-    footer { margin-top: 100px; padding: 32px 24px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
-    footer a { color: #888; text-decoration: none; }
-    footer a:hover { color: #FF6B00; }
+    p.subtitle { font-size: clamp(1.1rem, 3vw, 1.4rem); color: #a3a3a3; line-height: 1.5; margin-bottom: 50px; max-width: 550px; font-weight: 400; }
+    .btn { display: inline-flex; align-items: center; gap: 10px; background: #FF6B00; color: #000; padding: 18px 36px; border-radius: 8px; text-decoration: none; font-weight: 900; font-size: 1.2rem; transition: all 0.2s; border: 2px solid #FF6B00; box-shadow: 4px 4px 0px rgba(255,107,0,0.4); }
+    .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px rgba(255,107,0,0.6); }
+    footer { margin-top: 10vh; padding: 40px 5vw; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; }
+    .copyright { color: #555; font-size: 0.9rem; }
+    .links a { color: #888; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .links a:hover { color: #FF6B00; }
   </style>
 </head>
 <body>
-  <nav><a href="#">BrostiMap</a></nav>
-  <div class="hero">
-    <h1>Le <span>Waze</span><br>de la Brosti</h1>
-    <p>Ne tourne plus en rond dans les rayons. Trouve les stocks, signale les ruptures, et aide la communauté.</p>
-    <a href="#" class="btn">Bientôt sur l'App Store 🥔</a>
-  </div>
+  <nav>
+    <a href="#" class="logo">Brosti<span>Map</span></a>
+  </nav>
+  <main>
+    <div class="badge">Application iOS</div>
+    <h1>La chasse<br>est <span>ouverte.</span></h1>
+    <p class="subtitle">Le Waze de la Brosti. Ne fais plus 4 supermarchés pour rien : trouve les stocks, signale les ruptures, et aide la commu en temps réel.</p>
+    <a href="#" class="btn">🥔 Bientôt sur l'App Store</a>
+  </main>
   <footer>
-    <a href="privacy.html">Mentions Légales & Politique de Confidentialité</a>
+    <div class="copyright">© 2026 Mahé Brizion. Application non-officielle.</div>
+    <div class="links">
+      <a href="privacy.html">Mentions Légales & Confidentialité</a>
+    </div>
   </footer>
 </body>
 </html>

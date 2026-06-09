@@ -3,44 +3,227 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BrostiMap — Le radar à chips 🥔</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <title>BrostiMap — Le Waze de la Brosti 🥔</title>
+  
+  <!-- Polices Officielles Brosti : Syne (Titres) & Inter (Corps) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
   <style>
+    :root {
+      /* Couleurs extraites de la DA Brosti */
+      --brosti-cream: #FDF8F0;
+      --brosti-orange: #E65100;
+      --brosti-orange-hover: #CC4800;
+      --brosti-black: #1A1A1A;
+    }
+    
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Outfit', sans-serif; background-color: #0a0a0a; color: #ededed; overflow-x: hidden;
-           background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-           background-size: 30px 30px; }
-    nav { padding: 30px 5vw; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-weight: 900; font-size: 1.5rem; color: #fff; text-decoration: none; letter-spacing: -1px; }
-    .logo span { color: #FF6B00; }
-    main { padding: 10vh 5vw; max-width: 900px; }
-    .badge { display: inline-block; padding: 6px 12px; border: 1px solid rgba(255,107,0,0.4); border-radius: 50px; color: #FF6B00; font-size: 0.85rem; font-weight: 700; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; background: rgba(255,107,0,0.1); }
-    h1 { font-size: clamp(3.5rem, 8vw, 6.5rem); font-weight: 900; line-height: 0.95; letter-spacing: -0.04em; margin-bottom: 30px; }
-    h1 span { color: #FF6B00; }
-    p.subtitle { font-size: clamp(1.1rem, 3vw, 1.4rem); color: #a3a3a3; line-height: 1.5; margin-bottom: 50px; max-width: 550px; font-weight: 400; }
-    .btn { display: inline-flex; align-items: center; gap: 10px; background: #FF6B00; color: #000; padding: 18px 36px; border-radius: 8px; text-decoration: none; font-weight: 900; font-size: 1.2rem; transition: all 0.2s; border: 2px solid #FF6B00; box-shadow: 4px 4px 0px rgba(255,107,0,0.4); }
-    .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px rgba(255,107,0,0.6); }
-    footer { margin-top: 10vh; padding: 40px 5vw; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; }
-    .copyright { color: #555; font-size: 0.9rem; }
-    .links a { color: #888; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
-    .links a:hover { color: #FF6B00; }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background-color: var(--brosti-cream); 
+      color: var(--brosti-black); 
+      overflow-x: hidden; 
+    }
+    
+    /* Navigation */
+    nav { 
+      padding: 30px 5vw; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      position: absolute; 
+      width: 100%; 
+      z-index: 20; 
+    }
+    .logo { 
+      font-family: 'Syne', sans-serif; 
+      font-weight: 800; 
+      font-size: 1.8rem; 
+      color: var(--brosti-black); 
+      text-decoration: none; 
+      letter-spacing: -1px; 
+    }
+    .logo span { color: var(--brosti-orange); }
+    
+    /* Hero Section */
+    .hero { 
+      position: relative; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      text-align: center; 
+      padding: 15vh 5vw 10vh; 
+      overflow: hidden;
+    }
+    
+    .badge { 
+      display: inline-block; 
+      padding: 8px 16px; 
+      border: 2px solid var(--brosti-orange); 
+      border-radius: 50px; 
+      color: var(--brosti-orange); 
+      font-size: 0.85rem; 
+      font-weight: 700; 
+      margin-bottom: 30px; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      background: rgba(230, 81, 0, 0.05); 
+      position: relative;
+      z-index: 10;
+    }
+    
+    h1 { 
+      font-family: 'Syne', sans-serif; 
+      font-size: clamp(3.5rem, 8vw, 7.5rem); 
+      font-weight: 800; 
+      line-height: 0.95; 
+      letter-spacing: -0.04em; 
+      margin-bottom: 25px; 
+      text-transform: uppercase; 
+      position: relative;
+      z-index: 10;
+    }
+    h1 span { color: var(--brosti-orange); }
+    
+    p.subtitle { 
+      font-size: clamp(1.1rem, 3vw, 1.4rem); 
+      color: #4A4A4A; 
+      line-height: 1.5; 
+      margin-bottom: 50px; 
+      max-width: 600px; 
+      font-weight: 500; 
+      position: relative;
+      z-index: 10;
+    }
+    
+    .btn { 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 10px; 
+      background: var(--brosti-orange); 
+      color: #fff; 
+      padding: 18px 36px; 
+      border-radius: 50px; 
+      text-decoration: none; 
+      font-weight: 600; 
+      font-size: 1.15rem; 
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+      box-shadow: 0 10px 20px rgba(230, 81, 0, 0.25); 
+      position: relative;
+      z-index: 10;
+    }
+    .btn:hover { 
+      background: var(--brosti-orange-hover); 
+      transform: translateY(-4px); 
+      box-shadow: 0 15px 30px rgba(230, 81, 0, 0.35); 
+    }
+    
+    /* Chips Flottantes (Assets extraits) */
+    .chip { 
+      position: absolute; 
+      z-index: 1; 
+      pointer-events: none; 
+      animation: float 6s ease-in-out infinite; 
+      will-change: transform;
+    }
+    .chip-1 { top: 12%; left: 8%; width: 140px; animation-delay: 0s; transform: rotate(15deg); }
+    .chip-2 { top: 20%; right: 10%; width: 180px; animation-delay: -2s; transform: rotate(-25deg); filter: blur(2px); }
+    .chip-3 { bottom: 25%; left: 12%; width: 160px; animation-delay: -4s; transform: rotate(45deg); }
+    .chip-4 { bottom: 30%; right: 12%; width: 120px; animation-delay: -1s; transform: rotate(-10deg); }
+    .chip-5 { top: 45%; left: 3%; width: 90px; animation-delay: -3s; transform: rotate(80deg); filter: blur(3px); }
+    .chip-6 { bottom: 10%; right: 30%; width: 100px; animation-delay: -5s; transform: rotate(120deg); filter: blur(1px); }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-25px) rotate(10deg); }
+    }
+    
+    /* Vague de séparation (Mask SVG) */
+    .wave-divider {
+      width: 100%;
+      height: 120px;
+      background-color: var(--brosti-black);
+      -webkit-mask-image: url('https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a19df1410367112b2dc9615_69fafe57a06928c71a095113_Vector.svg');
+      mask-image: url('https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a19df1410367112b2dc9615_69fafe57a06928c71a095113_Vector.svg');
+      -webkit-mask-size: cover;
+      mask-size: cover;
+      -webkit-mask-position: bottom;
+      mask-position: bottom;
+      margin-bottom: -1px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 5;
+    }
+    
+    /* Footer */
+    footer { 
+      background-color: var(--brosti-black); 
+      color: var(--brosti-cream); 
+      padding: 60px 5vw 40px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 20px; 
+      position: relative;
+      z-index: 10;
+    }
+    .footer-logo { 
+      font-family: 'Syne', sans-serif; 
+      font-size: 2rem; 
+      font-weight: 800; 
+      color: var(--brosti-cream); 
+    }
+    .footer-logo span { color: var(--brosti-orange); }
+    .links { display: flex; gap: 30px; margin-top: 20px; }
+    .links a { color: #A0A0A0; text-decoration: none; font-size: 1rem; transition: color 0.2s; }
+    .links a:hover { color: var(--brosti-orange); }
+    .copyright { margin-top: 40px; color: #666; font-size: 0.9rem; text-align: center; }
+    
+    @media (max-width: 768px) {
+      .chip-1 { width: 90px; left: -5%; }
+      .chip-2 { width: 110px; right: -5%; }
+      .chip-3 { width: 100px; }
+      .chip-4 { width: 80px; }
+      .chip-5, .chip-6 { display: none; }
+      .wave-divider { height: 60px; }
+    }
   </style>
 </head>
 <body>
   <nav>
     <a href="#" class="logo">Brosti<span>Map</span></a>
   </nav>
-  <main>
+  
+  <section class="hero">
+    <!-- Assets extraits de Brosti.com -->
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="Chips 1" class="chip chip-1">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cd1e61a31979eff5d5f_chips2.png" alt="Chips 2" class="chip chip-2">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0708507e6030e77610d2fd_eclat1.png" alt="Éclat 1" class="chip chip-3">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0703642600803cbf1d1b60_eclat2.png" alt="Éclat 2" class="chip chip-4">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a07094c267cc98b45c043b4_eclat3.png" alt="Éclat 3" class="chip chip-5">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="Chips 3" class="chip chip-6">
+    
     <div class="badge">Application iOS</div>
-    <h1>La chasse<br>est <span>ouverte.</span></h1>
-    <p class="subtitle">Le Waze de la Brosti. Ne fais plus 4 supermarchés pour rien : trouve les stocks, signale les ruptures, et aide la commu en temps réel.</p>
+    <h1>Le Waze de<br>la <span>Brosti</span></h1>
+    <p class="subtitle">Trouve les stocks, signale les ruptures, et aide la communauté en temps réel.</p>
     <a href="#" class="btn">🥔 Bientôt sur l'App Store</a>
-  </main>
+    
+    <!-- Vague Brosti.com convertie en mask -->
+    <div class="wave-divider"></div>
+  </section>
+  
   <footer>
-    <div class="copyright">© 2026 Mahé Brizion. Application non-officielle.</div>
+    <div class="footer-logo">Brosti<span>Map</span></div>
     <div class="links">
       <a href="privacy.html">Mentions Légales & Confidentialité</a>
     </div>
+    <div class="copyright">© 2026 Mahé Brizion. Application indépendante, non affiliée à FatBros / Brosti.</div>
   </footer>
 </body>
 </html>

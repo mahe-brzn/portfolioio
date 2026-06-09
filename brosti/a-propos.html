@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrostiMap — À propos 🥔</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --brosti-cream: #FDF8F0;
+      --brosti-orange: #E65100;
+      --brosti-orange-hover: #CC4800;
+      --brosti-black: #1A1A1A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--brosti-cream); color: var(--brosti-black); overflow-x: hidden; }
+    
+    nav { padding: 30px 5vw; display: flex; justify-content: space-between; align-items: center; width: 100%; z-index: 20; background: var(--brosti-cream); }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--brosti-black); text-decoration: none; letter-spacing: -1px; }
+    .logo span { color: var(--brosti-orange); }
+    
+    .content-section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 5vw 100px;
+      line-height: 1.6;
+    }
+    
+    .content-section h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      color: var(--brosti-orange);
+    }
+    
+    .content-section h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      margin-top: 50px;
+      margin-bottom: 20px;
+      font-weight: 800;
+      border-bottom: 2px solid rgba(230, 81, 0, 0.2);
+      padding-bottom: 10px;
+    }
+    
+    .content-section h3 {
+      font-size: 1.3rem;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: var(--brosti-orange);
+    }
+    
+    .content-section p {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      color: #333;
+    }
+    
+    .content-section ul {
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+    
+    .content-section li {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .content-section code {
+      background: rgba(0,0,0,0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+
+    .content-section blockquote {
+      background: rgba(230, 81, 0, 0.05);
+      border-left: 4px solid var(--brosti-orange);
+      padding: 20px;
+      margin: 40px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .content-section blockquote strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--brosti-orange);
+    }
+    
+    /* Footer */
+    footer { background-color: var(--brosti-black); color: var(--brosti-cream); padding: 60px 5vw 40px; display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative; z-index: 10; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--brosti-cream); }
+    .footer-logo span { color: var(--brosti-orange); }
+    .links { display: flex; gap: 30px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+    .links a { color: #A0A0A0; text-decoration: none; font-size: 1rem; transition: color 0.2s; }
+    .links a:hover { color: var(--brosti-orange); }
+    .copyright { margin-top: 40px; color: #666; font-size: 0.9rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">Brosti<span>Map</span></a>
+  </nav>
+
+  <main class="content-section">
+    <h1>Résumé de l'Application : BrostiMap 🥔📍</h1>
+
+    <h2>📝 Concept Global</h2>
+    <p><strong>BrostiMap</strong> est le "Waze de la Brosti". C'est une application iOS communautaire et participative dédiée à la localisation en temps réel des chips artisanales françaises "Brosti" (créées par les YouTubers Mcfly & Carlito). L'objectif est de résoudre le problème des ruptures de stock fréquentes en permettant aux utilisateurs de signaler et vérifier la disponibilité des paquets dans les supermarchés.</p>
+
+    <h2>🛠 Stack Technique & Architecture</h2>
+    <p>L'application est développée de manière native pour l'écosystème Apple avec une architecture moderne, robuste et scalable :</p>
+    <ul>
+      <li><strong>Front-end iOS</strong> : SwiftUI, Swift 6 (stricte concurrence avec <code>@MainActor</code> et <code>async/await</code>), Architecture MVVM.</li>
+      <li><strong>Back-end (BaaS)</strong> : Supabase (PostgreSQL pour la base de données, Supabase Auth pour l'authentification, Supabase Storage pour les photos, et RPC/Triggers SQL pour la logique métier côté serveur).</li>
+      <li><strong>Intégrations Natives Apple</strong> : MapKit (Carte interactive), CoreLocation (Géolocalisation), ActivityKit (Live Activities & Dynamic Island), UserNotifications (Push APNs), UIImpactFeedbackGenerator (Haptiques).</li>
+    </ul>
+
+    <h2>🚀 Fonctionnalités Clés (Features)</h2>
+
+    <h3>1. La Carte Interactive (Waze-like)</h3>
+    <ul>
+      <li>Affichage des signalements (Store Points) autour de l'utilisateur.</li>
+      <li><strong>Time Decay (Fraîcheur des données)</strong> : L'opacité ou la couleur des pins sur la carte varie dynamiquement en fonction de l'ancienneté du signalement. Comme les stocks périment très vite en rayon, un vieux signalement s'estompe visuellement (gris/transparent) par rapport à un signalement chaud (orange vif).</li>
+    </ul>
+
+    <h3>2. Signalement et Preuve Visuelle</h3>
+    <ul>
+      <li>L'utilisateur peut ajouter un nouveau magasin s'il y trouve des chips.</li>
+      <li>Intégration de <strong>MKLocalSearch</strong> pour utiliser les vrais POI (Points d'Intérêt) d'Apple Maps et empêcher les fausses adresses.</li>
+      <li>Sélection rapide des goûts disponibles (Nature, Barbecue, Sel & Vinaigre, Jambon Beurre, etc.).</li>
+      <li>Ajout obligatoire d'une photo (stockée et compressée via Supabase Storage) pour prouver le stock réel.</li>
+    </ul>
+
+    <h3>3. Système de Modération et Votes Communautaires</h3>
+    <ul>
+      <li>Sur la fiche détaillée d'un magasin (<code>StoreDetailView</code>), les utilisateurs valident ou invalident le stock.</li>
+      <li>Boutons d'actions rapides : <strong>"Je confirme"</strong> (stock toujours présent) ou <strong>"Rupture"</strong> (le rayon a été dévalisé).</li>
+      <li><strong>Modération Automatique (UGC)</strong> : Gérée par des Triggers SQL côté base de données. Au bout de 3 signalements "Rupture" consécutifs, le magasin passe automatiquement en statut <code>is_hidden = true</code> et disparaît de la carte des autres joueurs.</li>
+    </ul>
+
+    <h3>4. Guidage GPS et Live Activities</h3>
+    <ul>
+      <li>Bouton principal "Y aller" sur la fiche d'un spot.</li>
+      <li>Génère un <strong>Deep Link</strong> vers l'application native Apple Plans avec l'itinéraire vers les coordonnées GPS exactes.</li>
+      <li>Déclenche instantanément une <strong>Live Activity</strong> affichée sur l'écran de verrouillage et la Dynamic Island pour garder l'œil sur l'objectif. Elle se termine de façon fluide au retour sur l'app.</li>
+    </ul>
+
+    <h3>5. Gamification et Classement (Leaderboard)</h3>
+    <ul>
+      <li>Chaque profil possède un <strong>Trust Score</strong> (Score de fiabilité).</li>
+      <li>Les points sont gagnés lors de l'apport d'une information valide, et perdus lors de signalements modérés.</li>
+      <li><strong>Top 50 des contributeurs</strong> : Le calcul et le tri du leaderboard sont délégués au serveur via une fonction Remote Procedure Call (<code>get_leaderboard()</code> en SQL) pour économiser la batterie du téléphone et garantir des performances parfaites.</li>
+    </ul>
+
+    <h3>6. Mode Hors-Ligne pour les Supermarchés (SyncManager)</h3>
+    <ul>
+      <li>En sachant que le réseau 4G/5G capte souvent très mal au fond d'un supermarché, un mode hors-ligne partiel a été conçu.</li>
+      <li>Les confirmations de stocks ou ruptures sont sauvegardées en cache local via un <strong>SyncManager</strong>.</li>
+      <li>Dès le retour à la lumière (et au réseau), les requêtes en attente sont automatiquement synchronisées vers Supabase de manière silencieuse.</li>
+    </ul>
+
+    <h3>7. Partage et Viralité</h3>
+    <ul>
+      <li>Intégration du <code>ShareLink</code> natif d'iOS. D'un simple clic, l'utilisateur peut textoter à ses amis : <em>"J'ai trouvé des Brosti [Goût] au [Nom du Magasin] ! Viens voir sur BrostiMap 🥔📍"</em>.</li>
+    </ul>
+
+    <h3>8. Push Notifications (APNs)</h3>
+    <ul>
+      <li>Stockage du Token APNs de l'appareil dans la base de données.</li>
+      <li>Infrastructure prête pour du Geofencing et l'envoi d'alertes push silencieuses lorsqu'un utilisateur passe près d'un magasin fraîchement restocké.</li>
+    </ul>
+
+    <h2>🎨 Direction Artistique & UI/UX</h2>
+    <ul>
+      <li><strong>Interface iOS</strong> : Glassmorphism, composants très natifs, navigation fluide via TabView, et micro-interactions accompagnées de retours haptiques pour un feeling ultra "Premium".</li>
+      <li><strong>Cohérence de Marque</strong> : Reprise intégrale de la DA officielle Brosti (Couleurs Crème <code>#FDF8F0</code> et Orange <code>#E65100</code>).</li>
+      <li><strong>Site Vitrine (Landing Page)</strong> : Hébergée sur <code>mahebrizion.fr/brosti/</code>, elle utilise les polices officielles (<code>Syne</code> et <code>Inter</code>), arbore un effet parallaxe 3D avec de vraies images d'éclats de chips Brosti flottant autour du titre, et inclut une politique de confidentialité RGPD complète nécessaire pour la validation App Store.</li>
+    </ul>
+
+    <blockquote>
+      <strong>Le choix de l'architecte</strong><br>
+      BrostiMap a été pensée pour scaler ("Scale & Pro"). En poussant toute la logique lourde (calculs de score, modération, tris) dans le Cloud (Supabase PostgreSQL) plutôt que dans les vues SwiftUI, l'application restera fluide et rapide à l'écran, même avec des dizaines de milliers d'utilisateurs connectés simultanément lors d'une annonce vidéo de Mcfly & Carlito.
+    </blockquote>
+  </main>
+
+  <footer>
+    <div class="footer-logo">Brosti<span>Map</span></div>
+    <div class="links">
+      <a href="privacy.html">Mentions Légales & Confidentialité</a>
+      <a href="a-propos.html">À propos de l'App</a>
+    </div>
+    <div class="copyright">© 2026 Mahé Brizion. Application indépendante, non affiliée à FatBros / Brosti.</div>
+  </footer>
+</body>
+</html>

@@ -122,6 +122,62 @@
       transform: translateY(-4px); 
       box-shadow: 0 15px 30px rgba(230, 81, 0, 0.35); 
     }
+
+    /* Beta Form */
+    .beta-form {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .beta-form input {
+      flex: 1;
+      padding: 18px 24px;
+      border: 2px solid rgba(26, 26, 26, 0.1);
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .beta-form input:focus {
+      border-color: var(--brosti-orange);
+      background: #fff;
+    }
+    .btn-submit {
+      background: var(--brosti-orange);
+      color: #fff;
+      padding: 18px 28px;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 8px 15px rgba(230, 81, 0, 0.2);
+    }
+    .btn-submit:hover {
+      background: var(--brosti-orange-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(230, 81, 0, 0.3);
+    }
+    
+    @media (max-width: 600px) {
+      .beta-form {
+        flex-direction: column;
+        width: 90%;
+      }
+      .beta-form input, .btn-submit {
+        width: 100%;
+      }
+    }
     
     /* Chips Flottantes (Assets extraits) */
     .chip { 
@@ -212,7 +268,11 @@
     <div class="badge">Application iOS</div>
     <h1>Le Waze de<br>la <span>Brosti</span></h1>
     <p class="subtitle">Trouve les stocks, signale les ruptures, et aide la communauté en temps réel.</p>
-    <a href="#" class="btn">🥔 Bientôt sur l'App Store</a>
+    
+    <form action="#" method="POST" class="beta-form" onsubmit="event.preventDefault(); alert('Merci ! Ton e-mail a bien été enregistré. Tu recevras bientôt une invitation TestFlight 🥔.'); this.reset();">
+      <input type="email" name="email" placeholder="Ton adresse e-mail" required>
+      <button type="submit" class="btn-submit">Rejoindre la bêta TestFlight</button>
+    </form>
     
     <!-- Vague Brosti.com convertie en mask -->
     <div class="wave-divider"></div>

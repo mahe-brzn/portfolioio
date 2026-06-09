@@ -172,10 +172,21 @@
     @media (max-width: 600px) {
       .beta-form {
         flex-direction: column;
-        width: 90%;
-      }
-      .beta-form input, .btn-submit {
         width: 100%;
+        gap: 12px;
+      }
+      .beta-form input {
+        width: 100%;
+        padding: 16px 20px;
+        text-align: center;
+      }
+      .btn-submit {
+        width: 100%;
+        padding: 16px 20px;
+      }
+      .success-message {
+        font-size: 0.9rem;
+        padding: 14px 20px;
       }
     }
     
@@ -260,12 +271,22 @@
     .copyright { margin-top: 40px; color: #666; font-size: 0.9rem; text-align: center; }
     
     @media (max-width: 768px) {
-      .chip-1 { width: 90px; left: -5%; }
-      .chip-2 { width: 110px; right: -5%; }
-      .chip-3 { width: 100px; }
-      .chip-4 { width: 80px; }
+      h1 { font-size: clamp(2.8rem, 12vw, 4rem); margin-bottom: 20px; }
+      p.subtitle { font-size: 1.05rem; margin-bottom: 40px; }
+      .btn { padding: 16px 28px; font-size: 1.05rem; width: 100%; max-width: 320px; text-align: center; justify-content: center; }
+      
+      .chip-1 { width: 70px; left: -10%; top: 10%; }
+      .chip-2 { width: 90px; right: -10%; top: 15%; }
+      .chip-3 { width: 80px; bottom: 35%; left: -5%; }
+      .chip-4 { width: 60px; bottom: 30%; right: -5%; }
       .chip-5, .chip-6 { display: none; }
+      
       .wave-divider { height: 60px; }
+      
+      footer { padding: 50px 5vw 30px; }
+      .footer-logo { font-size: 1.6rem; }
+      .links { flex-direction: column; gap: 15px; text-align: center; }
+      .copyright { margin-top: 30px; font-size: 0.8rem; }
     }
   </style>
 </head>

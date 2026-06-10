@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrostiMap — L'application iOS pour trouver des chips Brosti en temps réel 🥔</title>
+  
+  <!-- SEO & Meta Description -->
+  <meta name="description" content="Découvrez BrostiMap, le 'Waze de la Brosti'. Une application iOS communautaire pour localiser les stocks de chips Brosti (Mcfly & Carlito) en supermarché et signaler les ruptures.">
+  <meta name="keywords" content="Brosti, BrostiMap, chips Brosti, trouver des brosti, application brosti, waze de la brosti, carte brosti, stock brosti, Mcfly, Carlito">
+  <meta name="author" content="Mahé Brizion">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://mahebrizion.fr/brostimap/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mahebrizion.fr/brostimap/">
+  <meta property="og:title" content="BrostiMap — Le Waze de la Brosti 🥔📍">
+  <meta property="og:description" content="L'application communautaire pour traquer les stocks de chips Brosti en temps réel.">
+  <meta property="og:image" content="https://mahebrizion.fr/assets/img/og-brosti.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://mahebrizion.fr/brostimap/">
+  <meta property="twitter:title" content="BrostiMap — L'application iOS Brosti">
+  <meta property="twitter:description" content="Localise les chips Brosti près de chez toi. Le Waze de la Brosti.">
+  <meta property="twitter:image" content="https://mahebrizion.fr/assets/img/og-brosti.png">
+
+  <!-- Schema.org JSON-LD pour Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "BrostiMap",
+    "operatingSystem": "iOS",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "description": "BrostiMap est une application iOS communautaire permettant de localiser en temps réel les points de vente et les stocks des chips Brosti (créées par Mcfly et Carlito).",
+    "author": {
+      "@type": "Person",
+      "name": "Mahé Brizion",
+      "url": "https://mahebrizion.fr/"
+    },
+    "image": "https://mahebrizion.fr/assets/img/og-brosti.png",
+    "url": "https://mahebrizion.fr/brostimap/"
+  }
+  </script>
+  <!-- Polices Officielles Brosti : Syne (Titres) & Inter (Corps) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=optional">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=optional" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Couleurs extraites de la DA Brosti */
+      --brosti-cream: #FDF8F0;
+      --brosti-orange: #E65100;
+      --brosti-orange-hover: #CC4800;
+      --brosti-black: #1A1A1A;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+      font-family: 'Syne', sans-serif; 
+      background-color: var(--brosti-cream); 
+      color: var(--brosti-black); 
+      overflow-x: hidden; 
+    }
+    
+    /* Navigation */
+    nav { 
+      padding: 30px 5vw; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      position: absolute; 
+      width: 100%; 
+      z-index: 20; 
+    }
+    .logo { 
+      font-family: 'Syne', sans-serif; 
+      font-weight: 800; 
+      font-size: 1.8rem; 
+      color: var(--brosti-black); 
+      text-decoration: none; 
+      letter-spacing: -1px; 
+    }
+    .logo span { color: var(--brosti-orange); }
+    
+    /* Hero Section */
+    .hero { 
+      position: relative; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      text-align: center; 
+      padding: 18vh 5vw 12vh; 
+      overflow: hidden;
+    }
+    
+    .badge { 
+      display: inline-block; 
+      padding: 8px 16px; 
+      border: 2px solid var(--brosti-orange); 
+      border-radius: 50px; 
+      color: #C04000; 
+      font-size: 0.85rem; 
+      font-weight: 800; 
+      margin-bottom: 30px; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      background: rgba(230, 81, 0, 0.08); 
+      position: relative;
+      z-index: 10;
+    }
+    
+    h1 { 
+      font-family: 'Syne', sans-serif; 
+      font-size: clamp(3.5rem, 8vw, 7.5rem); 
+      font-weight: 800; 
+      line-height: 0.95; 
+      letter-spacing: -0.04em; 
+      margin-bottom: 35px; 
+      text-transform: uppercase; 
+      position: relative;
+      z-index: 10;
+    }
+    h1 span { color: var(--brosti-orange); }
+    
+    p.subtitle { 
+      font-size: clamp(1.1rem, 3vw, 1.4rem); 
+      color: #4A4A4A; 
+      line-height: 1.6; 
+      margin-bottom: 60px; 
+      max-width: 600px; 
+      font-weight: 500; 
+      position: relative;
+      z-index: 10;
+    }
+    
+    .btn { 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 10px; 
+      background: var(--brosti-orange); 
+      color: #000; 
+      padding: 18px 40px; 
+      font-size: 1.1rem; 
+      font-family: 'Syne', sans-serif; 
+      font-weight: 800; 
+      border: none; 
+      border-radius: 50px; 
+      text-decoration: none; 
+      cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+      box-shadow: 0 10px 20px rgba(230, 81, 0, 0.3); 
+      position: relative;
+      z-index: 10;
+    }
+    .btn:hover { 
+      background: var(--brosti-orange-hover); 
+      transform: translateY(-4px); 
+      box-shadow: 0 15px 30px rgba(230, 81, 0, 0.35); 
+    }
+
+    /* Beta Form */
+    .beta-form {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .beta-form input {
+      flex: 1;
+      padding: 18px 24px;
+      border: 2px solid rgba(26, 26, 26, 0.1);
+      border-radius: 50px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .beta-form input:focus {
+      border-color: var(--brosti-orange);
+      background: #fff;
+    }
+    .btn-submit {
+      background: var(--brosti-orange);
+      color: #fff;
+      padding: 18px 28px;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 8px 15px rgba(230, 81, 0, 0.2);
+    }
+    .btn-submit:hover {
+      background: var(--brosti-orange-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(230, 81, 0, 0.3);
+    }
+    
+    @media (max-width: 600px) {
+      .beta-form {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+      }
+      .beta-form input {
+        width: 100%;
+        padding: 16px 20px;
+        text-align: center;
+      }
+      .btn-submit {
+        width: 100%;
+        padding: 16px 20px;
+      }
+      .success-message {
+        font-size: 0.9rem;
+        padding: 14px 20px;
+      }
+    }
+    
+    .microcopy {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 15px;
+      font-weight: 500;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .text-teaser {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 100px;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 10;
+      flex-wrap: wrap;
+      max-width: 1050px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .teaser-item {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(26, 26, 26, 0.05);
+      border-radius: 24px;
+      padding: 32px 28px;
+      flex: 1;
+      min-width: 260px;
+      backdrop-filter: blur(10px);
+      text-align: left;
+      transition: transform 0.3s ease, box-shadow 0.3s;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+    }
+    .teaser-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+    }
+    .teaser-icon {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+    .teaser-item h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      color: var(--brosti-black);
+      margin-bottom: 12px;
+    }
+    .teaser-item p {
+      color: #555;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    
+    .success-message {
+      background: rgba(253, 248, 240, 0.1);
+      border: 1px solid rgba(253, 248, 240, 0.2);
+      color: var(--brosti-black);
+      padding: 16px 24px;
+      border-radius: 50px;
+      font-weight: 500;
+      position: relative;
+      z-index: 10;
+      display: inline-block;
+      backdrop-filter: blur(4px);
+    }
+    
+    button.btn {
+      border: none;
+      cursor: pointer;
+    }
+    
+    /* Chips Flottantes (Assets extraits) */
+    .chip { 
+      position: absolute; 
+      z-index: 1; 
+      opacity: 0.8;
+      pointer-events: none; 
+      animation: float 6s ease-in-out infinite; 
+      height: auto;
+      will-change: transform, translate;
+      transition: translate 0.1s ease-out;
+      translate: var(--mouse-x, 0px) calc(var(--mouse-y, 0px) + var(--scroll-y, 0px));
+    }
+    .chip-1 { top: 12%; left: 8%; width: 140px; aspect-ratio: 377/392; animation-delay: 0s; rotate: 15deg; }
+    .chip-2 { top: 25%; right: 5%; width: 180px; aspect-ratio: 362/326; animation-delay: 1s; rotate: -10deg; }
+    .chip-3 { bottom: 20%; left: 10%; width: 86px; aspect-ratio: 86/116; animation-delay: 2s; rotate: 25deg; }
+    .chip-4 { bottom: 35%; right: 15%; width: 74px; aspect-ratio: 74/125; animation-delay: 0.5s; rotate: -15deg; }
+    .chip-5 { top: 5%; left: 45%; width: 102px; aspect-ratio: 102/77; animation-delay: 1.5s; rotate: 5deg; opacity: 0.5; }
+    .chip-6 { bottom: 5%; right: 40%; width: 140px; aspect-ratio: 377/392; animation-delay: 2.5s; rotate: -20deg; opacity: 0.6; }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    /* Vague de séparation (Mask SVG) */
+    .wave-divider {
+      width: 100%;
+      height: 120px;
+      background-color: var(--brosti-black);
+      -webkit-mask-image: url('https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a19df1410367112b2dc9615_69fafe57a06928c71a095113_Vector.svg');
+      mask-image: url('https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a19df1410367112b2dc9615_69fafe57a06928c71a095113_Vector.svg');
+      -webkit-mask-size: cover;
+      mask-size: cover;
+      -webkit-mask-position: bottom;
+      mask-position: bottom;
+      margin-bottom: -1px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 5;
+    }
+    
+    /* Footer */
+    footer { 
+      background-color: var(--brosti-black); 
+      color: var(--brosti-cream); 
+      padding: 60px 5vw 40px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 20px; 
+      position: relative;
+      z-index: 10;
+    }
+    .footer-logo { 
+      font-family: 'Syne', sans-serif; 
+      font-size: 2rem; 
+      font-weight: 800; 
+      color: var(--brosti-cream); 
+    }
+    .footer-logo span { color: var(--brosti-orange); }
+    .links { display: flex; gap: 30px; margin-top: 20px; }
+    .links a { color: #A0A0A0; text-decoration: none; font-size: 1rem; transition: color 0.2s; }
+    .links a:hover { color: var(--brosti-orange); }
+    .copyright { margin-top: 40px; color: #999; font-size: 0.9rem; text-align: center; }
+    
+    @media (max-width: 768px) {
+      h1 { font-size: clamp(2.8rem, 12vw, 4rem); margin-bottom: 20px; }
+      p.subtitle { font-size: 1.05rem; margin-bottom: 40px; }
+      .btn { padding: 16px 28px; font-size: 1.05rem; width: 100%; max-width: 320px; text-align: center; justify-content: center; }
+      
+      .chip-1 { width: 70px; left: -10%; top: 10%; }
+      .chip-2 { width: 90px; right: -10%; top: 15%; }
+      .chip-3 { width: 80px; bottom: 35%; left: -5%; }
+      .chip-4 { width: 60px; bottom: 30%; right: -5%; }
+      .text-teaser { gap: 20px; margin-top: 60px; }
+      .teaser-item { padding: 24px; min-width: 100%; text-align: left; }
+      
+      .wave-divider { height: 60px; }
+      
+      footer { padding: 50px 5vw 30px; }
+      .footer-logo { font-size: 1.6rem; }
+      .links { flex-direction: column; gap: 15px; text-align: center; }
+      .copyright { margin-top: 30px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#" class="logo">Brosti<span>Map</span></a>
+  </nav>
+  
+  <main>
+  <section class="hero">
+    <!-- Assets extraits de Brosti.com -->
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="" width="377" height="392" class="chip chip-1" fetchpriority="high">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cd1e61a31979eff5d5f_chips2.png" alt="" width="362" height="326" class="chip chip-2">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0708507e6030e77610d2fd_eclat1.png" alt="" width="86" height="116" class="chip chip-3">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a0703642600803cbf1d1b60_eclat2.png" alt="" width="74" height="125" class="chip chip-4">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a07094c267cc98b45c043b4_eclat3.png" alt="" width="102" height="77" class="chip chip-5">
+    <img src="https://cdn.prod.website-files.com/69f0ca9d4c73fdff69c3f900/6a070cf4ccc8bdab798189b9_chips1.png" alt="" width="377" height="392" class="chip chip-6">
+    
+    <div class="badge">Application iOS</div>
+    <h1>Le Waze de<br>la <span>Brosti</span></h1>
+    <p class="subtitle">Trouve les stocks, signale les ruptures, et aide la communauté en temps réel.</p>
+    
+    <div id="beta-container">
+      <button id="show-form-btn" class="btn" onclick="document.getElementById('show-form-btn').style.display='none'; document.getElementById('microcopy').style.display='none'; document.getElementById('beta-form').style.display='flex'; document.getElementById('form-microcopy').style.display='block';">Obtenir un accès VIP 🥔</button>
+      <p id="microcopy" class="microcopy">🔒 Accès anticipé exclusif sur iOS. Places très limitées.</p>
+      
+      <form id="beta-form" action="https://formspree.io/f/xvznqopr" method="POST" class="beta-form" style="display: none;" onsubmit="submitForm(event)">
+        <input type="email" name="email" placeholder="Entre ton meilleur e-mail..." required>
+        <button type="submit" class="btn-submit" id="submit-btn">Sécuriser ma place</button>
+      </form>
+      <p id="form-microcopy" class="microcopy" style="display: none;">100% sans spam. Tu seras notifié(e) dès l'ouverture des accès.</p>
+
+      <div id="success-message" class="success-message" style="display: none;">
+        ✅ Place sécurisée ! Surveille tes e-mails pour l'invitation TestFlight.
+      </div>
+      <div id="error-message" class="success-message" style="display: none; border-color: rgba(230, 81, 0, 0.4);">
+        ❌ Oups, une erreur est survenue.
+      </div>
+
+      <script>
+        // Effet Parallaxe sur les chips (Souris)
+        document.addEventListener('mousemove', (e) => {
+          const x = (e.clientX / window.innerWidth - 0.5) * 2;
+          const y = (e.clientY / window.innerHeight - 0.5) * 2;
+          document.querySelectorAll('.chip').forEach((chip, index) => {
+            const speed = (index % 3 + 1) * 15; // 15, 30, ou 45
+            chip.style.setProperty('--mouse-x', `${-x * speed}px`);
+            chip.style.setProperty('--mouse-y', `${-y * speed}px`);
+          });
+        });
+
+        // Effet Parallaxe sur les chips (Scroll)
+        window.addEventListener('scroll', () => {
+          const scrollY = window.scrollY;
+          document.querySelectorAll('.chip').forEach((chip, index) => {
+            const speed = (index % 3 + 1) * 0.25; // 0.25, 0.5, ou 0.75
+            chip.style.setProperty('--scroll-y', `${-scrollY * speed}px`);
+          });
+        });
+
+        async function submitForm(event) {
+          event.preventDefault();
+          const form = event.target;
+          const btn = document.getElementById('submit-btn');
+          const data = new FormData(form);
+          
+          btn.innerText = "Envoi en cours...";
+          btn.style.opacity = "0.7";
+          btn.disabled = true;
+
+          try {
+            const response = await fetch(form.action, {
+              method: form.method,
+              body: data,
+              headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+              document.getElementById('beta-form').style.display = 'none';
+              document.getElementById('form-microcopy').style.display = 'none';
+              document.getElementById('error-message').style.display = 'none';
+              document.getElementById('success-message').style.display = 'inline-block';
+              form.reset();
+            } else {
+              document.getElementById('error-message').style.display = 'inline-block';
+            }
+          } catch (error) {
+            document.getElementById('error-message').style.display = 'inline-block';
+          } finally {
+            btn.innerText = "Rejoindre la bêta";
+            btn.style.opacity = "1";
+            btn.disabled = false;
+          }
+        }
+      </script>
+    </div>
+    
+    <div class="text-teaser">
+      <div class="teaser-item">
+        <span class="teaser-icon">📍</span>
+        <h2>Radar en Temps Réel</h2>
+        <p>Ne cherche plus à l'aveugle. Vois instantanément les rayons pleins et vides sur la carte.</p>
+      </div>
+      <div class="teaser-item">
+        <span class="teaser-icon">🚨</span>
+        <h2>Rapports Terrain</h2>
+        <p>La commu signale les ruptures de stock. Fini les déplacements inutiles au supermarché.</p>
+      </div>
+      <div class="teaser-item">
+        <span class="teaser-icon">🏆</span>
+        <h2>Top 50 Chasseurs</h2>
+        <p>Gagne du Trust Score à chaque signalement vérifié et grimpe dans le classement mondial.</p>
+      </div>
+    </div>
+    
+    <!-- Vague Brosti.com convertie en mask -->
+    <div class="wave-divider"></div>
+  </section>
+  </main>
+  
+  <footer>
+    <div class="footer-logo">Brosti<span>Map</span></div>
+    <div class="links">
+      <a href="privacy.html">Mentions Légales & Confidentialité</a>
+      <a href="a-propos.html">À propos de l'App</a>
+    </div>
+    <div class="copyright">© 2026 Mahé Brizion. Application indépendante, non affiliée à FatBros / Brosti.</div>
+  </footer>
+</body>
+</html>

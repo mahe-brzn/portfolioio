@@ -1,1 +1,3 @@
 /spreadsheet/* /404.html 200
+/brosti /brostimap 301
+/brosti/* /brostimap/:splat 301

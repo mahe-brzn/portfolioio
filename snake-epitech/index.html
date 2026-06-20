@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNAKE : CYBERPUNK EDITION</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050014;
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+        }
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #scoreBox {
+            padding: 20px 40px;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ff0055;
+            text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055;
+            letter-spacing: 4px;
+        }
+        #score {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+        #gameOverScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px 80px;
+            border: 2px solid #ff0055;
+            box-shadow: 0 0 30px #ff0055, inset 0 0 30px #ff0055;
+            border-radius: 10px;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+        }
+        #gameOverScreen h1 {
+            margin: 0;
+            font-size: 4rem;
+            color: #ff0055;
+            text-shadow: 0 0 20px #ff0055;
+            letter-spacing: 10px;
+            animation: pulse 1s infinite alternate;
+        }
+        #gameOverScreen p {
+            font-size: 1.5rem;
+            color: #00ffff;
+            margin-top: 20px;
+        }
+        @keyframes pulse {
+            from { text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055; }
+            to { text-shadow: 0 0 20px #ff0055, 0 0 40px #ff0055, 0 0 60px #ff0055; }
+        }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <div id="scoreBox">SCORE: <span id="score">0</span></div>
+        <div id="gameOverScreen" style="display:none;">
+            <h1>GAME OVER</h1>
+            <p>Appuie sur ESPACE pour relancer le système</p>
+        </div>
+    </div>
+
+    <script>
+        // === PARAMÈTRES DU JEU ===
+        let gridSize = 35;
+        let cols = 25;
+        let rows = 25;
+        let moveDelay = 120; // Vitesse de départ (plus bas = plus rapide)
+        
+        // === VARIABLES D'ÉTAT ===
+        let snake = [];
+        let dir = {x: 1, z: 0};
+        let nextDir = {x: 1, z: 0};
+        let apples = [];
+        let particles = [];
+        let lastMove = 0;
+        let gameOver = false;
+        let score = 0;
+        let shake = 0;
+        
+        // === CAMÉRA ===
+        let camPos, camTarget;
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight, WEBGL);
+            colorMode(HSB, 360, 100, 100, 100);
+            
+            camPos = createVector(0, -800, 1000);
+            camTarget = createVector(0, 0, 0);
+            
+            resetGame();
+        }
+
+        function resetGame() {
+            snake = [];
+            for(let i=0; i<4; i++) {
+                snake.push({
+                    x: Math.floor(cols/2) - i, 
+                    z: Math.floor(rows/2), 
+                    rx: Math.floor(cols/2) - i, 
+                    rz: Math.floor(rows/2)
+                });
+            }
+            dir = {x: 1, z: 0};
+            nextDir = {x: 1, z: 0};
+            apples = [];
+            particles = [];
+            score = 0;
+            moveDelay = 120;
+            gameOver = false;
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('score').innerText = score;
+            
+            for(let i=0; i<3; i++) spawnApple();
+        }
+
+        function spawnApple() {
+            let x = floor(random(cols));
+            let z = floor(random(rows));
+            apples.push({x: x, z: z, spawnTime: millis()});
+        }
+
+        function spawnParticles(x, z, hue) {
+            for(let i=0; i<30; i++) {
+                particles.push({
+                    x: (x - cols/2 + 0.5) * gridSize,
+                    y: 0,
+                    z: (z - rows/2 + 0.5) * gridSize,
+                    vx: random(-5, 5),
+                    vy: random(-10, -2),
+                    vz: random(-5, 5),
+                    life: 100,
+                    hue: hue,
+                    size: random(2, 8)
+                });
+            }
+        }
+
+        function explodeSnake() {
+            for(let s of snake) {
+                spawnParticles(s.x, s.z, 0); // Explosion rouge
+            }
+            snake = [];
+        }
+
+        function draw() {
+            background(260, 100, 5); // Fond cyberpunk très sombre
+            
+            // --- LOGIQUE DU JEU ---
+            if (!gameOver && millis() - lastMove > moveDelay) {
+                dir = nextDir;
+                let head = snake[0];
+                let nx = head.x + dir.x;
+                let nz = head.z + dir.z;
+                
+                // Murs qui bouclent (Pac-Man style)
+                if(nx < 0) nx = cols-1;
+                if(nx >= cols) nx = 0;
+                if(nz < 0) nz = rows-1;
+                if(nz >= rows) nz = 0;
+
+                // Collision avec soi-même
+                let hit = false;
+                for(let s of snake) {
+                    if(s.x === nx && s.z === nz) hit = true;
+                }
+                
+                if (hit) {
+                    gameOver = true;
+                    shake = 50;
+                    document.getElementById('gameOverScreen').style.display = 'block';
+                    explodeSnake();
+                } else {
+                    let newHead = {x: nx, z: nz, rx: head.rx, rz: head.rz};
+                    snake.unshift(newHead);
+                    
+                    let ate = false;
+                    for(let i = apples.length-1; i>=0; i--) {
+                        if(nx === apples[i].x && nz === apples[i].z) {
+                            apples.splice(i, 1);
+                            ate = true;
+                            score++;
+                            document.getElementById('score').innerText = score;
+                            shake = 15;
+                            spawnParticles(nx, nz, 180); // Particules cyan
+                            spawnApple();
+                            moveDelay = max(40, moveDelay - 3); // Accélération
+                        }
+                    }
+                    if(!ate) snake.pop();
+                }
+                lastMove = millis();
+            }
+
+            // --- EFFET DE SECOUSSE (SCREEN SHAKE) ---
+            if (shake > 0) {
+                translate(random(-shake, shake), random(-shake, shake), random(-shake, shake));
+                shake *= 0.85;
+            }
+
+            // --- GESTION DE LA CAMÉRA DYNAMIQUE ---
+            let targetX = 0, targetZ = 0;
+            if (snake.length > 0) {
+                let head = snake[0];
+                targetX = (head.rx - cols/2) * gridSize * 0.4;
+                targetZ = (head.rz - rows/2) * gridSize * 0.4;
+            }
+            camTarget.lerp(targetX, 0, targetZ, 0.1);
+
+            // La caméra se balance doucement devant le jeu
+            let camAngle = sin(frameCount * 0.005) * PI * 0.15 + PI/2;
+            let camRadius = 800 + score * 5;
+            let camHeight = -500 - score * 3;
+            
+            let cx = cos(camAngle) * camRadius;
+            let cz = sin(camAngle) * camRadius;
+            
+            camPos.lerp(cx, camHeight, cz, 0.05);
+            camera(camPos.x, camPos.y, camPos.z, camTarget.x, camTarget.y, camTarget.z, 0, 1, 0);
+
+            // --- LUMIÈRES ---
+            ambientLight(280, 80, 20); // Ambiance violette
+            pointLight(0, 0, 100, 0, -1000, 0); // Lumière blanche zénithale
+            
+            // Lumière accrochée à la tête du serpent
+            if (snake.length > 0) {
+                let head = snake[0];
+                let hx = (head.rx - cols/2 + 0.5) * gridSize;
+                let hz = (head.rz - rows/2 + 0.5) * gridSize;
+                pointLight(180, 100, 100, hx, -50, hz); // Halo Cyan
+            }
+
+            // --- DÉCOR : LE SOLEIL SYNTHWAVE ---
+            push();
+            translate(0, -100, -2000);
+            noStroke();
+            emissiveMaterial(330, 100, 100); // Rose fluo
+            sphere(600, 32, 32);
+            pop();
+
+            // --- DÉCOR : LA GRILLE NEON ---
+            strokeWeight(2);
+            for(let i=0; i<=cols; i++) {
+                let x = (i - cols/2) * gridSize;
+                let zStart = -rows/2 * gridSize;
+                let zEnd = rows/2 * gridSize;
+                
+                // Effet de mouvement sur les lignes
+                let alpha = map(cos(frameCount * 0.05 + i), -1, 1, 20, 80);
+                stroke(300, 100, 80, alpha); // Rose
+                line(x, 0, zStart, x, 0, zEnd);
+            }
+            for(let i=0; i<=rows; i++) {
+                let z = (i - rows/2) * gridSize;
+                let xStart = -cols/2 * gridSize;
+                let xEnd = cols/2 * gridSize;
+                
+                let alpha = map(sin(frameCount * 0.05 + i), -1, 1, 20, 80);
+                stroke(180, 100, 80, alpha); // Cyan
+                line(xStart, 0, z, xEnd, 0, z);
+            }
+
+            // --- DESSIN DES POMMES (Anneaux tournoyants) ---
+            for(let a of apples) {
+                push();
+                let ax = (a.x - cols/2 + 0.5) * gridSize;
+                let az = (a.z - rows/2 + 0.5) * gridSize;
+                // Flottaison
+                let ay = sin((millis() - a.spawnTime)*0.005) * 10 - 10;
+                translate(ax, ay, az);
+                
+                rotateX(frameCount * 0.05);
+                rotateY(frameCount * 0.03);
+                
+                fill(340, 100, 100);
+                emissiveMaterial(340, 100, 100); // Rouge rubis brillant
+                noStroke();
+                torus(gridSize * 0.35, gridSize * 0.1);
+                
+                // Cœur de la pomme
+                fill(0, 0, 100);
+                emissiveMaterial(0, 0, 100);
+                sphere(gridSize * 0.15);
+                pop();
+            }
+
+            // --- DESSIN DU SERPENT (Interpolation fluide & Dégradé arc-en-ciel) ---
+            if (!gameOver) {
+                for(let i=0; i<snake.length; i++) {
+                    let s = snake[i];
+                    // Lerp pour un mouvement super fluide, même si la logique est sur une grille
+                    s.rx = lerp(s.rx, s.x, 0.4);
+                    s.rz = lerp(s.rz, s.z, 0.4);
+
+                    push();
+                    let sx = (s.rx - cols/2 + 0.5) * gridSize;
+                    let sz = (s.rz - rows/2 + 0.5) * gridSize;
+                    translate(sx, -gridSize/4, sz);
+                    
+                    // Couleur qui ondule tout le long du corps
+                    let hue = (frameCount * 2 + i * 8) % 360;
+                    fill(hue, 100, 100);
+                    emissiveMaterial(hue, 100, 80);
+                    stroke(hue, 100, 40);
+                    strokeWeight(1);
+                    
+                    if (i === 0) {
+                        // Tête plus grosse
+                        box(gridSize * 0.9);
+                        // Yeux
+                        push();
+                        translate(dir.x * 5, -5, dir.z * 5);
+                        fill(0, 0, 100);
+                        emissiveMaterial(0, 0, 100);
+                        noStroke();
+                        sphere(5);
+                        pop();
+                    } else {
+                        // La queue s'affine
+                        let szBox = map(i, 0, snake.length, gridSize * 0.8, gridSize * 0.2);
+                        box(szBox);
+                    }
+                    pop();
+                }
+            }
+
+            // --- DESSIN DES PARTICULES ---
+            for(let i=particles.length-1; i>=0; i--) {
+                let p = particles[i];
+                push();
+                translate(p.x, p.y, p.z);
+                noStroke();
+                fill(p.hue, 100, 100, p.life);
+                emissiveMaterial(p.hue, 100, 100, p.life);
+                box(p.size);
+                pop();
+                
+                // Physique basique
+                p.x += p.vx;
+                p.y += p.vy;
+                p.z += p.vz;
+                p.vy += 0.4; // Gravité vers le bas (y positif en WEBGL = bas)
+                
+                // Rebond sur le sol
+                if(p.y > 0) {
+                    p.y = 0;
+                    p.vy *= -0.5;
+                }
+                
+                p.life -= 2;
+                if(p.life <= 0) particles.splice(i, 1);
+            }
+        }
+
+        // --- CONTRÔLES ---
+        function keyPressed() {
+            if (keyCode === LEFT_ARROW && dir.x !== 1) nextDir = {x: -1, z: 0};
+            else if (keyCode === RIGHT_ARROW && dir.x !== -1) nextDir = {x: 1, z: 0};
+            else if (keyCode === UP_ARROW && dir.z !== 1) nextDir = {x: 0, z: -1};
+            else if (keyCode === DOWN_ARROW && dir.z !== -1) nextDir = {x: 0, z: 1};
+            else if (keyCode === 32 && gameOver) resetGame(); // Espace pour recommencer
+            
+            return false; // Empêche le scrolling natif
+        }
+
+        // --- REDIMENSIONNEMENT FENÊTRE ---
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>
